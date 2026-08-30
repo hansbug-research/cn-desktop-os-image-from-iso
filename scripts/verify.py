@@ -508,9 +508,24 @@ in_text(S["census_field_citations"], label="正文写明的字段级引用处数
 # 把「查不到」写成「有」正是 §9.2 批判过的错法，这里用断言把它钉住。
 ok(S["iso_access_missing"] == [],
    f'名录里每个 OS 都必须有 ISO 获取一列（缺：{S["iso_access_missing"]}）')
-ok(len(S["iso_direct"]) + len(S["iso_gated"]) + len(S["iso_unverified"])
-   == S["census_os_count"],
-   "ISO 获取的三分类必须覆盖全部条目，不能有条目落在三类之外")
+ok(S["iso_class_unknown"] == [],
+   f'ISO 获取必须用受控取值（越界：{S["iso_class_unknown"]}）—— 自由文本当分类会让条目被算进两类')
+ok(len(S["iso_direct"]) + len(S["iso_public_unresolved"]) + len(S["iso_gated"])
+   + len(S["iso_unverified"]) == S["census_os_count"],
+   "ISO 获取的四分类必须恰好覆盖全部条目，既不重复也不遗漏")
+ok(S["customers_missing"] == [],
+   f'名录里每个 OS 都必须有客户与场景一列（缺：{S["customers_missing"]}）')
+# 安可桌面附表在列的家数由名录现算并与 §2.4 的选型对账 ——
+# 这是「交付端需求」这条判据的第三方背书，不许悄悄变。
+ok(len(S["aqkk_desktop_listed"]) == 3,
+   f'安可桌面附表在列应为 3 家，实际 {S["aqkk_desktop_listed"]}')
+ok(set(S["aqkk_desktop_listed"]) == {"银河麒麟桌面操作系统", "统信桌面操作系统 V25（UOS）",
+                                     "方德桌面操作系统 V5.0"},
+   f'安可在列的三家应为银河麒麟/统信/方德，实际 {S["aqkk_desktop_listed"]}')
+ok("Google Chromebook 的海外案例" in REPORT,
+   "FydeOS 那个易被误读的案例陷阱必须写明")
+ok("图形工作站席位" in REPORT,
+   "凝思的「桌面」实为调度席位这一区分必须写明，否则会被当成通用办公 PC")
 ok(len(S["iso_unverified"]) > 0,
    "「未实测/未查到」这一类不许为空 —— 本轮确有没验证到的，清空它等于粉饰")
 in_text(len(S["iso_direct"]), label="ISO 直接下载家数",
@@ -541,7 +556,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "284"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "290"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

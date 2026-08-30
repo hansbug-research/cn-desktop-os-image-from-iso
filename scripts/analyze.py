@@ -125,13 +125,17 @@ if d8:
                      e.get("s_lineage", e["lineage"]) + _c(e, "s_lineage"),
                      e.get("s_version", e["latest_version"]) + _c(e, "s_version"),
                      e.get("s_desktop", e["desktop"]) + _c(e, "s_desktop"),
-                     e.get("s_iso_access", "") + _c(e, "s_iso_access"),
+                     (e.get("s_iso_access", "")
+                      + ("（" + e["iso_access_qualifier"] + "）"
+                         if e.get("iso_access_qualifier") else "")
+                      + _c(e, "s_iso_access")),
+                     e.get("s_customers", "") + _c(e, "s_customers"),
                      e["maintained"].split("（")[0].split("：")[0],
                      img + _c(e, "image"),
                      _c(e, "general")])
     csv("t14_os_census.csv",
         ["subject", "os", "type", "vendor", "lineage", "latest_version", "desktop",
-         "iso_access", "maintained", "official_image", "other_refs"], rows)
+         "iso_access", "customers", "maintained", "official_image", "other_refs"], rows)
 
     rows = []
     for e in d8["entries"]:
@@ -140,7 +144,7 @@ if d8:
                      e.get("official_image_note", "")])
     csv("t14b_os_census_detail.csv",
         ["os", "lineage_full", "version_full", "desktop_full", "maintained_full",
-         "iso_access_note", "official_image_note"], rows)
+         "iso_access_note", "customers_note", "official_image_note"], rows)
 
     rows = []
     for pr in d8["probes"]:
@@ -169,16 +173,32 @@ if d8:
     S["census_dangling_refs"] = sorted(_cited - set(REF_BY_ID))
     # ISO 获取一列：以「直连能否 HEAD 到真实字节」为判据而非厂商说法。
     # 「未实测」必须单独成类 —— 把它并进「可下载」就是把查不到当成了有。
-    S["iso_direct"] = sorted(e["name"] for e in d8["entries"]
-                             if e.get("s_iso_access", "").startswith("直接下载"))
-    S["iso_gated"] = sorted(e["name"] for e in d8["entries"]
-                            if "授权" in e.get("s_iso_access", "")
-                            or "登录" in e.get("s_iso_access", ""))
-    S["iso_unverified"] = sorted(e["name"] for e in d8["entries"]
-                                 if "未实测" in e.get("s_iso_access", "")
-                                 or "未查到" in e.get("s_iso_access", ""))
+    # 四类，不是三类：「公开列出但直链未解引用」必须单独成类 ——
+    # 它既不是「我们 HEAD 到了字节」，也不是「厂商设了门槛」，归进任一类都是失真。
+    # 分类是受控取值（见 config 的 s_iso_access），形态差异走 iso_access_qualifier。
+    # 早先用自由文本当分类，一个条目被算进两类，合计 23 > 21，断言当场抓到。
+    _ISO_CLS = ("直接下载", "公开列出·直链未解引用", "需申请授权或登录", "未实测或未查到")
+    _by = {k: sorted(e["name"] for e in d8["entries"]
+                     if e.get("s_iso_access") == k) for k in _ISO_CLS}
+    S["iso_direct"] = _by["直接下载"]
+    S["iso_public_unresolved"] = _by["公开列出·直链未解引用"]
+    S["iso_gated"] = _by["需申请授权或登录"]
+    S["iso_unverified"] = _by["未实测或未查到"]
+    S["iso_class_unknown"] = sorted(e["name"] for e in d8["entries"]
+                                    if e.get("s_iso_access") not in _ISO_CLS)
     S["iso_access_missing"] = sorted(e["name"] for e in d8["entries"]
                                      if not e.get("s_iso_access"))
+    S["customers_missing"] = sorted(e["name"] for e in d8["entries"]
+                                    if not e.get("s_customers"))
+    # 安可（安全可靠测评）桌面附表是这一列里唯一的第三方硬名录 —— 厂商自述与它必须分开。
+    # 「在列」的家数由名录现算，不手写进正文。
+    S["aqkk_desktop_listed"] = sorted(
+        e["name"] for e in d8["entries"]
+        if "安可桌面" in e.get("s_customers", "") and "在列" in e.get("s_customers", "")
+        and "从未" not in e.get("s_customers", "") and "不在" not in e.get("s_customers", ""))
+    S["aqkk_desktop_absent"] = sorted(
+        e["name"] for e in d8["entries"]
+        if any(k in e.get("s_customers", "") for k in ("从未在列", "从未入安可", "不在安可", "未在列")))
 
     S["census_os_count"] = len(d8["entries"])
     S["census_commercial"] = sum(1 for e in d8["entries"] if e["type"].startswith("商业"))

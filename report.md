@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **284** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **86** 条
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **290** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **115** 条
 
 ## 1. 问题
 
@@ -23,31 +23,31 @@
 
 ### 2.1 名录：主要的国产桌面 OS
 
-名录含 **21 个** OS：商业 **12 个**、社区开源 **9 个**。**★ 标记的两个是本项目的被试**（下面 §2.4 说明为什么选它们）。可核对的源文件是 [`config/os_census.json`](config/os_census.json)，采集脚本拒收任何缺 `sources` 的条目，`verify.py` 另有一条断言要求「缺出处的条目集合为空」。表里为可读性用了紧凑措辞，每格的完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。**每个单元格末尾的上标编号是支撑该格的引用**（GitHub 原生脚注 `[^Rn]`，点击跳到文末 Footnotes 区，共 86 条，定义见附录 C，可复算副本见表 [`t16`](derived/tables/t16_references.csv)）；名录里共 120 处字段级引用，`verify.py` 断言其中没有一处悬空。
+名录含 **21 个** OS：商业 **12 个**、社区开源 **9 个**。**★ 标记的两个是本项目的被试**（下面 §2.4 说明为什么选它们）。可核对的源文件是 [`config/os_census.json`](config/os_census.json)，采集脚本拒收任何缺 `sources` 的条目，`verify.py` 另有一条断言要求「缺出处的条目集合为空」。表里为可读性用了紧凑措辞，每格的完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。**每个单元格末尾的上标编号是支撑该格的引用**（GitHub 原生脚注 `[^Rn]`，点击跳到文末 Footnotes 区，共 115 条，定义见附录 C，可复算副本见表 [`t16`](derived/tables/t16_references.csv)）；名录里共 157 处字段级引用，`verify.py` 断言其中没有一处悬空。
 
-| | OS | 类型 | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | ISO 获取 | 维护 | 官方容器镜像 | 其他 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| ★ | **银河麒麟桌面操作系统** | 商业 | 麒麟软件有限公司（中国电子 CEC 旗下） | Debian/Ubuntu 系（⚠️ 官方未声明，注 1）[^R64][^R65] | V11（2025-08）/ V10 SP1 2503（2025-04）[^R76][^R64] | V10 SP1 = UKUI；V11 未公开（注 2）[^R64] | 需申请授权[^R64] | 活跃 | 未公开[^R7][^R8] | — |
-| ★ | **统信桌面操作系统 V25（UOS）** | 商业 | 统信软件技术有限公司（UnionTech） | Debian 系（⚠️ 官方未书面确认，注 3）[^R14] | V25（2026-04-15）；V20 线 1070u4[^R53] | DDE（V25 起 Treeland + Qt6）[^R53] | 需申请授权 / 注册后下载[^R84] | 活跃 | 未公开[^R80][^R46][^R47] | — |
-|  | **openKylin（开放麒麟）** | 社区开源 | openKylin 社区 | Debian 系[^R40] | 3.0「黄河」（2026-08-28）[^R73] | UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）[^R73] | 公开下载页（直链未实测）[^R85] | 活跃 | 未公开[^R74][^R16][^R30] | — |
-|  | **deepin（深度）** | 社区开源 | 深度科技 / deepin 社区 | Debian 系[^R4] | 25.2.1（2026-08-04，仅在线更新）[^R57][^R4] | DDE 7.0 + Treeland[^R57] | 直接下载[^R4] | 活跃 | 未公开[^R31] | [^R14] |
-|  | **openEuler** | 社区开源 | openEuler 社区 | 独立选型，rpm/dnf[^R71] | 24.03 LTS SP4（2026-06-30）[^R71] | 无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）[^R13][^R49] | 直接下载[^R49] | 活跃 | 未公开[^R32][^R17][^R48] | — |
-|  | **麒麟信安操作系统（KylinSec）** | 商业 | 湖南麒麟信安科技 | openEuler 系[^R72] | V6 SP1（2026-06）[^R72] | 自研 Kiran / KiranUI[^R66] | 需申请授权[^R72] | 活跃 | 未公开 | — |
-|  | **方德桌面操作系统 V5.0** | 商业 | 中科方德软件有限公司 | deb 系（⚠️ 官方未声明，注 6）[^R50] | V5.0（2022-06）；Pro 版 2025-09 过评[^R63][^R70] | ⚠️ 未公开（疑 MATE 衍生）[^R50] | 需申请授权[^R70] | 活跃 | 未公开 | — |
-|  | **Ubuntu Kylin（优麒麟）** | 社区开源 | Canonical / 麒麟软件 CCN 联合实验室 | Ubuntu 直系[^R5] | 26.04.1 LTS（2026-08-27，支持 3 年）[^R6][^R79] | UKUI[^R78] | 直接下载[^R6] | 活跃 | 未公开 | — |
-|  | **Loongnix（龙芯）** | 社区开源 | 龙芯中科 / Loongnix 社区 | Debian 系（25 线⚠️推断 trixie，注 7）[^R69] | 25.1（2026-08-20）/ 20.7（2026-07-17）[^R69] | KDE[^R69] | 直接下载[^R69] | 活跃 | 未公开[^R9] | — |
-|  | **凝思安全操作系统** | 商业 | 北京凝思软件股份有限公司 | Debian 系（证据最硬，注 8）[^R67] | V6.0.80-20250816；并行 V6.0.100[^R67] | ⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE[^R67] | 需申请授权（文档公开）[^R67] | 活跃 | 未公开 | [^R68] |
-|  | **Anolis OS（龙蜥）** | 社区开源 | OpenAnolis 龙蜥社区 | RHEL 兼容系[^R44] | 23.5（官方公告未同步）[^R41] | 无桌面 ISO；有独立 DDE 仓库[^R42][^R41] | 直接下载[^R41] | 活跃 | 未公开[^R18][^R33] | — |
-|  | **OpenCloudOS** | 社区开源 | OpenCloudOS 社区 | 自主演进，RHEL 系包管理[^R11] | 9.6（2026-07-13）[^R43][^R11] | 无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE[^R12][^R19] | 直接下载[^R43] | 活跃 | 未公开[^R34] | — |
-|  | **新支点桌面操作系统（NewStart NSDL）** | 商业 | 广东中兴新支点技术有限公司（中兴通讯全资子公司） | ⚠️ 未查到官方结论[^R83] | V4.5.2（⚠️ 官方未标日期）[^R59] | EX-NDE 超凡桌面（Qt 自研）[^R60][^R19] | 网盘分发 / 镜像站需登录[^R59] | ⚠️ 品牌活跃 | 未公开 | — |
-|  | **AOSC OS（安同 OS）** | 社区开源 | 安同开源社区 | 完全独立自建，自研 oma[^R1] | 滚动（下载页 2026-06-21）[^R1] | KDE Plasma[^R1] | 直接下载[^R1] | 活跃 | 未公开[^R35][^R20] | — |
-|  | **RevyOS** | 社区开源 | 中科院软件所 PLCT Lab / RuyiSDK | Debian 13 trixie；RISC-V[^R39] | 镜像站 20260504（文档滞后）[^R82] | Xfce4[^R82] | 直接下载（刷机镜像，非 ISO）[^R39] | 活跃 | 未公开 | [^R51] |
-|  | **Bianbu OS** | 商业 | 进迭时空 SpacemiT | Ubuntu 26.04；RISC-V[^R2] | v4.0.6（2026-08-26）[^R2] | ⚠️ 未核实[^R2] | 直接下载（开发板镜像）[^R86] | 活跃 | 未公开 | — |
-|  | **FydeOS** | 商业 | 燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实） | Chromium OS + Gentoo Portage[^R45][^R21] | v23（openFyde r144）[^R15] | ChromeOS 风格自研 shell[^R45] | 公开下载（免费版）/ 商业版按授权[^R45] | 活跃 | 未公开 | — |
-|  | **普华桌面操作系统** | 商业 | 普华基础软件股份有限公司（中国电科投资设立） | ⚠️ 官方未声明[^R62] | ⚠️ 官方两处不一致：V4.0 / V5.0（注 9）[^R61][^R54] | V4.1 = KDE 5.4；V5.0 未查到[^R61] | 未查到公开下载[^R61] | ⚠️ 桌面线沉寂但未 EOL | 未公开 | — |
-|  | **中标麒麟桌面操作系统（NeoKylin）** | 商业 | 中标软件有限公司 → 现运营主体为麒麟软件有限公司 | ⚠️ 未查到；历史被归为 RHEL 系[^R81] | ⚠️ 未查到 V7 之后新版本[^R81] | 未查到[^R81] | 未查到公开下载[^R10] | 停更 | 未公开[^R36][^R37] | [^R10] |
-|  | **一铭桌面操作系统（EmindDesktop）** | 商业 | 一铭软件股份有限公司（新三板 831266） | ⚠️ 官方未声明[^R58] | 4.0 SP1（2016-06）[^R55] | 未查到[^R58] | 未查到公开下载[^R55] | ⚠️ 疑似停止 | 未公开 | — |
-|  | **EulerOS（华为）** | 商业 | 华为 | openEuler 商业/闭源对应物[^R72] | 未公开[^R72] | 未见桌面版[^R72] | 需申请授权[^R72] | 活跃 | 未公开 | — |
+| | OS | 类型 | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | ISO 获取 | 常见客户与使用场景 | 维护 | 官方容器镜像 | 其他 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| ★ | **银河麒麟桌面操作系统** | 商业 | 麒麟软件有限公司（中国电子 CEC 旗下） | Debian/Ubuntu 系（⚠️ 官方未声明，注 1）[^R64][^R65] | V11（2025-08）/ V10 SP1 2503（2025-04）[^R76][^R64] | V10 SP1 = UKUI；V11 未公开（注 2）[^R64] | 公开下载（直链未解引用）[^R87][^R88] | 党政·金融·电力·运营商·交通·教育·医疗·制造（厂商自述）｜**安可桌面 4 批在列**[^R90][^R91] | 活跃 | 未公开[^R7][^R8] | — |
+| ★ | **统信桌面操作系统 V25（UOS）** | 商业 | 统信软件技术有限公司（UnionTech） | Debian 系（⚠️ 官方未书面确认，注 3）[^R14] | V25（2026-04-15）；V20 线 1070u4[^R53][^R84] | DDE（V25 起 Treeland + Qt6）[^R53] | 直接下载[^R89] | 党政·央国企·金融·教育·医疗·邮政（厂商自述）｜**安可桌面 3 批在列**[^R98][^R92] | 活跃 | 未公开[^R80][^R46][^R47] | — |
+|  | **openKylin（开放麒麟）** | 社区开源 | openKylin 社区 | Debian 系[^R40] | 3.0「黄河」（2026-08-28）[^R73] | UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）[^R73] | 公开下载页（直链未实测）[^R85] | 共建方与衍生方·高校科研·个人开发者·芯片生态（社区自述）[^R107] | 活跃 | 未公开[^R74][^R16][^R30] | — |
+|  | **deepin（深度）** | 社区开源 | 深度科技 / deepin 社区 | Debian 系[^R4] | 25.2.1（2026-08-04，仅在线更新）[^R57][^R4] | DDE 7.0 + Treeland[^R57] | 直接下载[^R4] | 开发者·爱好者·高校学生（统信官方定义：社区版）[^R108][^R14] | 活跃 | 未公开[^R31] | [^R14] |
+|  | **openEuler** | 社区开源 | openEuler 社区 | 独立选型，rpm/dnf[^R71] | 24.03 LTS SP4（2026-06-30）[^R71] | 无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）[^R13][^R49] | 直接下载[^R49] | 服务器/云/边缘/嵌入式为主；桌面仅 DevStation 面向开发者（社区自述）[^R106][^R92] | 活跃 | 未公开[^R32][^R17][^R48] | — |
+|  | **麒麟信安操作系统（KylinSec）** | 商业 | 湖南麒麟信安科技 | openEuler 系[^R72] | V6 SP1（2026-06）[^R72] | 自研 Kiran / KiranUI[^R66] | 需申请授权[^R72] | 电力·航天测发控（1 万余套）·党政·金融·交通·医疗（厂商自述）｜**桌面版不在安可桌面附表**[^R104][^R93] | 活跃 | 未公开 | — |
+|  | **方德桌面操作系统 V5.0** | 商业 | 中科方德软件有限公司 | deb 系（⚠️ 官方未声明，注 6）[^R50] | V5.0（2022-06）；Pro 版 2025-09 过评[^R63][^R70] | ⚠️ 未公开（疑 MATE 衍生）[^R50] | 需申请授权[^R70] | 党政·医疗（500+ 医院）·电信·教育·金融·军工院所（厂商自述）｜**安可桌面 3 批在列**[^R99][^R91] | 活跃 | 未公开 | — |
+|  | **Ubuntu Kylin（优麒麟）** | 社区开源 | Canonical / 麒麟软件 CCN 联合实验室 | Ubuntu 直系[^R5] | 26.04.1 LTS（2026-08-27，支持 3 年）[^R6][^R79] | UKUI[^R78] | 直接下载[^R6] | **全部个人向**：普通用户·开发者·科研人员·艺术工作者（官方文档）[^R109] | 活跃 | 未公开 | — |
+|  | **Loongnix（龙芯）** | 社区开源 | 龙芯中科 / Loongnix 社区 | Debian 系（25 线⚠️推断 trixie，注 7）[^R69] | 25.1（2026-08-20）/ 20.7（2026-07-17）[^R69] | KDE[^R69] | 直接下载[^R69] | 芯片适配基准与生态展示·合作厂商·科研机构·爱好者·终端用户（官方自述）[^R113][^R92] | 活跃 | 未公开[^R9] | — |
+|  | **凝思安全操作系统** | 商业 | 北京凝思软件股份有限公司 | Debian 系（证据最硬，注 8）[^R67] | V6.0.80-20250816；并行 V6.0.100[^R67] | ⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE[^R67] | 需申请授权（文档公开）[^R67] | 电力调度（国网/南网/发电集团）·涉密内网·运营商·军队列装（厂商自述）｜**桌面身份从未入安可**[^R101][^R93] | 活跃 | 未公开 | [^R68] |
+|  | **Anolis OS（龙蜥）** | 社区开源 | OpenAnolis 龙蜥社区 | RHEL 兼容系[^R44] | 23.5（官方公告未同步）[^R41] | 无桌面 ISO；有独立 DDE 仓库[^R42][^R41] | 直接下载[^R41] | **服务器端定位**：金融·运营商核心系统（社区自述）；桌面靠衍生版[^R110][^R92] | 活跃 | 未公开[^R18][^R33] | — |
+|  | **OpenCloudOS** | 社区开源 | OpenCloudOS 社区 | 自主演进，RHEL 系包管理[^R11] | 9.6（2026-07-13）[^R43][^R11] | 无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE[^R12][^R19] | 直接下载[^R43] | **服务器端定位**：腾讯内部全量业务·腾讯云客户·12 大行业（社区自述）[^R111][^R92] | 活跃 | 未公开[^R34] | — |
+|  | **新支点桌面操作系统（NewStart NSDL）** | 商业 | 广东中兴新支点技术有限公司（中兴通讯全资子公司） | ⚠️ 未查到官方结论[^R83] | V4.5.2（⚠️ 官方未标日期）[^R59] | EX-NDE 超凡桌面（Qt 自研）[^R60][^R19] | 网盘分发 / 镜像站需登录[^R59] | 政务办公·电力·金融·通信·教育（厂商自述）｜**桌面版从未入安可**[^R102][^R92] | ⚠️ 品牌活跃 | 未公开 | — |
+|  | **AOSC OS（安同 OS）** | 社区开源 | 安同开源社区 | 完全独立自建，自研 oma[^R1] | 滚动（下载页 2026-06-21）[^R1] | KDE Plasma[^R1] | 直接下载[^R1] | 有 Linux 经验的个人用户·旧机续命·LoongArch 生态（社区自述；**官方声明不适合商业部署**）[^R112] | 活跃 | 未公开[^R35][^R20] | — |
+|  | **RevyOS** | 社区开源 | 中科院软件所 PLCT Lab / RuyiSDK | Debian 13 trixie；RISC-V[^R39] | 镜像站 20260504（文档滞后）[^R82] | Xfce4[^R82] | 直接下载（刷机镜像，非 ISO）[^R39] | RISC-V 开发者·玄铁芯片生态适配者·开发板玩家（项目方自述）[^R114][^R115] | 活跃 | 未公开 | [^R51] |
+|  | **Bianbu OS** | 商业 | 进迭时空 SpacemiT | Ubuntu 26.04；RISC-V[^R2] | v4.0.6（2026-08-26）[^R2] | ⚠️ 未核实[^R2] | 直接下载（开发板镜像）[^R86] | RISC-V 开发者·量产下游客户与硬件厂商·芯片生态（厂商自述）[^R86] | 活跃 | 未公开 | — |
+|  | **FydeOS** | 商业 | 燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实） | Chromium OS + Gentoo Portage[^R45][^R21] | v23（openFyde r144）[^R15] | ChromeOS 风格自研 shell[^R45] | 公开下载（免费版）/ 商业版按授权[^R45] | 个人 PC 用户·旧机复活·教育机房·企业与机构（厂商自述）｜**安可未在列**[^R103][^R92] | 活跃 | 未公开 | — |
+|  | **普华桌面操作系统** | 商业 | 普华基础软件股份有限公司（中国电科投资设立） | ⚠️ 官方未声明[^R62] | ⚠️ 官方两处不一致：V4.0 / V5.0（注 9）[^R61][^R54] | V4.1 = KDE 5.4；V5.0 未查到[^R61] | 未查到公开下载[^R61] | 中国电科体系涉密网/办公网·国家电网试点·邮储·海关（第三方调研，2019 年）｜**安可从未在列**[^R100][^R96] | ⚠️ 桌面线沉寂但未 EOL | 未公开 | — |
+|  | **中标麒麟桌面操作系统（NeoKylin）** | 商业 | 中标软件有限公司 → 现运营主体为麒麟软件有限公司 | ⚠️ 未查到；历史被归为 RHEL 系[^R81] | ⚠️ 未查到 V7 之后新版本[^R81] | 未查到[^R81] | 未查到公开下载[^R10] | 国防·政府·企业·电力·金融·少数民族语言地区（厂商自述）｜**安可从未在列**[^R97] | 停更 | 未公开[^R36][^R37] | [^R10] |
+|  | **一铭桌面操作系统（EmindDesktop）** | 商业 | 一铭软件股份有限公司（新三板 831266） | ⚠️ 官方未声明[^R58] | 4.0 SP1（2016-06）[^R55] | 未查到[^R58] | 未查到公开下载[^R55] | 县市级党政与文体广电系统正版化（厂商自述）｜**央采未通过符合性审查·安可从未在列**[^R92] | ⚠️ 疑似停止 | 未公开 | — |
+|  | **EulerOS（华为）** | 商业 | 华为 | openEuler 商业/闭源对应物[^R72] | 未公开[^R72] | 未见桌面版[^R72] | 需申请授权[^R72] | **无桌面客群**（服务器/云/存储）[^R105][^R92] | 活跃 | 未公开 | — |
 
 **表下注**（编号对应表中「注 N」）：
 
@@ -61,7 +61,17 @@
 8. 凝思是本名录里血统证据最硬的一条：官方 V6.0.80 发布说明写 `grub2` 升级到 `2.06-3~deb10u4linx5`（`deb10` 即 Debian 10 buster），官方文档另有 `iceweasel`（Debian 独有的 Firefox 改名）+ glibc 2.28 组合。
 9. 普华官网产品详情页写 V4.0（4.4 内核，V4.0 系列发布于 2016 年），而 Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0；V5.0 的发布日期、内核、桌面环境全部未查到。
 
-**「ISO 获取」这一列不抄厂商说法，判据是直连能不能 HEAD 到真实字节。** 分三类：**直接下载 9 个**、**需申请授权或登录 8 个**、**未实测或未查到 4 个**。实测到的都记了字节数，例如 deepin 的 `deepin-desktop-community-25.2.0-amd64.iso` 是 6976131072 B、优麒麟的 `ubuntukylin-26.04.1-desktop-amd64.iso` 是 5694060544 B（托管在 Canonical 自有基础设施）、Loongnix 25.1 的 KDE livecd 是 5858738176 B、openEuler 25.09 DevStation 的 dvd 是 5627537408 B，逐条原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。
+**「常见客户与使用场景」这一列问的是操作系统本体（装在客户机器上的桌面系统），不是它的官方 docker 镜像**——两者的客群完全不同，混在一起会得出荒谬结论。这一列的每条都区分了**厂商自述**与**第三方核实**，因为二者证据强度差一个量级：厂商官网的客户清单与部署套数无法独立验证，而《安全可靠测评结果公告》、央采成交公告、深交所问询回复这类是可核对的第三方文件。完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。
+
+**这一列里最硬的一格是安可（安全可靠测评）桌面附表。** 逐批核对 2023 年第 1 号至 2026 年第 2 号共 8 批公告，桌面附表**只出现过 4 家送测单位**：麒麟软件、中科方德、统信软件、华为终端[^R94]。名录里在列的是 **3 家——银河麒麟桌面、统信 UOS、方德桌面**；另有 7 家明确不在（其中凝思、新支点、麒麟信安是以**服务器**身份入列而非桌面，中标麒麟、普华、一铭、优麒麟从未在列）。
+
+这条准入是硬的：财库〔2023〕34 号《操作系统政府采购需求标准（2023 年版）》[^R95]含独立的「桌面操作系统政府采购需求标准」分册，其带星指标要求「操作系统应当符合安全可靠测评要求」；财库〔2023〕29 号规定乡镇以上党政机关采购台式机须把 CPU 与操作系统「符合安全可靠测评要求」纳入采购需求。**但安可不等于采购资格**：2026 年度央采桌面框架协议只有 3 家过初审，而 HarmonyOS 虽是唯一拿到 Ⅱ 级的桌面 OS 却落选，原因是不满足桌面分册第 1 条带星指标「同源兼容多 CPU 平台架构」——它的硬件底座只有 ARM。
+
+**这一格直接印证了 §2.4 的选型**：我按「交付端真实存在需求」筛出的银河麒麟、统信、方德三家，恰好就是安可桌面附表里的那三家国产厂商。选型判据因此不只是我的判断，有第三方名录背书。
+
+有几处客群定位容易被误读，逐一点明：**凝思**的「桌面」是电力调度终端与变电站综自后台的**图形工作站席位**（调度台/监控席），不是通用办公 PC；**新支点**近两年所有公开落地与中标都在服务器/嵌入式侧，桌面线无新案例；**优麒麟**官方文档的「适用用户」四类**全部是个人向**，未查到任何机构客户或预装案例；**AOSC OS** 官网明确声明**不适合商业部署或任何要求高可靠性的场合**，属结构性不适用；**RevyOS 与 Bianbu** 几乎纯粹是芯片适配 + 开发板发行版，无装机/采购意义上的客户。⚠️ 还有一个陷阱：FydeOS 的中文企业材料里引用的 Arcadia 联合学区等案例是 **Google Chromebook 的海外案例，不是 FydeOS 客户**。
+
+**「ISO 获取」这一列不抄厂商说法，判据是直连能不能 HEAD 到真实字节。** 分四类：**直接下载 10 个**（HEAD 到真实字节）、**公开列出但直链未解引用 3 个**、**需申请授权或登录 5 个**、**未实测或未查到 3 个**。实测到的都记了字节数，例如 deepin 的 `deepin-desktop-community-25.2.0-amd64.iso` 是 6976131072 B、优麒麟的 `ubuntukylin-26.04.1-desktop-amd64.iso` 是 5694060544 B（托管在 Canonical 自有基础设施）、Loongnix 25.1 的 KDE livecd 是 5858738176 B、openEuler 25.09 DevStation 的 dvd 是 5627537408 B，逐条原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。
 
 「未实测」刻意与「可下载」分开，因为把它并进去就是**把查不到当成了有**——本报告在别处正好批判过这种做法（§9.2）。两个例子：openKylin 官网设公开下载页，但分发走站内 API，本轮没取到可 HEAD 的静态直链（南大镜像站只有 `dists/`、`pool/`、`project/`，无 ISO 目录），下载页里的「登录/申请」字样可能只是站点导航，不足以判定下载需注册；FydeOS 的下载页从本机经代理返回 403，可能是地域或 UA 策略，也没能确认。
 
@@ -474,9 +484,9 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 | [`t13`](derived/tables/t13_cve_coverage.csv) | 漏洞扫描器的覆盖判定 |
 ## 附录 C：参考来源
 
-正文与名录里的每处引用都是 GitHub 原生脚注（`[^Rn]`），GitHub 会把它们渲染成上标编号并在页面底部自动生成带回跳链接的 Footnotes 区，所以下面这份定义列表就是参考文献表本身。共 86 条，可复算副本在表 [`t16`](derived/tables/t16_references.csv)，源文件是 [`config/references.json`](config/references.json)。
+正文与名录里的每处引用都是 GitHub 原生脚注（`[^Rn]`），GitHub 会把它们渲染成上标编号并在页面底部自动生成带回跳链接的 Footnotes 区，所以下面这份定义列表就是参考文献表本身。共 115 条，可复算副本在表 [`t16`](derived/tables/t16_references.csv)，源文件是 [`config/references.json`](config/references.json)。
 
-**标题来源要分开看**：72 条的标题由脚本抓自该页的 `<title>`，另 14 条是该页不返回 `<title>`（目录页、JSON API、部分老站），标题为我们的人工描述性标注。后者的**内容**仍然可核对——URL 打开即是；只是标题那一栏不是原文，不应被当作原文引用。每条定义末尾都注明属于哪一种。
+**标题来源要分开看**：99 条的标题由脚本抓自该页的 `<title>`，另 16 条是该页不返回可用 `<title>`（目录页、JSON API、二进制文件、部分老站与 SPA 站点），标题为我们的人工描述性标注。后者的**内容**仍然可核对——URL 打开即是；只是标题那一栏不是原文，不应被当作原文引用。每条定义末尾都注明属于哪一种。
 
 [^R1]: 下载中心 \| 安同开源社区 (AOSC) · aosc.io · <https://aosc.io/downloads/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R2]: SpacemiT · bianbu.spacemit.com · <https://bianbu.spacemit.com/>（访问 2026-08-30；标题抓自该页 `<title>`）
@@ -493,9 +503,9 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 [^R13]: 图形桌面使用 \| 文档 \| openEuler社区 · docs.openeuler.org · <https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R14]: 统信操作系统【家庭版、专业版、教育版、社区版】区别介绍 \| 统信软件-知识分享平台 · faq.uniontech.com · <https://faq.uniontech.com/desktop/f435/install/da34>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R15]: FydeOS v23: Chromatic Cadence 正式发布 - FydeOS · fydeos.com · <https://fydeos.com/blog/release-note-v23/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R16]: openKylin 官方容器镜像构建仓（Gitee openkylin 组织） · gitee.com · <https://gitee.com/openkylin/openkylin-docker-images>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
-[^R17]: openEuler 官方容器镜像目录仓（Gitee openeuler 组织） · gitee.com · <https://gitee.com/openeuler/openeuler-docker-images>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
-[^R18]: Anolis OS 官方容器镜像仓（Gitee anolis 组织） · gitee.com · <https://gitee.com/anolis/docker-images>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R16]: openKylin 官方容器镜像构建仓（Gitee openkylin 组织） · gitee.com · <https://gitee.com/openkylin/openkylin-docker-images>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R17]: openEuler 官方容器镜像目录仓（Gitee openeuler 组织） · gitee.com · <https://gitee.com/openeuler/openeuler-docker-images>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R18]: Anolis OS 官方容器镜像仓（Gitee anolis 组织） · gitee.com · <https://gitee.com/anolis/docker-images>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R19]: OpenCloudOS 超凡桌面: 超凡桌面（简称EX-NDE）是一个超融合轻量级桌面环境，让系统具备拥有桌面、服务器、平板三种交互模式，能够在更低配置的智能终端、平板、一体机、PC、工作站、服务器等不同的设备场景中流畅运行，减少系统的碎片化。 · gitee.com · <https://gitee.com/opencloudos-exnde>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R20]: GitHub - AOSC-Dev/aosc-os-docker-files: Docker files for AOSC OS · GitHub · github.com · <https://github.com/AOSC-Dev/aosc-os-docker-files>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R21]: openFyde repositories · GitHub · github.com · <https://github.com/orgs/openFyde/repositories>（访问 2026-08-30；标题抓自该页 `<title>`）
@@ -506,7 +516,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 [^R26]: GitHub - hansbug-research/cn-desktop-os-buildchain-study: 国产桌面操作系统的 ABI 分档与构建链路选型：27 镜像实测、820 格运行矩阵、C/C++/Rust/Python 四链逐个验证，全部证据可审计 · GitHub · github.com · <https://github.com/hansbug-research/cn-desktop-os-buildchain-study>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R27]: GitHub - canonical/chisel · GitHub · github.com · <https://github.com/canonical/chisel>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R28]: GitHub - chainguard-dev/apko: Build OCI images from APK packages directly without Dockerfile · GitHub · github.com · <https://github.com/chainguard-dev/apko>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R29]: mmdebstrap 项目仓（J. Schauer） · gitlab.mister-muffin.de · <https://gitlab.mister-muffin.de/josch/mmdebstrap>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R29]: mmdebstrap 项目仓（J. Schauer） · gitlab.mister-muffin.de · <https://gitlab.mister-muffin.de/josch/mmdebstrap>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R30]: openkylin/openkylin - Docker Image · hub.docker.com · <https://hub.docker.com/r/openkylin/openkylin>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R31]: linuxdeepin/deepin - Docker Image · hub.docker.com · <https://hub.docker.com/r/linuxdeepin/deepin>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R32]: openeuler/openeuler - Docker Image · hub.docker.com · <https://hub.docker.com/r/openeuler/openeuler>（访问 2026-08-30；标题抓自该页 `<title>`）
@@ -517,7 +527,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 [^R37]: cs2cneokylin/ns76-base-x86_64 - Docker Image · hub.docker.com · <https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R38]: debian - Official Image \| Docker Hub · hub.docker.com · <https://hub.docker.com/_/debian>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R39]: Index of /revyos/ · mirror.iscas.ac.cn · <https://mirror.iscas.ac.cn/revyos/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R40]: openKylin apt 仓库 dists 目录（南京大学镜像站，用于核对代号与血统） · mirror.nju.edu.cn · <https://mirror.nju.edu.cn/openkylin/dists/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R40]: openKylin apt 仓库 dists 目录（南京大学镜像站，用于核对代号与血统） · mirror.nju.edu.cn · <https://mirror.nju.edu.cn/openkylin/dists/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R41]: Index of /anolis/23.5/isos/GA/x86_64/ · mirrors.openanolis.cn · <https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R42]: Index of /anolis/23.5/DDE/ · mirrors.openanolis.cn · <https://mirrors.openanolis.cn/anolis/23.5/DDE/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R43]: Index of /opencloudos/9.6/isos/x86_64/20260713.0/ · mirrors.opencloudos.tech · <https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/>（访问 2026-08-30；标题抓自该页 `<title>`）
@@ -525,28 +535,28 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 [^R45]: openFyde · openfyde.io · <https://openfyde.io/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R46]: (JSON API 响应) · registry.uniontech.com · <https://registry.uniontech.com/api/v2.0/projects>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R47]: (JSON API 响应) · registry.uniontech.com · <https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R48]: openEuler 24.03 LTS SP3 DevStation 容器 rootfs 目录（官方 repo） · repo.openeuler.org · <https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
-[^R49]: openEuler 24.03 LTS SP4 ISO 目录（官方 repo，用于核对无桌面版 ISO） · repo.openeuler.org · <https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R48]: openEuler 24.03 LTS SP3 DevStation 容器 rootfs 目录（官方 repo） · repo.openeuler.org · <https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R49]: openEuler 24.03 LTS SP4 ISO 目录（官方 repo，用于核对无桌面版 ISO） · repo.openeuler.org · <https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R50]: Welcome to Repo Server · repos.os.nfschina.com · <https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R51]: Site not found &middot; GitHub Pages · revyos.github.io · <https://revyos.github.io/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R52]: OsoLinux 项目页（SourceForge） · sourceforge.net · <https://sourceforge.net/projects/osolinux/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R52]: OsoLinux 项目页（SourceForge） · sourceforge.net · <https://sourceforge.net/projects/osolinux/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R53]: 智慧·高效·可靠——统信桌面操作系统V25发布！-统信软件 · uniontech.com · <https://uniontech.com/m/news-info/2877.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R54]: 通用基础软件产品-普华基础软件 · web.archive.org · <http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R55]: Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux · web.archive.org · <http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R56]: 铜豌豆 Linux · www.atzlinux.com · <https://www.atzlinux.com/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R57]: deepin 25.2.0 Release Note &#8211; Deepin Technology Community · www.deepin.org · <https://www.deepin.org/en/deepin-25-2-release/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R58]: 一铭软件官网首页 · www.emindsoft.com.cn · <http://www.emindsoft.com.cn/index.php>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R58]: 一铭软件官网首页 · www.emindsoft.com.cn · <http://www.emindsoft.com.cn/index.php>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R59]: 中兴新支点操作系统下载_中兴操作系统下载_NewStartOS下载_国产操作系统下载_新支点OS下载 · www.gd-linux.com · <https://www.gd-linux.com/downloads>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R60]: 中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统 · www.gd-linux.com · <https://www.gd-linux.com/desktop/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R61]: 普华基础软件 · 普华桌面操作系统 V4.0 产品详情页 · www.i-soft.com.cn · <https://www.i-soft.com.cn/detail/59.html>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
-[^R62]: 普华基础软件 · 通用产品页 · www.i-soft.com.cn · <https://www.i-soft.com.cn/product/currency.html>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R61]: 普华基础软件 · 普华桌面操作系统 V4.0 产品详情页 · www.i-soft.com.cn · <https://www.i-soft.com.cn/detail/59.html>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R62]: 普华基础软件 · 通用产品页 · www.i-soft.com.cn · <https://www.i-soft.com.cn/product/currency.html>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R63]: 安全可靠测评结果公告（2023年第1号） · www.itsec.gov.cn · <https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R64]: 银河麒麟桌面操作系统V11 -麒麟软件-国产操作系统 · www.kylinos.cn · <https://www.kylinos.cn/productPc/desktop/desktopMainV11/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R65]: 银河麒麟桌面操作系统V10-麒麟软件-国产操作系统 · www.kylinos.cn · <https://www.kylinos.cn/productPc/desktop/desktopMain/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R66]: 高效实时！麒麟信安操作系统（嵌入式版）V3来了，为工业领域数智化转型夯实安全底座--麒麟信安 · www.kylinsec.com.cn · <https://www.kylinsec.com.cn/detail/13151/1.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R67]: Index of /download/document/6.0.80 · www.linx-info.com · <https://www.linx-info.com/download/document/6.0.80/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R68]: Index of /download/security · www.linx-info.com · <https://www.linx-info.com/download/security/>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R69]: Loongnix 龙芯开源社区官网 · www.loongnix.cn · <https://www.loongnix.cn/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R69]: Loongnix 龙芯开源社区官网 · www.loongnix.cn · <https://www.loongnix.cn/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R70]: 中科方德 国产桌面操作系统 国产服务器操作系统 云计算 · www.nfschina.com · <https://www.nfschina.com/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R71]: openEuler下载 \| openEuler ISO镜像 \| openEuler社区官网 · www.openeuler.org · <https://www.openeuler.org/zh/download/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R72]: openEuler商业发行版 \| openEuler下载 \| openEuler社区官网 · www.openeuler.org · <https://www.openeuler.org/zh/download/commercial-release/>（访问 2026-08-30；标题抓自该页 `<title>`）
@@ -554,14 +564,43 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 [^R74]: openKylin镜像仓列表-openKylin - 开放麒麟 - 社区官网 \| 开源聚力，共创未来 · www.openkylin.top · <https://www.openkylin.top/support/docker_images.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R75]: 东方中科拟收购国产操作系统厂商万里红 - 安全内参 \| 决策者的网络安全知识库 · www.secrss.com · <https://www.secrss.com/articles/23492>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R76]: 首个商用6.6内核中国操作系统银河麒麟V11发布 · www.stdaily.com · <https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R77]: 北京万里红科技官网（用于核对产品列表已无操作系统条目） · www.superred.com.cn · <https://www.superred.com.cn/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R77]: 北京万里红科技官网（用于核对产品列表已无操作系统条目） · www.superred.com.cn · <https://www.superred.com.cn/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R78]: 优麒麟 · www.ubuntukylin.com · <https://www.ubuntukylin.com/downloads/>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R79]: 优麒麟 26.04 版本正式发布！-优麒麟｜Linux 开源操作系统 · www.ubuntukylin.com · <https://www.ubuntukylin.com/news/ubuntukylin2604-cn.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R80]: 统信容器镜像平台-统信软件 · www.uniontech.com · <https://www.uniontech.com/os-containerImage.html>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R81]: 中标麒麟 - 维基百科，自由的百科全书 · zh.wikipedia.org · <https://zh.wikipedia.org/zh-hans/中标麒麟>（访问 2026-08-30；标题抓自该页 `<title>`）
-[^R82]: RevyOS 官方文档站 · docs.revyos.dev · <https://docs.revyos.dev/>（访问 2026-08-30；⚠️ 该页不返回 `<title>`，标题为人工描述性标注）
+[^R82]: RevyOS 官方文档站 · docs.revyos.dev · <https://docs.revyos.dev/>（访问 2026-08-30；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
 [^R83]: 关于我们_中兴新支点公司介绍_中兴新支点联系方式_新支点操作系统-NewStartOS · www.gd-linux.com · <https://www.gd-linux.com/about>（访问 2026-08-30；标题抓自该页 `<title>`）
 [^R84]: 产品动态-统信软件 · uniontech.com · <https://uniontech.com/m/Product-release.html>（访问 2026-08-31；标题抓自该页 `<title>`）
 [^R85]: openKylin开源操作系统（下载页） · www.openkylin.top · <https://www.openkylin.top/downloads/>（访问 2026-08-31；标题抓自该页 `<title>`）
 [^R86]: Index of /image/k1/version · archive.spacemit.com · <https://archive.spacemit.com/image/k1/version/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R87]: 试用申请下载-麒麟软件-国产操作系统 · www.kylinos.cn · <https://www.kylinos.cn/support/trial/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R88]: 共享文件下载 - Kylin Distro（银河麒麟镜像下载中间页，含文件名/大小/SHA256/SM3） · iso.kylinos.cn · <https://iso.kylinos.cn/web_pungi/download/cdn/5Kmv3q98GLtFdMQSDTOe6wr4ZcnpXVCb/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R89]: 统信桌面专业版 V25 ISO（本项目切片路径的 ISO_URL，匿名可下） · cdimage-download.chinauos.com · <https://cdimage-download.chinauos.com/desktop-professional/2500u1/beta/uos-desktop-25-professional-2500-amd64-202604.iso>（访问 2026-08-31；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R90]: 行业解决方案-麒麟软件-国产操作系统 · www.kylinos.cn · <https://www.kylinos.cn/product/solution/scene/solutionIndustry/index.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R91]: 安全可靠测评结果公告（2025年第3号） · www.itsec.gov.cn · <https://www.itsec.gov.cn/aqkkcp/cpgg/202509/t20250912_235645.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R92]: 安全可靠测评结果公告（2026年第1号） · www.itsec.gov.cn · <https://www.itsec.gov.cn/aqkkcp/cpgg/202601/t20260116_249958.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R93]: 安全可靠测评结果公告（2024年第1号） · www.itsec.gov.cn · <https://www.itsec.gov.cn/aqkkcp/cpgg/202405/t20240520_172866.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R94]: 安全可靠测评结果公告（2025年第1号） · www.itsec.gov.cn · <https://www.itsec.gov.cn/aqkkcp/cpgg/202503/t20250314_216512.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R95]: 关于印发《操作系统政府采购需求标准（2023年版）》的通知 · gks.mof.gov.cn · <https://gks.mof.gov.cn/guizhangzhidu/202312/t20231226_3924123.htm>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R96]: 关于印发《台式计算机政府采购需求标准（2023年版）》的通知 · www.mof.gov.cn · <https://www.mof.gov.cn/jrttts/202312/t20231226_3924133.htm>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R97]: 中标麒麟桌面操作系统 - 国产操作系统、银河麒麟、中标麒麟--中标软件官网 · cs2c.com.cn · <https://cs2c.com.cn/scheme/product/9.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R98]: 统信桌面操作系统 V25 专业版 · www.uniontech.com · <https://www.uniontech.com/OS-Professional-edition-V25.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R99]: 中科方德 国产桌面操作系统 国产服务器操作系统 云计算 · www.nfschina.com · <https://www.nfschina.com/index.php?id=65>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R100]: 企业调研：国产操作系统厂商普华软件 - 安全内参 \| 决策者的网络安全知识库 · www.secrss.com · <https://www.secrss.com/articles/11535>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R101]: 北京凝思软件股份有限公司 · www.linx-info.com · <https://www.linx-info.com/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R102]: 中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统 · www.gd-linux.com · <https://www.gd-linux.com/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R103]: 下载 - FydeOS · fydeos.com · <https://fydeos.com/download/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R104]: 麒麟信安操作系统桌面版--麒麟信安 · www.kylinsec.com.cn · <https://www.kylinsec.com.cn/detail/1413/1.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R105]: EulerOS_华为云 · developer.huaweicloud.com · <https://developer.huaweicloud.com/euleros/index.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R106]: openEuler解决方案 \| 用户案例 \| openEuler社区官网 · www.openeuler.org · <https://www.openeuler.org/zh/showcase/index.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R107]: 社区-openKylin - 开放麒麟 - 社区官网 \| 开源聚力，共创未来 · www.openkylin.top · <https://www.openkylin.top/community/openkylin-cn.html>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R108]: deepin - 基于Linux的开源国产操作系统 · www.deepin.org · <https://www.deepin.org/index/zh>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R109]: 优麒麟官网 · ubuntukylin.com · <https://ubuntukylin.com/>（访问 2026-08-31；⚠️ 该页不返回可用 `<title>`，标题为人工描述性标注）
+[^R110]: Anolis OS · OpenAnolis · openanolis.cn · <https://openanolis.cn/anolisos>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R111]: OpenCloudOS 版本介绍 - OpenCloudOS Documentation · docs.opencloudos.org · <https://docs.opencloudos.org/release/oc_intro/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R112]: 安同 OS 适合我吗？ \| 安同开源社区 (AOSC) · aosc.io · <https://aosc.io/aosc-os/right-for-me>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R113]: 龙芯开源社区 · www.loongnix.cn · <https://www.loongnix.cn/zh/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R114]: RevyOS · docs.revyos.dev · <https://docs.revyos.dev/docs/intro/>（访问 2026-08-31；标题抓自该页 `<title>`）
+[^R115]: RuyiSDK · 为 100 万 RISC-V 软件开发人员做好准备 \| RuyiSDK · ruyisdk.org · <https://ruyisdk.org/>（访问 2026-08-31；标题抓自该页 `<title>`）
 

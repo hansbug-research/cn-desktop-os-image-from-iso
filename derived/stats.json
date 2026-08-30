@@ -4,6 +4,20 @@
   "anchor_mismatches": [],
   "anchor_pairs_checked": 12,
   "anchored_records": 12,
+  "aqkk_desktop_absent": [
+    "FydeOS",
+    "一铭桌面操作系统（EmindDesktop）",
+    "中标麒麟桌面操作系统（NeoKylin）",
+    "凝思安全操作系统",
+    "新支点桌面操作系统（NewStart NSDL）",
+    "普华桌面操作系统",
+    "麒麟信安操作系统（KylinSec）"
+  ],
+  "aqkk_desktop_listed": [
+    "方德桌面操作系统 V5.0",
+    "统信桌面操作系统 V25（UOS）",
+    "银河麒麟桌面操作系统"
+  ],
   "build_methods": [
     "mmdebstrap",
     "selfhost",
@@ -21,7 +35,7 @@
   "census_community": 9,
   "census_dangling_refs": [],
   "census_entries_without_source": [],
-  "census_field_citations": 120,
+  "census_field_citations": 157,
   "census_os_count": 21,
   "census_os_with_any_image": [
     "AOSC OS（安同 OS）",
@@ -41,6 +55,7 @@
     "银河麒麟桌面操作系统",
     "统信桌面操作系统 V25（UOS）"
   ],
+  "customers_missing": [],
   "cve_effective_coverage": 0,
   "cve_high_critical_total": 0,
   "cve_misidentified": 6,
@@ -84,6 +99,7 @@
   "installable_kylin11": 14,
   "installable_uos25": 0,
   "iso_access_missing": [],
+  "iso_class_unknown": [],
   "iso_direct": [
     "AOSC OS（安同 OS）",
     "Anolis OS（龙蜥）",
@@ -93,20 +109,22 @@
     "RevyOS",
     "Ubuntu Kylin（优麒麟）",
     "deepin（深度）",
-    "openEuler"
+    "openEuler",
+    "统信桌面操作系统 V25（UOS）"
   ],
   "iso_gated": [
     "EulerOS（华为）",
-    "FydeOS",
     "凝思安全操作系统",
     "新支点桌面操作系统（NewStart NSDL）",
     "方德桌面操作系统 V5.0",
-    "统信桌面操作系统 V25（UOS）",
-    "银河麒麟桌面操作系统",
     "麒麟信安操作系统（KylinSec）"
   ],
-  "iso_unverified": [
+  "iso_public_unresolved": [
+    "FydeOS",
     "openKylin（开放麒麟）",
+    "银河麒麟桌面操作系统"
+  ],
+  "iso_unverified": [
     "一铭桌面操作系统（EmindDesktop）",
     "中标麒麟桌面操作系统（NeoKylin）",
     "普华桌面操作系统"
@@ -200,9 +218,9 @@
   "probe_complete_all": true,
   "probe_provenance_recorded": 9,
   "probe_stale_vs_image": [],
-  "references_title_from_page": 72,
-  "references_title_manual": 14,
-  "references_total": 86,
+  "references_title_from_page": 99,
+  "references_title_manual": 16,
+  "references_total": 115,
   "repro_identical": 6,
   "sbom_passed": 9,
   "setuid_micro": {
