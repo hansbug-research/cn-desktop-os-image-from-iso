@@ -227,7 +227,8 @@ for v, ctx, lbl in [
     (S["digest_chain_passed"], r"\| {v} / 9 \|", "README 门禁表 digest"),
     (S["mutation_caught"], r"{v} 抓到 / 0 漏", "README 门禁表 mutation"),
     (S["repro_identical"], r"{v} / 6 逐位一致", "README 门禁表 repro"),
-    (S["existence_probes"], r"{v} 条存在性探测", "README 结论 3 探测数"),
+    (S["census_probes"], r"{v} 个候选引用实测", "README 结论 3 的实测引用数"),
+    (S["census_os_count"], r"名录 {v} 个 OS", "README 结论 3 的名录规模"),
     (S["uos_iso_packages"], r"ISO（{v} 个包）", "README 结论 5 ISO 包数"),
 ]:
     in_text(v, where="readme", label=lbl, ctx=ctx.replace("{v}", str(v)))
@@ -397,11 +398,11 @@ ok(S["census_entries_without_source"] == [],
 ok(S["census_os_count"] == S["census_commercial"] + S["census_community"],
    "名录的商业/社区分类必须覆盖全部条目，不能有条目落在两类之外")
 in_text(S["census_os_count"], label="名录 OS 总数",
-        ctx=rf"合计 {S['census_os_count']} 个")
+        ctx=rf"名录含 \*\*{S['census_os_count']} 个\*\* OS")
 in_text(S["census_commercial"], label="名录商业型个数",
-        ctx=rf"含\*\*商业 {S['census_commercial']} 个")
+        ctx=rf"商业 \*\*{S['census_commercial']} 个\*\*")
 in_text(S["census_community"], label="名录社区型个数",
-        ctx=rf"社区开源 {S['census_community']} 个")
+        ctx=rf"社区开源 \*\*{S['census_community']} 个\*\*")
 in_text(S["census_probes"], label="名录实测引用数",
         ctx=rf"{S['census_probes']} 个引用中")
 in_text(S["census_probes_exist"], label="名录实测存在数",
@@ -409,12 +410,34 @@ in_text(S["census_probes_exist"], label="名录实测存在数",
 # 「桌面命名的引用一条都不存在」是本节的核心结论，单独绑
 _desk = [p for p in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["probes"]
          if any(k in p["ref"] for k in ("desktop", "ukui", "dde"))]
-ok(len(_desk) == 9, f"桌面命名引用应为 9 条，实际 {len(_desk)}")
+ok(len(_desk) == 13, f"桌面命名引用应为 13 条，实际 {len(_desk)}")
 ok(all(not p["exists"] for p in _desk), "桌面命名引用必须全部不存在（本节核心结论）")
-in_text("9 条，一条都不存在", label="桌面命名引用全不存在这句结论")
+in_text("13 条", label="桌面命名引用条数",
+        ctx=r"共 13 条，跨 5 家 registry")
+in_text("一条都不存在", label="桌面命名引用全不存在这句结论")
 # DevStation 那两个体积是本节唯一的一手数字，写死在正文里，必须与实测一致
 in_text("2066238156", label="DevStation rootfs 字节数")
 in_text("43690908", label="openEuler 基础镜像 rootfs 字节数")
+
+# §2.2 的 registry 枚举是本节最强的一格证据（从「我们拉不到」升级为「厂商库里没有」），
+# 两家的枚举结论各绑一次；代理陷阱那条方法学提醒也绑，它决定了别人复现时会不会得出反结论。
+in_text("27", label="麒麟 kylin 项目仓库数", ctx=r"kylin\(27\)")
+in_text("0 个", label="麒麟 registry 零桌面", ctx=r"含 desktop 或 ukui 的：0 个")
+in_text("18 个公开项目", label="统信 registry 项目数",
+        ctx=r"\*\*18 个公开项目，含 `desktop`/`dde`/`ukui` 的 0 个\*\*")
+in_text("uos-server-base", label="统信基础镜像项目名")
+ok("--noproxy" in REPORT, "代理陷阱那条方法学提醒必须在正文里（决定复现者会不会得出反结论）")
+in_text("000", label="代理下的假不可达", ctx=r"经代理访问时\*\*都返回 000\*\*")
+# 名录里「官方未声明血统」的家数是正文的一个论断，从名录现算而不是手写
+_unstated = sum(1 for e in json.loads((ROOT / "config" / "os_census.json").read_text())["entries"]
+                if "未" in e["lineage"][:12])
+in_text(_unstated, label="血统未声明的家数", ctx=rf"\*\*：{_unstated} 家的血统是「官方未声明」")
+# 剔除项与小型社区两个清单的条数也绑，避免悄悄增删
+_cen = json.loads((ROOT / "config" / "os_census.json").read_text())
+in_text(len(_cen["scope"]["exclusions"]), label="剔除项条数",
+        ctx=rf"剔除 {len(_cen['scope']['exclusions'])} 项")
+in_text(len(_cen["scope"]["small_community"]), label="小型社区条数",
+        ctx=rf"另有 {len(_cen['scope']['small_community'])} 个\*\*小型社区发行版")
 
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
@@ -430,7 +453,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "234"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "245"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

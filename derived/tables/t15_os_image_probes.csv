@@ -27,3 +27,17 @@ OpenCloudOS,docker.io/opencloudos/opencloudos9-desktop:latest,不存在,docker m
 AOSC OS（安同 OS）,docker.io/aosc/aosc-os:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
 麒麟信安操作系统（KylinSec）,docker.io/kylinsec/kylinsec:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
 EulerOS（华为）,docker.io/euleros/euleros:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+Loongnix（龙芯）,cr.loongnix.cn/loongson/loongnix:20.7,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+Loongnix（龙芯）,cr.loongnix.cn/loongson/loongnix:25.1,不存在,docker manifest inspect,,,,no such manifest: cr.loongnix.cn/loongson/loongnix:25.1
+Loongnix（龙芯）,cr.loongnix.cn/loongson/loongnix:25,不存在,docker manifest inspect,,,,no such manifest: cr.loongnix.cn/loongson/loongnix:25
+Loongnix（龙芯）,cr.loongnix.cn/loongson/loongnix-desktop:25.1,不存在,docker manifest inspect,,,,no such manifest: cr.loongnix.cn/loongson/loongnix-desktop:25.1
+RevyOS,docker.io/revyos/revyos:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+Bianbu OS,docker.io/spacemit/bianbu:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+银河麒麟桌面操作系统,cr.kylinos.cn/kylin/kylin-server-v10sp3-x86_64:20230324,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+银河麒麟桌面操作系统,cr.kylinos.cn/kylin/kylin-desktop-v11:latest,不存在,docker manifest inspect,,,,unknown: repository kylin/kylin-desktop-v11 not found
+银河麒麟桌面操作系统,cr.kylinos.cn/kylin/kylin-desktop-v10sp1-x86_64:latest,不存在,docker manifest inspect,,,,unknown: repository kylin/kylin-desktop-v10sp1-x86_64 not found
+中标麒麟桌面操作系统（NeoKylin）,docker.io/cs2cneokylin/ns76-base-x86_64:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+中标麒麟桌面操作系统（NeoKylin）,docker.io/cs2cneokylin/neokylin-desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+统信桌面操作系统 V25（UOS）,docker.io/uniontech/uos:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+统信桌面操作系统 V25（UOS）,registry.uniontech.com/uos-server-base/uos-server-20-1070a:latest,不存在,docker manifest inspect,,,,"failed to configure transport: error pinging v2 registry: Get ""https://registry.uniontech.com/v2/"": net/http: TLS handshake timeout"
+FydeOS,docker.io/openfyde/openfyde:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required

@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **234** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **16** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **245** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **16** 张
 
 ## 1. 问题
 
@@ -23,35 +23,84 @@
 
 ### 2.1 名录：主要的国产桌面 OS
 
-| OS | 类型 | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | 维护 | 出处 |
+名录含 **21 个** OS：商业 **12 个**、社区开源 **9 个**。可核对的源文件是 [`config/os_census.json`](config/os_census.json)，采集脚本拒收任何缺 `sources` 的条目，`verify.py` 另有一条断言要求「缺出处的条目集合为空」。
+
+**商业（12 个）**
+
+| OS | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | 维护 | 官方容器镜像 | 出处 |
 |---|---|---|---|---|---|---|---|
-| openEuler | 社区开源<br>（厂商主导：华为发起，开放原子开源基金会运营） | openEuler 社区 | 独立选型，早期 RHEL/CentOS 血统、现自主演进；rpm/dnf | 24.03 LTS SP4（2026-06-30）；创新版 25.09（2025-09-30） | 无桌面版 ISO；UKUI/DDE/Kiran 以软件包提供（曾有 GNOME/Xfce，文档已下架）；DevStation 为官方开发者桌面 ISO | 活跃 | [[1]](https://www.openeuler.org/zh/download/) [[2]](https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html) [[3]](https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/) [[4]](https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/) [[5]](https://gitee.com/openeuler/openeuler-docker-images) [[6]](https://hub.docker.com/r/openeuler/openeuler) |
-| openKylin（开放麒麟） | 社区开源<br>（厂商主导：麒麟软件为核心贡献方，开放原子开源基金会孵化） | openKylin 社区 | Debian 系（apt，dists 代号 yangtze/nile/huanghe） | 3.0「黄河」（2026-08-28） | UKUI 4.24（自研） | 活跃 | [[1]](https://www.openkylin.top/news/4099-en.html) [[2]](https://www.openkylin.top/support/docker_images.html) [[3]](https://gitee.com/openkylin/openkylin-docker-images) [[4]](https://mirror.nju.edu.cn/openkylin/dists/) [[5]](https://hub.docker.com/r/openkylin/openkylin) |
-| deepin（深度） | 社区开源<br>（厂商主导：统信软件，深度科技为其全资子公司；deepin 与 UOS 为社区版↔商业版关系） | 深度科技 / deepin 社区 | Debian 系（代号 apricot/beige/crimson） | 25.2.0（2026-07-08） | DDE（自研）+ Treeland（Wayland 合成器） | 活跃 | [[1]](https://www.deepin.org/en/deepin-25-2-release/) [[2]](https://cdimage.deepin.com/releases/) [[3]](https://faq.uniontech.com/desktop/f435/install/da34) [[4]](https://hub.docker.com/r/linuxdeepin/deepin) |
-| Ubuntu Kylin（优麒麟） | 社区开源<br>（Canonical 官方 flavor，中方由麒麟软件主导开发） | Canonical / 麒麟软件 CCN 联合实验室 | Ubuntu 直系（ISO 托管在 cdimage.ubuntu.com 的 Canonical 自有基础设施） | 26.04.1 LTS（2026-08-27） | UKUI | 活跃 | [[1]](https://cdimage.ubuntu.com/ubuntukylin/releases/) [[2]](https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/) [[3]](https://www.ubuntukylin.com/downloads/) |
-| Anolis OS（龙蜥） | 社区开源<br>（厂商主导：阿里巴巴发起，龙蜥社区理事会运营） | OpenAnolis 龙蜥社区 | RHEL/CentOS 兼容系；ANCK 内核；rpm/dnf | 23.5（镜像站已上线；官方发布动态只到 23.3 GA / 2025-06，23.4/23.5 发布日期未公开） | 无桌面版 ISO（实测 23.3/23.4/23.5 只有 boot.iso 与 dvd.iso）；官网仅称仓库集成/兼容 GNOME、DDE | 活跃（镜像站），但官方发布动态未同步 | [[1]](https://openanolis.cn/anolisos/23) [[2]](https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/) [[3]](https://gitee.com/anolis/docker-images) [[4]](https://hub.docker.com/r/openanolis/anolisos) |
-| OpenCloudOS | 社区开源<br>（厂商主导：腾讯发起，联合中兴新支点等） | OpenCloudOS 社区 | 自主演进选型，RHEL 系包管理（rpm/dnf，8/9 双系列） | 9.6（镜像快照 2026-07-13） | 无桌面版 ISO（实测 9.6 只有 boot/everything/minimal）；桌面靠中兴新支点开源的超凡桌面 EX-NDE 按包组安装，9.2 起为实验性支持 | 活跃 | [[1]](https://docs.opencloudos.org/release/v9.6/) [[2]](https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/) [[3]](https://gitee.com/OpenCloudOS/SIG-EX-NDE) [[4]](https://docs.opencloudos.org/faq/) [[5]](https://hub.docker.com/u/opencloudos) |
-| AOSC OS（安同 OS） | 社区开源<br>（纯社区，无厂商主导） | 安同开源社区 | 完全独立自建，不属 Debian/RHEL 任一系；自研包管理器 oma | 滚动发布，下载页标注 2026-06-21 | 下载页未列具体桌面环境（本体定位为桌面 OS） | 活跃 | [[1]](https://aosc.io/downloads/) [[2]](https://github.com/AOSC-Dev/aosc-os-docker-files) [[3]](https://hub.docker.com/r/aosc/aosc-os) |
-| 麒麟信安操作系统（KylinSec） | 商业 | 湖南麒麟信安科技 | openEuler 系（列于 openEuler 官方商业发行版页） | V6 SP1（2026-06） | 自研 Kiran / KiranUI | 活跃 | [[1]](https://www.openeuler.org/zh/download/commercial-release/) [[2]](https://www.kylinsec.com.cn/detail/13151/1.html) |
-| EulerOS（华为） | 商业 | 华为 | openEuler 的商业/闭源对应物 | 未公开（面向服务器与华为云 B2B） | 未见桌面版 | 活跃（服务器向） | [[1]](https://www.openeuler.org/zh/download/commercial-release/) |
+| **麒麟信安操作系统（KylinSec）** | 湖南麒麟信安科技 | openEuler 系（列于 openEuler 官方商业发行版页） | V6 SP1（2026-06） | 自研 Kiran / KiranUI | 活跃 | 未公开 | [[1]](https://www.openeuler.org/zh/download/commercial-release/) [[2]](https://www.kylinsec.com.cn/detail/13151/1.html) |
+| **EulerOS（华为）** | 华为 | openEuler 的商业/闭源对应物 | 未公开（面向服务器与华为云 B2B） | 未见桌面版 | 活跃（服务器向） | 未公开 | [[1]](https://www.openeuler.org/zh/download/commercial-release/) |
+| **Bianbu OS** | 进迭时空 SpacemiT | Ubuntu 26.04 resolute 血统；RISC-V | v4.0（K3 线 v4.0.6，2026-08-26） | 未核实具体桌面环境 | 活跃 | 未公开 | [[1]](https://bianbu.spacemit.com/) |
+| **银河麒麟桌面操作系统** | 麒麟软件有限公司（中国电子 CEC 旗下） | ⚠️ 官方未声明。V10 SP1 实测为 Debian/Ubuntu 系（deb/apt、ID_LIKE=debian）；V11 官网只写「基于全新内核开发」+ 磐石架构 + 开明包格式 + OSTree 原子更新，全文不提上游发行版，但出现「一键转换 deb 包为开明包」，间接指向 deb 底座。流传的「V11 桌面基于 openKylin」未找到任何一手出处，按未证实处理 | V11（2025-08-26 在 2025 中国操作系统产业大会发布，官方称首个采用 6.6 内核的商业版国产操作系统；官网挂 2603 版本说明，PDF 上传路径日期 20260228/20260423/20260511）；V10 SP1 最新为 2503 版本（2025-04） | V10 SP1 = UKUI；V11 = ⚠️ 未公开（官网 V11 产品页全文未出现 UKUI 字样，只写「新桌面、新壁纸、新屏保」） | 活跃 | 有（非桌面） | [[1]](https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html) [[2]](https://www.kylinos.cn/productPc/desktop/desktopMainV11/) [[3]](https://www.kylinos.cn/productPc/desktop/desktopMain/) [[4]](https://cr.kylinos.cn/api/v2.0/projects) [[5]](https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories) |
+| **中标麒麟桌面操作系统（NeoKylin）** | 中标软件有限公司 → 现运营主体为麒麟软件有限公司 | ⚠️ 未查到官方结论；历史上中标 Linux 被 DistroWatch 归为 Red Hat 系 | ⚠️ 未查到 V7 之后的新版本；桌面版确切最后版本号与日期未公开 | 未查到 | 停更（维基标「停止开发」；官方容器镜像最后更新 2019-09-16；无 2025/2026 新版本公告） | 有（非桌面） | [[1]](https://zh.wikipedia.org/zh-hans/中标麒麟) [[2]](https://cs2c.com.cn/about/company/1349.html) [[3]](https://hub.docker.com/v2/orgs/cs2cneokylin/) [[4]](https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64) |
+| **统信桌面操作系统 V25（UOS）** | 统信软件技术有限公司（UnionTech） | ⚠️ 官方未书面确认。官方话语体系只讲 DTK + Qt 与内核版本（V20 线 4.19/5.10，V25 线 6.6），全程不提 Debian；业界共识为 Debian 系。社区上游为 deepin（统信全资子公司），而 deepin 自 23 起已自建独立基础仓库 | 桌面专业版 V25（2026-04-15 正式发布；镜像名 uos-desktop-25-professional-2500-amd64-202604.iso，内部版本号 2500）；V20 线仍维护，桌面专业版最新 1070u4 | DDE（V25 起走 Treeland Wayland + Qt6 路线） | 活跃 | 未公开 | [[1]](https://uniontech.com/m/news-info/2877.html) [[2]](https://www.uniontech.com/os-containerImage.html) [[3]](https://registry.uniontech.com/api/v2.0/projects) [[4]](https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories) |
+| **方德桌面操作系统 V5.0** | 中科方德软件有限公司 | ⚠️ 官方未声明，只说「基于核高基重大专项安全加固内核成果持续优化发展」。旁证指向 deb 系：官方源 repos.os.nfschina.com/debian-sign/ 与 update.os.nfschina.com/repo_desktop_4.0/ 内含 mate-desktop-environment 等 deb 包 | V5.0 首发 2022-06-17；兆芯适配版 2025-05 上线；Pro 版 V5.0（内核 6.6）2025-09-12 通过《安全可靠测评结果公告（2025年第3号）》，与银河麒麟桌面 V11 并列为首批基于 Linux 6.6 LTS 过评的两款桌面 OS | ⚠️ 未公开（官方未命名；官方源内含 MATE 包，疑为 MATE 衍生但不确定） | 活跃 | 未公开 | [[1]](https://www.nfschina.com/) [[2]](https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/) [[3]](https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html) |
+| **普华桌面操作系统** | 普华基础软件股份有限公司（中国电科投资设立） | ⚠️ 官方未声明，只写「以开源 Linux 为基础」。服务器线（现名普华太极）明确融合 openEuler，桌面线是否同源官方未说 | ⚠️ 两个官方来源不一致，如实并列：官网产品详情页是 V4.0（4.4 内核，V4.0 系列发布于 2016 年）；Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0。V5.0 的发布日期、内核、桌面环境全部未查到 | V4.1 = KDE 5.4（Plasma）；V5.0 未查到 | ⚠️ 桌面线沉寂但未 EOL：官网近两年新闻全是车用 AUTOSAR / 开源小满 EasyXMen 方向，首页版权信息只到 2009–2022，但未见任何停售或 EOL 公告，产品页仍在架 | 未公开 | [[1]](https://www.i-soft.com.cn/detail/59.html) [[2]](https://www.i-soft.com.cn/product/currency.html) [[3]](http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html) |
+| **凝思安全操作系统** | 北京凝思软件股份有限公司 | Debian 系，本名录里证据最硬的一条：官方 V6.0.80 发布说明写 grub2 升级到 2.06-3~deb10u4linx5（deb10 = Debian 10 buster），官方文档中出现 iceweasel（Debian 独有的 Firefox 改名）+ glibc 2.28 组合。厂商自身表述只到「以 Linux 社区发行版本为基础」。另有 openEuler 分支产品（欧拉版 V6.0.99） | X86_64 为 V6.0.80 子版本 20250816（cat /etc/issue → LinxOS 6.0.80 20250816）；并行在架 V6.0.100 与 V6.0.99 欧拉版。⚠️ V6.0.100 正式发布日期未查到 | ⚠️ 无独立命名的「桌面版」产品：图形场景由基础版与图形工作站版承担，可选 GNOME 3.14 / KDE 4.11 / MATE 1.8 / XFCE 4.10，无自研 DE。V6.0.80 发布说明的适用范围原文是「适用 X86_64 架构的服务器和工作站」 | 活跃（发布说明 20250816；针对 CVE-2025-26465/26466、CVE-2024-27078 的升级预案持续发布） | 未公开 | [[1]](https://www.linx-info.com/download/document/6.0.80/) [[2]](https://www.linx-info.com/download/security/) |
+| **新支点桌面操作系统（NewStart NSDL）** | 广东中兴新支点技术有限公司（中兴通讯全资子公司） | ⚠️ 官方只说「基于 Linux 稳定内核」。桌面线血统第三方说法互相矛盾（Debian 系 vs RHEL 系），不下结论。同厂服务器线 CGSL V7 明确基于 6.6 内核 | 官网下载中心 x86 最新为 V4.5.2；此前 V4.4.0 提供 X86/ARM/MIPS/LoongArch 四架构。⚠️ 官方未标任何发布日期。桌面 V4.x 与服务器 V7 是两套版本号体系 | EX-NDE 超凡桌面（Qt 自研 + NDE-Wayland；支持桌面/服务器/平板三种交互模式）。该桌面 2023-04 在 OpenCloudOS V9 发布会上开源，Gitee 组织 opencloudos-exnde，安装包约 104MB，目前只支持 OpenCloudOS 8 | ⚠️ 品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体 | 未公开 | [[1]](https://www.gd-linux.com/downloads) [[2]](https://www.gd-linux.com/desktop/) [[3]](https://gitee.com/opencloudos-exnde) |
+| **一铭桌面操作系统（EmindDesktop）** | 一铭软件股份有限公司（新三板 831266） | ⚠️ 官方未声明。第三方称基于 Ubuntu 但未找到官方一手出处；官方历史表述只有「基于国家 Linux 标准开发」 | ⚠️ 最后可查桌面版本为 EmindDesktop 4.0 / 4.0 SP1（2016 年 6 月） | 未查到 | ⚠️ 疑似停止：桌面版最后公开版本 2016 年，官网 Wayback 最后可用快照 2023-04-01，2023–2025 无新版本/新闻/中标公示。未查到工商注销或吊销证据，公司是否存续未确认。部分省级软件正版化平台仍列该条目，属存量采购目录，不代表在维护 | 未公开 | [[1]](http://www.emindsoft.com.cn/index.php) [[2]](http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/) |
+| **FydeOS** | 燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实） | Chromium OS 衍生 + Gentoo Portage overlay 体系。openFyde 宣称 0 闭源组件，FydeOS 含闭源组件并提供自动更新 | 商业版 FydeOS v23「Chromatic Cadence」（对应 Chromium OS r150，⚠️ 精确发布日期未查到）；开源版 openFyde r144 | ChromeOS 风格自研 shell（Chromium OS Ash/Aura），非传统 Linux DE，无 X11/Wayland 传统 DE 概念 | 活跃（openFyde overlay 2026-06-11 更新） | 未公开 | [[1]](https://fydeos.com/blog/release-note-v23/) [[2]](https://openfyde.io/) [[3]](https://github.com/orgs/openFyde/repositories) |
 
-口径与边界：**已明显停止维护的不列入**；非 Linux 内核的（如鸿蒙 PC）不在本研究范围；服务器专用发行版只在它与桌面线容易被混淆时提及（§2.3 就是这么一个案例）。名录含**商业 2 个、社区开源 7 个**，合计 9 个。
+**社区开源（9 个）**
 
-「社区开源」不等于「无厂商」：openKylin 的核心贡献方是麒麟软件、deepin 的主导方深度科技是统信软件全资子公司、优麒麟由麒麟软件主导开发同时是 Canonical 官方认可的 Ubuntu flavor、Anolis OS 由阿里发起、OpenCloudOS 由腾讯发起、openEuler 由华为发起后交开放原子开源基金会运营。这一列写的是**治理形态**，不是「有没有公司在背后」。
+| OS | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | 维护 | 官方容器镜像 | 出处 |
+|---|---|---|---|---|---|---|---|
+| **openEuler** | openEuler 社区 | 独立选型，早期 RHEL/CentOS 血统、现自主演进；rpm/dnf | 24.03 LTS SP4（2026-06-30）；创新版 25.09（2025-09-30） | 无桌面版 ISO；UKUI/DDE/Kiran 以软件包提供（早期还有 GNOME 与 Xfce，官方文档已在 24.03 LTS SP1 与 SP4 相继下架）；官方开发者桌面形态为 DevStation，桌面环境是 GNOME（依据 25.09 版 ISO 的 .rpmlist：gnome-shell-44.6 / gnome-session-44.0 / gdm-45.0.1 + vscodium，同清单里 ukui/dde/kiran/xfce/plasma 命中均为 0） | 活跃 | 有（非桌面） | [[1]](https://www.openeuler.org/zh/download/) [[2]](https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html) [[3]](https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/) [[4]](https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/) [[5]](https://gitee.com/openeuler/openeuler-docker-images) [[6]](https://hub.docker.com/r/openeuler/openeuler) |
+| **openKylin（开放麒麟）** | openKylin 社区 | Debian 系（apt，dists 代号 yangtze/nile/huanghe） | 3.0「黄河」（ISO 构建日 2026-08-27，公告 2026-08-28） | UKUI 4.24（自研）。⚠️ 桌面 ISO 只有 x86_64/arm64/loong64 三种架构，RISC-V 侧只有嵌入式镜像（openKylin-Embedded-V3.0-Release-spacemit-k3-riscv64.zip），与公告宣称的「四架构支持」不完全一致 | 活跃 | 有（非桌面） | [[1]](https://www.openkylin.top/news/4099-en.html) [[2]](https://www.openkylin.top/support/docker_images.html) [[3]](https://gitee.com/openkylin/openkylin-docker-images) [[4]](https://mirror.nju.edu.cn/openkylin/dists/) [[5]](https://hub.docker.com/r/openkylin/openkylin) |
+| **deepin（深度）** | 深度科技 / deepin 社区 | Debian 系（代号 apricot/beige/crimson） | 25.2.1（2026-08-04，在线更新，不出新 ISO）；最新 ISO 仍为 25.2.0（cdimage amd64/arm64/riscv64 = 2026-07-07，loong64 = 2026-07-14） | DDE 7.0（自研）+ Treeland（Wayland 合成器）；riscv64 明确标 Technology Preview | 活跃 | 有（非桌面） | [[1]](https://www.deepin.org/en/deepin-25-2-release/) [[2]](https://cdimage.deepin.com/releases/) [[3]](https://faq.uniontech.com/desktop/f435/install/da34) [[4]](https://hub.docker.com/r/linuxdeepin/deepin) |
+| **Ubuntu Kylin（优麒麟）** | Canonical / 麒麟软件 CCN 联合实验室 | Ubuntu 直系（ISO 托管在 cdimage.ubuntu.com 的 Canonical 自有基础设施） | 26.04.1 LTS（2026-08-27）；26.04 于 2026-04-24 发布，官方公告原文「该版本将支持3年」 | UKUI | 活跃 | 未公开 | [[1]](https://cdimage.ubuntu.com/ubuntukylin/releases/) [[2]](https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/) [[3]](https://www.ubuntukylin.com/downloads/) [[4]](https://www.ubuntukylin.com/news/ubuntukylin2604-cn.html) |
+| **Anolis OS（龙蜥）** | OpenAnolis 龙蜥社区 | RHEL/CentOS 兼容系；ANCK 内核；rpm/dnf | 23.5（镜像站已上线；官方发布动态只到 23.3 GA / 2025-06，23.4/23.5 发布日期未公开） | 无独立桌面 ISO（实测 23.3/23.4/23.5 只有 boot.iso 与 dvd.iso），但有官方桌面供货渠道：mirrors.openanolis.cn/anolis/23.5/DDE/ 是独立 DDE 仓库，含 x86_64/aarch64/loongarch64（无 riscv64），装法 yum groupinstall dde，DDE 自 23.1 起与 GNOME 同级 | 活跃（镜像站），但官方发布动态未同步 | 有（非桌面） | [[1]](https://openanolis.cn/anolisos/23) [[2]](https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/) [[3]](https://mirrors.openanolis.cn/anolis/23.5/DDE/) [[4]](https://gitee.com/anolis/docker-images) [[5]](https://hub.docker.com/r/openanolis/anolisos) |
+| **OpenCloudOS** | OpenCloudOS 社区 | 自主演进选型，RHEL 系包管理（rpm/dnf，8/9 双系列） | 9.6（镜像快照 2026-07-13） | 无独立桌面 ISO（实测 9.6 只有 boot/everything/minimal），但官方文档有「桌面安装」章节提供 GNOME 43（dnf group install "Server with GUI"）；另有中兴新支点开源的超凡桌面 EX-NDE，目前只支持 OpenCloudOS 8 | 活跃 | 有（非桌面） | [[1]](https://docs.opencloudos.org/release/v9.6/) [[2]](https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/) [[3]](https://docs.opencloudos.org/OCS/Install_Guide/ocs-desktop/) [[4]](https://gitee.com/opencloudos-exnde) [[5]](https://hub.docker.com/u/opencloudos) |
+| **AOSC OS（安同 OS）** | 安同开源社区 | 完全独立自建，不属 Debian/RHEL 任一系；自研包管理器 oma | 滚动发布，下载页标注 2026-06-21 | KDE Plasma（硬证据：aoscbootstrap/recipes/mainline-desktop.lst 内容只有一行 kde.lst）；一级架构 x86-64/AArch64/LoongArch，另有 RISC-V 与 WSL 构建 | 活跃 | 有（非桌面） | [[1]](https://aosc.io/downloads/) [[2]](https://github.com/AOSC-Dev/aosc-os-docker-files) [[3]](https://hub.docker.com/r/aosc/aosc-os) |
+| **Loongnix（龙芯）** | 龙芯中科 / Loongnix 社区 | Debian 系。25 线 ⚠️**推断为** Debian 13 trixie（依据是 pool 里 bash 5.2.37-2、libc-bin 2.41-13 正是 trixie 组合；官方无明文声明），架构 loong64 新世界 ABI；20 线为 Debian 10 buster、架构 loongarch64 旧世界 ABI。⚠️ 陷阱：两条线的 dists/*/Release 都误写 Origin: Debian / Version: 10.4，不能据此判断血统 | Loongnix-25.1 正式版（2026-08-20）；20 线 Loongnix-20.7 正式版（2026-07-17） | KDE（硬证据是 ISO 文件名 Loongnix-25.1.livecd.kde-loong64.hybrid.iso、Loongnix-20.7.livecd.kde.loongarch64.iso）。「Loongnix 用 MATE」是 20 系列早期旧资料，已过时 | 活跃 | 有（非桌面） | [[1]](https://www.loongnix.cn/) [[2]](https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true) |
+| **RevyOS** | 中科院软件所 PLCT Lab / RuyiSDK | Debian 13 trixie 基线（已从 sid 迁出），另新开 Ubuntu noble 线；RISC-V | 镜像站已有 20260504（官方文档停在 20251226，changelog 页 404） | Xfce4 | 活跃（镜像站） | 未公开 | [[1]](https://revyos.github.io/) [[2]](https://mirror.iscas.ac.cn/revyos/) |
 
-其中 openEuler 系值得单独点出：它自己不出桌面版 ISO，桌面以软件包形式提供（UKUI/DDE/Kiran，早期还有 GNOME 与 Xfce，两者的官方文档已在 24.03 LTS SP1 与 SP4 相继下架），官方的开发者桌面形态叫 **DevStation**。而麒麟信安（KylinSec）这一支是 openEuler 系里少见的、桌面形态明确的商业发行版（自研 Kiran 桌面）。
+「社区开源」不等于「无厂商」，这一列写的是**治理形态**而不是「背后有没有公司」：openKylin 的核心贡献方是麒麟软件、deepin 的主导方深度科技是统信软件全资子公司、优麒麟由麒麟软件主导开发同时是 Canonical 官方认可的 Ubuntu flavor、Anolis OS 由阿里发起、OpenCloudOS 由腾讯发起、openEuler 由华为发起后交开放原子开源基金会运营、Loongnix 由龙芯中科主导、RevyOS 由中科院软件所 PLCT 实验室主导。
+
+**血统一列有一个反复出现的现象值得记**：6 家的血统是「官方未声明」，只能靠旁证推断。旁证质量差别很大，最硬的是凝思（官方发布说明里写 `grub2` 升级到 `2.06-3~deb10u4linx5`，`deb10` 即 Debian 10 buster；文档中另有 `iceweasel` 这个 Debian 独有的 Firefox 改名）；而 Loongnix 是个反面例子——它两条产品线的 `dists/*/Release` **都误写** `Origin: Debian` / `Version: 10.4`，照着读会把 25 线也判成 Debian 10，实际按 pool 里的 `bash 5.2.37-2`、`libc-bin 2.41-13` 组合推断是 Debian 13 trixie（⚠️ 官方无声明，这是推断）。银河麒麟 V11 则连桌面环境都未公开：官网 V11 产品页全文不出现 UKUI 字样，只写「新桌面、新壁纸、新屏保」。
+
+**口径**（完整定义在 `config/os_census.json` 的 `scope` 字段）：收面向桌面使用、Linux 内核、当前仍在维护的国产发行版；「维护中」的依据是可核对的时间点（最近发布日、镜像站目录时间戳、代码仓最近提交），逐条写在名录里。
+
+剔除 7 项，每项都有理由，不是漏掉：鸿蒙 PC（非 Linux 内核，不在容器化前提内）、ZimaOS（Buildroot 构建、RAUC OTA 分发的 NAS/个人云 OS）、Circle Linux（RHEL 下游服务器发行版，实测 10.2 的 x86_64 目录只有 `boot.iso` 与 `dvd1.iso`，无桌面 spin；DistroWatch 标的 `Desktop=GNOME` 源自 DVD 内软件组，是误读）、UbuntuDDE Remix（非中国项目，主导者为尼泊尔 Debian Developer，且已停滞）、openthos（已停，主体停在 2020；顺带纠一处误传——主导方是清华大学 + 同方股份 + 一铭软件，「上海交大」之说源自镜像站 `ftp.sjtu.edu.cn` 的域名误读）、万里红桌面操作系统 V3.0（曾有，现已淡出：官网实测 200 在线但产品列表已无任何操作系统条目）、CutefishOS。
+
+**CutefishOS 要分两层说**，一层化会说错：作为**发行版**它事实停摆两年多（SourceForge 最后是 `cutefishos-debian-12-beta-amd64-2023.08.iso`，2023-08-07，官方下载页只写 "The new iso is coming soon."）；但它的**桌面环境 Cutefish DE** 仍由原作者高频提交 Qt6/KF6 迁移。停摆的是发行版，不是 DE。
+
+另有 5 个**小型社区发行版**查到即列，但不进主名录——个人或小团队维护的发行版与银河麒麟并列会把分母灌水：铜豌豆 Linux（肖盛文，Debian Developer；12.15.1 / 2026-08-22）、Evernight Vista（44.0.1 / 2026-07-28，Fedora 衍生 + KDE）、CatOS（2026.08.05 滚动，Arch 衍生）、LankeOS（0.18 / 2026-08-23，LFS 自建 + 自研 lpkg）、OsoLinux（fc44 / 2026-08-25，⚠️ 找不到任何公开源码仓库，「开源发行版」这一标签需加注）。它们**全部没有官方容器镜像**；唯一沾边的是 `docker.io/wtada233/lankeos:0.18-1`，用户名即作者 GitHub handle、CI 里无推送步骤、官网未提，官方性未确认。
 
 ### 2.2 官方容器镜像现状：有镜像，但没有一个是桌面版
 
-我们对名录里的候选镜像引用逐个实测：**28 个引用中 15 个存在**（表 [`t15`](derived/tables/t15_os_image_probes.csv)）。另有一组针对麒麟与统信桌面 tag 的专项探测，见 §2.3。
+对名录里的候选镜像引用逐个实测：**42 个引用中 18 个存在**（表 [`t15`](derived/tables/t15_os_image_probes.csv)）。d1 那一轮更早的探测（表 [`t01`](derived/tables/t01_official_image_availability.csv)，8 个候选引用 6 个可匿名拉取）已经把麒麟、统信、openKylin、deepin 四家逐字段读过，本节把范围扩到 21 个 OS。
 
-d1 那一轮更早的探测（表 [`t01`](derived/tables/t01_official_image_availability.csv)，8 个候选引用 6 个可匿名拉取）已经把麒麟与统信、openKylin、deepin 四家逐字段读过，本节的名录把范围扩到 9 个 OS。
+存在的那些是什么：openEuler 有 `openeuler/openeuler`（rpm 系，实测 `NAME=openEuler`）；openKylin 的 2.0 与 3.0 都拉得到（dpkg 系）；deepin 有 `linuxdeepin/deepin:25` 与旧代号 `beige`(23)、`apricot`(20)；Anolis OS 有 `openanolis/anolisos`（rpm 系）；OpenCloudOS 有四档；AOSC OS 有 `aosc/aosc-os`（实测是六架构 manifest：`amd64/arm64/loong64/mips64le/ppc64le/riscv64`，名录里架构覆盖最广的一个）；Loongnix 有 `cr.loongnix.cn/loongson/loongnix:20.7`；中标麒麟有 `cs2cneokylin/ns76-base-x86_64`。
 
-先说存在的那些是什么。openEuler 有 `openeuler/openeuler`（rpm 系，实测 `NAME=openEuler`）；openKylin 有 `openkylin/openkylin`，2.0 与 3.0 都拉得到（dpkg 系）；deepin 有 `linuxdeepin/deepin:25` 以及旧代号的 `beige`(23)、`apricot`(20)（dpkg 系）；Anolis OS 有 `openanolis/anolisos`（rpm 系）；OpenCloudOS 有一整套四档（下面单说）；AOSC OS 有 `aosc/aosc-os`。
+**关键的是不存在的那些。名录里带 `desktop`、`ukui`、`dde` 字样的引用共 13 条，跨 5 家 registry、跨商业与社区两类，一条都不存在。** 官方容器镜像在国产阵营并不稀缺，稀缺的是**桌面版**的官方容器镜像；所有拉得到的都是服务器/基础/应用镜像。
 
-**关键的是不存在的那些。** 名录里凡是带 `desktop`、`ukui`、`dde` 字样的引用——`openeuler/desktop`、`openeuler/devstation`、`openeuler/ukui`、`openeuler/dde`、`openkylin/openkylin-desktop`、`openkylin/ukui`、`linuxdeepin/deepin-desktop`、`linuxdeepin/dde`、`opencloudos9-desktop`——**9 条，一条都不存在**。也就是说：官方容器镜像在国产阵营里并不稀缺，稀缺的是**桌面版**的官方容器镜像。所有拉得到的都是服务器/基础/应用镜像。
+#### 从「我们拉不到」到「厂商 registry 里就没有」
 
-这条结论有**一个例外，而它恰好把问题说得更清楚**：openEuler 的 DevStation 确实有一份官方容器 rootfs，但它不在任何 registry 上，而是以 `tar.xz` 的形态放在 repo 目录里——
+逐个 tag 探测有个天然弱点：探不到只能证明**我们猜的那个引用名**不存在。所以对两家最关键的商业厂商，我们改成直接枚举它们自己的 registry——这比探测强一个量级。
+
+**麒麟软件的 `cr.kylinos.cn`**（Harbor v2.11.1，站点标题「服务器软件中心」）公开项目可匿名枚举：
+
+```
+$ curl -s https://cr.kylinos.cn/api/v2.0/projects
+basekylin(160 repo) · eco(107) · kylin(27) · goharbor(18) · k8s.gcr.io(26) · hostos(2) · ingress-nginx(2) · bitnami(1)
+
+$ curl -s https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories   # 27 个全部列出
+kylin-server-micro / -minimal / -init / -platform
+kylin-server-v10sp{1,2,3}-{,init-,minimal-,micro-}{x86_64,aarch64,loongarch64}
+→ 含 desktop 或 ukui 的：0 个
+```
+
+**统信软件的 `registry.uniontech.com`**（统信容器镜像平台 UOS Container Registry，门户 `uoscr.chinauos.com`）同样可枚举：**18 个公开项目，含 `desktop`/`dde`/`ukui` 的 0 个**。基础镜像项目的名字本身就写着 server——`uos-server-base`，8 个仓库全是 `uos-server-20-*`（含 loongarch 与 sw64 分支）。官方产品页也写明适用范围是「统信服务器操作系统 V20 及统信云原生操作系统 V20，暂不支持其他操作系统」，全文未提 desktop。
+
+⚠️ **这里有一个会导致错误结论的方法学陷阱，值得单独记。** 统信这两个域名从本机经代理访问时**都返回 000**，看起来完全不可达——按这个结果只能写「无法验证」。但 `curl --noproxy '*'` 直连，两个都是 **200**。原因是本机走 v2ray 代理，代理把中国大陆站点绕到境外出口，于是造出了假的「不可达」。**探测国产厂商基础设施时，代理会系统性地把「可达」误报成「不可达」，进而把「查不到」误当成「没有」。** 本节所有对国产域名的探测都以直连结果为准。
+
+**厂商自己也在用分档。** `kylin` 项目那 27 个仓库里，`-micro` / `-minimal` / `-init` 三个后缀成体系地出现在 v10sp1/sp2/sp3 三个版本 × 三种架构上；OpenCloudOS 则提供 `opencloudos9-busybox`（无包管理器）/`-microdnf`/`-minimal`（官方推荐默认）/`-init`（带 systemd），四档我们逐个实测存在。这与 Red Hat UBI 的 `micro/minimal/standard/init` 是同一思路——也就是说 §3 那两条分档轴（装不装包管理器、装不装工具链）在国产厂商这里已经是既成实践，不是我们的臆造。但两家的分档**全部只覆盖服务器线，没有桌面档**。
+
+#### 唯一的例外：openEuler DevStation
+
+openEuler 的 DevStation 确实有一份官方容器 rootfs，但它不在任何 registry 上，而是以 `tar.xz` 的形态放在 repo 目录里——
 
 ```
 $ curl -sI https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/openEuler-docker.x86_64.tar.xz
@@ -60,7 +109,16 @@ $ curl -sI https://repo.openeuler.org/openEuler-24.03-LTS-SP3/docker_img/x86_64/
 HTTP/2 200 ；content-length: 43690908          # 41.7 MiB，同名的基础镜像
 ```
 
-同一个文件名、体积差 47 倍，说明 DevStation 那份是独立构建的桌面向 rootfs。但它的可得性很受限：**只有 24.03 LTS SP3 这一个版本有**（实测 `openEuler-24.03-LTS-SP4/DevStation/` 返回 **404**，SP3 返回 200，而 SP4 是当前最新 LTS 扩展版），不进 registry 就意味着没有 tag、没有 digest、没有 `docker pull`，CI 里要用得自己下载解包再 `docker import`——本项目对三个被试做的正是这件事。⚠️ 我们没有解包验证这份 rootfs 的内容，「里面装了桌面/开发工具」是依据体积、sha256 与路径的推断，不是实测。
+同一个文件名、体积差 47 倍，说明 DevStation 那份是独立构建的桌面向 rootfs。但它的可得性很受限，而且要把两件事分开说清（早先这里混成了一句）：**DevStation 本身有 6 个版本**，`docker_img/` 目录**只有一个版本有**。逐版本实测：
+
+| 版本 | `DevStation/` | `DevStation/x86_64/docker_img/` |
+|---|---|---|
+| 24.03 LTS SP1 / SP2 | 200 | **404** |
+| **24.03 LTS SP3** | 200 | **200** |
+| 24.03 LTS SP4（当前最新 LTS 扩展版） | **404** | 404 |
+| 24.09 / 25.03 / 25.09 | 200 | **404** |
+
+也就是说：DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在 SP3 出过一次，而当前最新的 SP4 连 DevStation 目录都没有。不进 registry 还意味着没有 tag、没有 digest、没有 `docker pull`，CI 里要用得自己下载解包再 `docker import`——本项目对三个被试做的正是这件事。DevStation 的桌面环境是 **GNOME**（依据 25.09 那版 ISO 的 `.rpmlist`：`gnome-shell-44.6`、`gnome-session-44.0`、`gdm-45.0.1`，另含 `vscodium-1.94.2`；同一份清单里 ukui/dde/kiran/xfce/plasma 命中数均为 0，网上「DevStation 默认 UKUI」的说法与之矛盾，不采信）。⚠️ 我们没有解包验证这份 rootfs 的内容，「里面装了桌面/开发工具」是依据体积、sha256 与路径的推断，不是实测。
 
 顺带记一个真会绊人的同名陷阱：`openeuler/kylin` **不是**麒麟操作系统，是 **Apache Kylin OLAP 引擎**（full_description 原文写「Kylin is a high concurrency, high performance and intelligent OLAP engine」并直链 kylin.apache.org，tag 形如 `5.0.3-oe2403sp4`）。同理 `openeuler/guacd` 是 Apache Guacamole 远程桌面网关，不是桌面 OS 镜像。
 
