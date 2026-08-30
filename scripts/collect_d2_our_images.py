@@ -9,7 +9,7 @@ import json, os, shlex, subprocess, sys, time, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
 # 若产物在别处，用 DOSBUILD_OUT 指过去。不要硬编码开发机路径 —— 换台机器就跑不了。
-OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "out"))
+OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "artifacts"))
 OUT = ROOT / "raw" / "d2_our_images.json"
 
 OURS = [(d, t, img) for d, img in
@@ -49,6 +49,11 @@ def facts(img):
                         "/etc/apt/sources.list.d/ 2>/dev/null | head -8"),
         "stopsignal": run(f"docker image inspect {img} --format '{{{{.Config.StopSignal}}}}'"),
         "labels": run(f"docker image inspect {img} --format '{{{{json .Config.Labels}}}}'"),
+        # mask 掉的单元数随发行版而变（候选表按「镜像里存在该单元才 mask」筛选），
+        # 所以必须实测而不是在正文写死一个数：麒麟 V10 镜像里有 udev 单元，多 mask 4 个。
+        "masked_units": sh("find /etc/systemd/system -maxdepth 1 -lname /dev/null "
+                           "-printf '%f\\n' 2>/dev/null | sort | tr '\\n' ' '"),
+        "setuid_bins": sh("find / -xdev -perm -4000 -type f 2>/dev/null | sort | tr '\\n' ' '"),
     }
 
 def main():
@@ -59,10 +64,24 @@ def main():
         print(f"  采集 {img}", file=sys.stderr)
         rec = {"distro_id": did, "tier": tier, "image": img}
         rec.update(facts(img))
+        # tar 的字节数与 sha256 是 t04 体积列与摘要链的来源。仓库不含 tar（体积原因），
+        # 所以优先从 artifacts/ 的 manifest 里读已记录的 sha256；两处都没有就报错，
+        # 不静默跳过 —— 静默跳过会让 t04 的体积列变空而没人发现。
         tar = OUTDIR / f"{did}-{tier}.tar"
+        man = OUTDIR / f"{did}-{tier}.manifest"
         if tar.exists():
             rec["tar_bytes"] = tar.stat().st_size
             rec["tar_sha256"] = run(f"sha256sum {tar}").split()[0]
+            rec["tar_source"] = "本地 tar 实测"
+        elif man.exists():
+            import re as _re
+            t = man.read_text(errors="replace")
+            rec["tar_sha256"] = (_re.search(r"# tarball sha256: ([0-9a-f]{64})", t) or [None, ""])[1]
+            rec["tar_bytes"] = int((_re.search(r"# tarball bytes: (\d+)", t) or [None, 0])[1] or 0)
+            rec["tar_source"] = "manifest 记录"
+        else:
+            print(f"!! 既无 {tar.name} 也无 {man.name}，无法取得产物锚点", file=sys.stderr)
+            sys.exit(1)
         data["ours"].append(rec)
     print(f"  采集官方对照 {OFFICIAL}", file=sys.stderr)
     off = {"image": OFFICIAL,

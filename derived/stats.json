@@ -4,11 +4,11 @@
     "selfhost",
     "slice"
   ],
-  "capability_cells": 711,
-  "capability_items": 79,
-  "cells_gap": 102,
-  "cells_na": 209,
-  "cells_supported": 400,
+  "capability_cells": 648,
+  "capability_items": 72,
+  "cells_gap": 56,
+  "cells_na": 201,
+  "cells_supported": 391,
   "defects": 12,
   "defects_by_distro": {
     "kylin10": 2,
@@ -28,10 +28,21 @@
   "existence_found": 1,
   "existence_probes": 8,
   "images_built": 9,
+  "info_probes": 6,
+  "installability_tools": 14,
+  "installable_kylin10": 14,
+  "installable_kylin11": 14,
+  "installable_uos25": 0,
   "kylin_desktop_official_images": 0,
   "manifests": 9,
+  "masked_units_by_distro": {
+    "kylin10": 11,
+    "kylin11": 7,
+    "uos25": 7
+  },
   "mutation_caught": 12,
   "mutation_missed": 0,
+  "mutation_skipped": 1,
   "official_available": 6,
   "official_pkg_format": "rpm",
   "official_probed": 8,
@@ -41,11 +52,29 @@
   ],
   "probe_complete_all": true,
   "repro_identical": 6,
+  "sbom_passed": 9,
+  "setuid_micro": {
+    "kylin10": 10,
+    "kylin11": 2,
+    "uos25": 2
+  },
   "tiers": [
     "base",
     "devel",
     "micro"
   ],
+  "uos_apt_normal_packages": 2710,
+  "uos_apt_package_names": 4758,
+  "uos_iso_has_gxx": false,
+  "uos_iso_missing": [
+    "autoconf",
+    "cmake",
+    "g++",
+    "gdb",
+    "git",
+    "strace"
+  ],
+  "uos_iso_packages": 1636,
   "uos_official_images": 0,
   "verify_baseline": 360,
   "verify_failed": 0,

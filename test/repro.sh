@@ -1,6 +1,6 @@
 #!/bin/bash
 # 可复现性凭据：重建一次，比对 tar 的 sha256，把实测结果写进 out/repro-evidence.txt。
-# README §10 原先只有结论没有凭据，这个脚本负责生成凭据。
+# report.md §8（可复现性） 原先只有结论没有凭据，这个脚本负责生成凭据。
 #
 # 覆盖范围说明（别把话说大）：本脚本做的是**同一 builder 内连构两次**。
 # 跨 builder（把 Dockerfile.builder 整个重建后再构）需要单独跑，结论另记。

@@ -29,8 +29,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", action="store_true", help="现场重跑探针")
     ap.add_argument("--from", dest="src",
-                    default=os.environ.get("DOSBUILD_OUT") or str(ROOT / "out"),
-                    help="已落盘 caps-*.txt 的目录（默认仓库自身的 out/，可用 DOSBUILD_OUT 覆盖）")
+                    default=os.environ.get("DOSBUILD_OUT") or str(ROOT / "artifacts"),
+                    help="已落盘 caps-*.txt 的目录（默认仓库自身的 artifacts/，可用 DOSBUILD_OUT 覆盖）")
     a = ap.parse_args()
     if a.run:
         subprocess.run([str(ROOT / "test" / "run-capabilities.sh")], check=True,

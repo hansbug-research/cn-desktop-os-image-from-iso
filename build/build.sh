@@ -12,7 +12,7 @@ umask 022
 SOURCE_DATE_EPOCH=$(derive_epoch "${MIRROR:-}" "${SUITE:-}")
 export SOURCE_DATE_EPOCH
 log "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH ($(date -u -d @$SOURCE_DATE_EPOCH 2>/dev/null))"
-# 落盘供清单引用：epoch 是逐位复现的必要输入，不记下来 manifest 就兑现不了 README §10 的承诺
+# 落盘供清单引用：epoch 是逐位复现的必要输入，不记下来 manifest 就兑现不了 report.md §8（可复现性） 的承诺
 mkdir -p "$ROOT/out"; printf '%s' "$SOURCE_DATE_EPOCH" > "$ROOT/out/$DID.epoch"
 
 EXC=(
@@ -109,7 +109,7 @@ build_slice() {
   #   ② dpkg 默认 admindir 是 /var/lib/dpkg，元文件（arch 等）不在那里就会
   #      对 Multi-Arch: same 的包报一片 "missing the list control file"
   # 所以把真 admindir 放回标准位置 /var/lib/dpkg，再把 UOS 的原路径做成符号链接指过来。
-  # 两边都能读到同一份数据，扫描器和 dpkg 都正常。这是与真机的有意偏差，README §7 有记。
+  # 两边都能读到同一份数据，扫描器和 dpkg 都正常。这是与真机的有意偏差，report.md §5（精简与容器化改造） 有记。
   if [ -n "${ADMINDIR:-}" ] && [ "$ADMINDIR" != "var/lib/dpkg" ]; then
     rm -rf "$D/var/lib/dpkg"
     mkdir -p "$D/var/lib"

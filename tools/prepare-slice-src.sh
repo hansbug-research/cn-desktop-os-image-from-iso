@@ -17,7 +17,7 @@ if [ "$(cat "$SRC_ROOTFS/.verified" 2>/dev/null)" = "$FP" ]; then
   exit 0
 fi
 
-log "[$DID] unsquashfs（须以 root 跑才能保住属主；xattr 在 rootless 下写不了，见 README §7）"
+log "[$DID] unsquashfs（须以 root 跑才能保住属主；xattr 在 rootless 下写不了，见 report.md §5（精简与容器化改造））"
 rm -rf "$SRC_ROOTFS"
 unsquashfs -no-progress -no-xattrs -d "$SRC_ROOTFS" "$SQ" 2>&1 | tail -2 || true
 [ -d "$SRC_ROOTFS/usr" ] || die "解包结果不完整"

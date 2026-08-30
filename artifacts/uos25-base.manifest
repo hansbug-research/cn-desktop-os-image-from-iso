@@ -1,10 +1,11 @@
 # 产物清单 uos-desktop-v25:base
-# 生成时间(UTC): 2026-08-30T03:56:44Z
+# 生成时间(UTC): 2026-08-30T06:31:52Z
 # 构建方法: slice
 # 源: n/a n/a n/a
-# tarball sha256: b740c3685f1197f406f0377be0d4a3118af742924340d3f935b38db31a08cdb3
+# tarball sha256: 6d9a057d07bdea7d8e90fa5c33db816b2bef1286c85093d934df04e8073b8b78
+# tarball bytes: 191262720
 # SOURCE_DATE_EPOCH: 1775779200
-# 镜像 ID: 0fd9aa941581
+# 镜像 ID: 6c39fc22583a
 # 预期基线: glibc=2.38 libstdc++=6.0.30 GLIBCXX=3.4.30
 #
 adduser	3.138
@@ -37,6 +38,7 @@ gzip	1.13-1
 hostname	3.25
 init-system-helpers	1.66
 iproute2	6.16.0-1
+iputils-ping	3:20250605-1
 less	668-1
 libacl1:amd64	2.3.1-3
 libapparmor1:amd64	3.0.13-2
@@ -165,6 +167,8 @@ tzdata	2025b-4+deb13u1deepin1
 unzip	6.0.1-deepin2
 usr-is-merged	39+nmu2deepin1
 util-linux	2.40.4-3deepin8
+vim-common	2:9.2.0218-1deepin1
+vim-tiny	2:9.2.0218-1deepin1
 xz-utils	5.4.5-0.3
 zlib1g:amd64	1:1.3.dfsg+really1.3.1-1deepin1
 zstd	1.5.6+dfsg-1

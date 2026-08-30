@@ -24,8 +24,9 @@ def csv(name, header, rows):
                             else str(x) for x in r))
     (TAB / name).write_text("\n".join(out) + "\n")
 
-d1, d2, d3, d4, d5 = (load(f"d{i}_{n}.json") for i, n in
-    [(1, "official_images"), (2, "our_images"), (3, "capabilities"), (4, "gates"), (5, "iso_and_defects")])
+d1, d2, d3, d4, d5, d6 = (load(f"d{i}_{n}.json") for i, n in
+    [(1, "official_images"), (2, "our_images"), (3, "capabilities"), (4, "gates"),
+     (5, "iso_and_defects"), (6, "installability")])
 S = {}
 
 # ── T01 官方容器镜像可获得性 ────────────────────────────────────────────────
@@ -106,13 +107,27 @@ NA_POLICY = {
               "ip_tools", "ping", "dnsutil", "file", "pager", "editor", "lsof", "strace", "gdb",
               "useradd", "useradd_works", "su_to_user", "sudo", "systemd", "default_target",
               "masked_units", "policy_rcd"},
+    # base 的 NA 集里原先有 strace —— 但 §3 给 base 的定位明写了「线上排查」，
+    # 而 strace 是纯排查工具、不依赖工具链，把它判成「不适用」与定位直接冲突。
+    # 改为如实记 N（麒麟侧一条 apt 就有，见 t11；UOS 侧是真缺口）。
+    # gdb 保留 NA：它要调试符号与工具链生态，属 devel 范畴。
     "base":  {"cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
               "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
-              "autotools", "cc_clean_stderr", "python3_dev", "git", "strace", "gdb", "sudo"},
+              "autotools", "cc_clean_stderr", "python3_dev", "git", "gdb", "sudo"},
     "devel": {"sudo"},
 }
+# 探针输出里有两类东西，不能混算：
+#   INFO_PROBES 是**环境指纹**（架构、glibc 版本、setuid 数量……），值是版本号或计数，
+#     不是「支持/不支持」。早先版本把它们塞进布尔判据 `v == "Y" else "N"`，
+#     于是 6 项 × 9 镜像里凭空多出 49 个假「缺口」——占当时缺口总数的近一半。
+#   probe_complete 是**哨兵**（探针有没有跑完），也不是能力项。
+# 指纹另出一张 t10 表，哨兵由 collect 阶段硬断言，两者都不进三态矩阵。
+INFO_PROBES = {"arch", "glibc", "os_id", "setuid_bins", "file_caps", "default_target"}
+SENTINELS = {"probe_complete"}
+
 probes = d3["probes"]
-keys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
+allkeys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
+keys = [k for k in allkeys if k not in INFO_PROBES and k not in SENTINELS]
 order = [f"{d}:{t}" for d in ["kylin11", "kylin10", "uos25"] for t in ["micro", "base", "devel"]]
 
 def tri(col, key):
@@ -127,8 +142,12 @@ def tri(col, key):
 csv("t05_capability_matrix.csv", ["capability"] + order,
     [[k] + [tri(c, k) for c in order] for k in keys])
 csv("t05b_capability_raw.csv", ["capability"] + order,
-    [[k] + [probes[c].get(k, "") for c in order] for k in keys])
+    [[k] + [probes[c].get(k, "") for c in order] for k in allkeys])
+# t10 环境指纹：这些是事实不是能力，单独成表
+csv("t10_environment_fingerprint.csv", ["fingerprint"] + order,
+    [[k] + [probes[c].get(k, "") for c in order] for k in sorted(INFO_PROBES)])
 S["capability_items"] = len(keys)
+S["info_probes"] = len(INFO_PROBES)
 S["capability_cells"] = len(keys) * len(order)
 S["probe_complete_all"] = all(v.get("_probe_complete") == "Y" for v in probes.values())
 _tri = [tri(c, k) for k in keys for c in order]
@@ -177,6 +196,41 @@ csv("t09_build_paths.csv",
     [[i["distro_id"], i["method"], i["suite"], i["expect_glibc"], i["expect_glibcxx"],
       i["usrmerge"] or "", i["immutable"] or ""] for i in d5["isos"]])
 S["build_methods"] = sorted({i["method"] for i in d5["isos"]})
+
+# ── T11 工具可装性：区分「没预装」与「装不上」的定量依据 ────────────────────
+rows = [[t] + [d6["images"][k]["candidates"].get(t, "?").split(":")[0] if
+               d6["images"][k]["candidates"].get(t, "NOREPO") != "NOREPO" else "装不上"
+               for k in ("kylin11", "kylin10", "uos25")] for t in d6["tools"]]
+csv("t11_tool_installability.csv", ["tool", "kylin11", "kylin10", "uos25"], rows)
+for k in ("kylin11", "kylin10", "uos25"):
+    S[f"installable_{k}"] = d6["images"][k]["installable"]
+S["installability_tools"] = len(d6["tools"])
+S["uos_iso_packages"] = (d6.get("uos_iso_inventory") or {}).get("package_count")
+_has = (d6.get("uos_iso_inventory") or {}).get("has", {})
+S["uos_iso_has_gxx"] = _has.get("g++")
+S["uos_iso_missing"] = sorted(k for k, v in _has.items() if v is False)
+# UOS apt 源规模：从 apt-cache stats 的原文里取
+import re as _re
+_m = _re.search(r"Total package names:\s*(\d+)", d6.get("uos_apt_scale") or "")
+S["uos_apt_package_names"] = int(_m.group(1)) if _m else None
+_m2 = _re.search(r"Normal packages:\s*(\d+)", d6.get("uos_apt_scale") or "")
+S["uos_apt_normal_packages"] = int(_m2.group(1)) if _m2 else None
+
+# ── T12 masked 单元与 setuid 面（随发行版而变，不能在正文写死）────────────────
+rows = []
+for r in d2["ours"]:
+    rows.append([r["distro_id"], r["tier"],
+                 len((r.get("masked_units") or "").split()),
+                 len((r.get("setuid_bins") or "").split())])
+csv("t12_hardening_surface.csv", ["distro", "tier", "masked_units", "setuid_bins"], rows)
+S["masked_units_by_distro"] = {r["distro_id"]: len((r.get("masked_units") or "").split())
+                               for r in d2["ours"] if r["tier"] == "base"}
+S["setuid_micro"] = {r["distro_id"]: len((r.get("setuid_bins") or "").split())
+                     for r in d2["ours"] if r["tier"] == "micro"}
+# sbom 通过数：原先正文写 9/9 却没有统计量，fig05 里是手写常量
+_sb = [r for r in d4["gates"]["sbom"]["rows"] if len(r) >= 4 and r[3] == "✅"]
+S["sbom_passed"] = len(_sb)
+S["mutation_skipped"] = d4["gates"]["mutation"]["skipped"]
 
 (DER / "stats.json").write_text(json.dumps(S, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
 print(f"derived/：{len(list(TAB.glob('*.csv')))} 张表，stats.json {len(S)} 个统计量")

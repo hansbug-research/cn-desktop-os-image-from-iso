@@ -20,9 +20,10 @@ help:
 	@echo "make builder-image — 从 Dockerfile.builder 构建 builder 镜像"
 	@echo "make verify      — 全量验收（动态计数，当前约 380 项，含总数基线断言）"
 	@echo "make sbom        — SBOM 可生成性门禁"
-	@echo "make mutation    — 变异测试：确认检查集真的会失败"
+	@echo "make mutation    — 变异测试（镜像层）：确认检查集真的会失败"
+	@echo "make mutation-docs — 变异测试（分析层）：确认 verify.py 真的会失败"
 	@echo "make digest-chain — 摘要链：manifest = tar = 镜像 三者对账"
-	@echo "make cve         — CVE 扫描（注意：trivy 无国产发行版漏洞库，见 README §8）"
+	@echo "make cve         — CVE 扫描（注意：trivy 无国产发行版漏洞库，见 report.md §7（验收））"
 	@echo "make repro       — 连构两次比对 sha256，写 out/repro-evidence.txt"
 	@echo "make all         — localrepo + 三个发行版 + import + manifest + verify"
 
@@ -70,6 +71,9 @@ repro:
 
 digest-chain:
 	@ROOT=$(ROOT) ./test/digest-chain.sh
+
+mutation-docs:
+	@ROOT=$(ROOT) ./test/mutation-docs.sh
 
 mutation:
 	@ROOT=$(ROOT) ./test/mutation.sh

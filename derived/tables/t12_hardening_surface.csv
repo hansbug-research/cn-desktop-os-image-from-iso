@@ -1,0 +1,10 @@
+distro,tier,masked_units,setuid_bins
+kylin11,micro,0,2
+kylin11,base,7,9
+kylin11,devel,7,9
+kylin10,micro,11,10
+kylin10,base,11,10
+kylin10,devel,11,10
+uos25,micro,0,2
+uos25,base,7,9
+uos25,devel,7,9

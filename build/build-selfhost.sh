@@ -93,10 +93,10 @@ for TIER in $TIERS; do
     # 不能按档位名 —— 麒麟 V10 把 systemd 放进了 Priority: required，
     # 连 micro 档都带着它，按名字判就会漏掉（实测踩过）。
     # 先落 tarball 再导入：产物可审计、可与其它两条路径统一做 tarball 层检查
-    # （注意：docker export 的字节流不可逐位复现，见 README §10）
+    # （注意：docker export 的字节流不可逐位复现，见 report.md §8（可复现性））
     docker export "$C" > "$ROOT_HOST/out/$DID-$TIER.tar"
     # systemd 探测必须查**导出的 tar**，不能 docker exec：阶段 3 跑完之后这个容器
-    # 就再也 exec 不进去了（报 cap_last_cap，见 README §9），用 exec 探测会让
+    # 就再也 exec 不进去了（报 cap_last_cap，见 report.md §9.1（局限）），用 exec 探测会让
     # STOPSIGNAL 静默漏设 —— 我就这么把它漏设过一次。
     if tar tf "$ROOT_HOST/out/$DID-$TIER.tar" 2>/dev/null | grep -qE '(usr/)?bin/systemctl$'; then
       IMPORT_OPTS+=(-c 'STOPSIGNAL SIGRTMIN+3')

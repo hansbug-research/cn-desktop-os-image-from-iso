@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T05:55:40Z",
+  "collected_at": "2026-08-30T06:29:53Z",
   "ours": [
     {
       "distro_id": "kylin11",
@@ -15,8 +15,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 11.0 main universe",
       "stopsignal": "",
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
+      "masked_units": "",
+      "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
       "tar_bytes": 88419840,
-      "tar_sha256": "967426f09bc605497444b1bb19b3730025c406b8449b77640edd2cc20f6641ed"
+      "tar_sha256": "967426f09bc605497444b1bb19b3730025c406b8449b77640edd2cc20f6641ed",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "kylin11",
@@ -32,8 +35,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 11.0 main universe",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
+      "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "tar_bytes": 248491520,
-      "tar_sha256": "aadad84ac7c44808270c32841fb99db1b962848da3a41f63617a85259b576ed3"
+      "tar_sha256": "aadad84ac7c44808270c32841fb99db1b962848da3a41f63617a85259b576ed3",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "kylin11",
@@ -49,8 +55,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 11.0 main universe",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
+      "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "tar_bytes": 497548800,
-      "tar_sha256": "ba3da0e4b80e424048a8dd2f2d4c4d17797984034bf0ee673c555f488cffea2c"
+      "tar_sha256": "ba3da0e4b80e424048a8dd2f2d4c4d17797984034bf0ee673c555f488cffea2c",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "kylin10",
@@ -66,8 +75,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 10.1 main universe",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
+      "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "tar_bytes": 213012992,
-      "tar_sha256": "b9c6621f9487068361e986791af9fefa63c30c9e06511af44e5784119fbcebce"
+      "tar_sha256": "b9c6621f9487068361e986791af9fefa63c30c9e06511af44e5784119fbcebce",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "kylin10",
@@ -83,8 +95,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 10.1 main universe",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
+      "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "tar_bytes": 270425088,
-      "tar_sha256": "6d3c9f7ec56bfded4d57cd53e1dd0229b9fd662da52a10747885d3bd240c959a"
+      "tar_sha256": "6d3c9f7ec56bfded4d57cd53e1dd0229b9fd662da52a10747885d3bd240c959a",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "kylin10",
@@ -100,8 +115,11 @@
       "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 10.1 main universe",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
+      "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "tar_bytes": 502584832,
-      "tar_sha256": "2c2b3677fd47e1eae1acb0f53e2f8f2953582f63506ffe70a62731e10db20c7e"
+      "tar_sha256": "2c2b3677fd47e1eae1acb0f53e2f8f2953582f63506ffe70a62731e10db20c7e",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
@@ -117,42 +135,51 @@
       "repo_urls": "deb https://pro-store-packages.uniontech.com/appstore-V25 snipe appstore",
       "stopsignal": "",
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
+      "masked_units": "",
+      "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
       "tar_bytes": 98099200,
-      "tar_sha256": "61e03d26e3ceaf67afae895294d56725fce6cffdee7be7439795a8995a7f60cd"
+      "tar_sha256": "61e03d26e3ceaf67afae895294d56725fce6cffdee7be7439795a8995a7f60cd",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "base",
       "image": "uos-desktop-v25:base",
-      "content_bytes": "74069914",
-      "unpacked_human": "274MB",
+      "content_bytes": "75761309",
+      "unpacked_human": "281MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
-      "pkg_count": "0\n161",
+      "pkg_count": "0\n164",
       "glibc_banner": "ldd (Debian GLIBC 2.38-6deepin19) 2.38",
       "glibc_pkg": "2.38-6deepin19",
       "repo_urls": "deb https://pro-store-packages.uniontech.com/appstore-V25 snipe appstore",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
-      "tar_bytes": 186542080,
-      "tar_sha256": "b740c3685f1197f406f0377be0d4a3118af742924340d3f935b38db31a08cdb3"
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
+      "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "tar_bytes": 191262720,
+      "tar_sha256": "6d9a057d07bdea7d8e90fa5c33db816b2bef1286c85093d934df04e8073b8b78",
+      "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "devel",
       "image": "uos-desktop-v25:devel",
-      "content_bytes": "163341058",
-      "unpacked_human": "631MB",
+      "content_bytes": "165043748",
+      "unpacked_human": "638MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
-      "pkg_count": "0\n205",
+      "pkg_count": "0\n208",
       "glibc_banner": "ldd (Debian GLIBC 2.38-6deepin19) 2.38",
       "glibc_pkg": "2.38-6deepin19",
       "repo_urls": "deb https://pro-store-packages.uniontech.com/appstore-V25 snipe appstore",
       "stopsignal": "SIGRTMIN+3",
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
-      "tar_bytes": 443740160,
-      "tar_sha256": "044af9b3b51b1b5375e8677d1a922d66031278e67042531facf6b1ddff9d141a"
+      "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
+      "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "tar_bytes": 448460800,
+      "tar_sha256": "164b08afb77eb409d0e3593316904fa41d9a342f7b4b80ee67257adbe180703e",
+      "tar_source": "本地 tar 实测"
     }
   ],
   "official_reference": {
@@ -167,6 +194,8 @@
     "glibc_pkg": "2.28-36.1.p24.ky10",
     "repo_urls": "baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/base/$basearch/\nbaseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/updates/$basearch/\nbaseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/addons/$basearch/",
     "stopsignal": "",
-    "labels": "{\"cn.kylinos.kylin-server-minimal.base_image\":\"\",\"cn.kylinos.kylin-server-minimal.build_id\":\"20260602\"}"
+    "labels": "{\"cn.kylinos.kylin-server-minimal.base_image\":\"\",\"cn.kylinos.kylin-server-minimal.build_id\":\"20260602\"}",
+    "masked_units": "",
+    "setuid_bins": ""
   }
 }

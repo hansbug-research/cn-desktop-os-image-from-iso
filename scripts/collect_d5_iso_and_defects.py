@@ -9,7 +9,7 @@ import json, os, pathlib, re, subprocess, time
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
 # 若产物在别处，用 DOSBUILD_OUT 指过去。不要硬编码开发机路径 —— 换台机器就跑不了。
-OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "out"))
+OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "artifacts"))
 OUT = ROOT / "raw" / "d5_iso_and_defects.json"
 SRC = OUTDIR.parent
 

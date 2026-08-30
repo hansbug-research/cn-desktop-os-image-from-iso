@@ -1,0 +1,7 @@
+fingerprint,kylin11:micro,kylin11:base,kylin11:devel,kylin10:micro,kylin10:base,kylin10:devel,uos25:micro,uos25:base,uos25:devel
+arch,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64
+default_target,,multi-user.target,multi-user.target,multi-user.target,multi-user.target,multi-user.target,,multi-user.target,multi-user.target
+file_caps,n/a,1,1,1,2,2,n/a,0,0
+glibc,2.38-1ok6.9k,2.38-1ok6.9k,2.38-1ok6.9k,2.31-0kylin9,2.31-0kylin9,2.31-0kylin9,2.38-6deepin,2.38-6deepin,2.38-6deepin
+os_id,kylin-v11,kylin-v11,kylin-v11,kylin-v10,kylin-v10,kylin-v10,uos-25,uos-25,uos-25
+setuid_bins,2,9,9,10,10,10,2,9,9

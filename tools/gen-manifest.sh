@@ -13,6 +13,8 @@ OUT="$ROOT/out/$DID-$TIER.manifest"
   echo "# 源: ${MIRROR:-n/a} ${SUITE:-n/a} ${COMPONENTS:-n/a}"
   if [ -f "$ROOT/out/$DID-$TIER.tar" ]; then
     echo "# tarball sha256: $(sha256sum "$ROOT/out/$DID-$TIER.tar" | cut -d' ' -f1)"
+    # 字节数也记下来：仓库不分发 tar，别人只能靠 manifest 复核体积
+    echo "# tarball bytes: $(stat -c %s "$ROOT/out/$DID-$TIER.tar")"
   else
     echo "# tarball sha256: n/a（该路径不产 tarball）"
   fi
@@ -21,7 +23,7 @@ OUT="$ROOT/out/$DID-$TIER.manifest"
   # 表现为清单只剩头部、包列表全空，而 make 的 @for 循环把失败吞了）
   ep="${SOURCE_DATE_EPOCH:-$(cat "$ROOT/out/$DID.epoch" 2>/dev/null || true)}"
   [ -n "$ep" ] || ep=$(sed -n 's/^SOURCE_DATE_EPOCH=//p' "$ROOT/distros/$DID.conf" 2>/dev/null | tr -d '"' | head -1)
-  echo "# SOURCE_DATE_EPOCH: ${ep:-n/a（该路径不归一时间戳，见 README §10）}"
+  echo "# SOURCE_DATE_EPOCH: ${ep:-n/a（该路径不归一时间戳，见 report.md §8（可复现性））}"
   if [ -n "${MIRROR:-}" ]; then
     ir=$(curl -fsS --max-time 40 "${MIRROR%/}/dists/$SUITE/InRelease" 2>/dev/null | sha256sum | cut -d" " -f1)
     echo "# InRelease sha256: ${ir:-取不到}"

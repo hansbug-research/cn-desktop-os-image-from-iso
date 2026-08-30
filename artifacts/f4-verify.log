@@ -1,0 +1,13 @@
+── kylin-desktop-v10:micro  (308MB)  Kylin  包=154
+── kylin-desktop-v10:base  (394MB)  Kylin  包=221
+── kylin-desktop-v10:devel  (710MB)  Kylin  包=263
+── kylin-desktop-v11:micro  (125MB)  Kylin  包=71
+── kylin-desktop-v11:base  (345MB)  Kylin  包=206
+── kylin-desktop-v11:devel  (686MB)  Kylin  包=255
+── uos-desktop-v25:micro  (142MB)  Uos  包=67
+── uos-desktop-v25:base  (281MB)  Uos  包=164
+── uos-desktop-v25:devel  (638MB)  Uos  包=208
+
+══ 汇总: 通过 365 / 失败 0 / 警告 0
+   检查总数 365（基线 360）
+✅ 全部必过项通过

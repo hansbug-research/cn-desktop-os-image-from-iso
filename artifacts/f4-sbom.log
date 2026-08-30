@@ -1,0 +1,12 @@
+镜像                       dpkg包数 SBOM包数 判定
+kylin-desktop-v10:micro      154        156        ✅
+kylin-desktop-v10:base       221        223        ✅
+kylin-desktop-v10:devel      263        265        ✅
+kylin-desktop-v11:micro      71         73         ✅
+kylin-desktop-v11:base       206        208        ✅
+kylin-desktop-v11:devel      255        257        ✅
+uos-desktop-v25:micro        67         69         ✅
+uos-desktop-v25:base         164        166        ✅
+uos-desktop-v25:devel        208        210        ✅
+
+✅ 全部镜像可生成 SBOM

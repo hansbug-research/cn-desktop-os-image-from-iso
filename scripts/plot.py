@@ -138,7 +138,10 @@ fig.tight_layout(); fig.savefig(FIG / "fig04_tier_size.png", dpi=150); plt.close
 # fig05 门禁与变异测试
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.5, 4))
 gl = ["verify", "digest-chain", "sbom", "mutation", "repro"]
-gv = [S["verify_passed"], S["digest_chain_passed"], 9, S["mutation_caught"], S["repro_identical"]]
+# sbom 原先是手写常量 9 —— plot.py 自己的 docstring 说「每个数字都来自 stats.json」，
+# 却在这里破了例；sbom 门禁若失败，图上照样画 9。现在改成读统计量。
+gv = [S["verify_passed"], S["digest_chain_passed"], S["sbom_passed"],
+      S["mutation_caught"], S["repro_identical"]]
 gm = [S["verify_failed"], 0, 0, S["mutation_missed"], 0]
 a1.bar(gl, gv, color="#2e7d32", label="通过")
 a1.bar(gl, gm, bottom=gv, color="#c62828", label="失败")

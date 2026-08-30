@@ -72,7 +72,7 @@ for DID in $DISTROS; do
     check ldconfig_clean 0 "$(g ldconfig_clean)" warn
     check tz UTC "$(g tz)"
     check localtime Etc/UTC "$(g localtime)" warn
-    # machine-id 必须存在且为空（systemd 的 first-boot 语义）——README §8 列了却一直没接线
+    # machine-id 必须存在且为空（systemd 的 first-boot 语义）——report.md §7（验收） 列了却一直没接线
     check machine_id_empty Y "$(g machine_id_empty)"
     check dpkg_list_ok Y "$(g dpkg_list_ok)"
     # 哨兵：检查集必须跑到最后一行，否则前面所有"通过"都不可信

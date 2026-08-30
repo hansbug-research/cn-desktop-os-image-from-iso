@@ -1,8 +1,8 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **711** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **77** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **5** 组 ｜ 图 **6** 张 ｜ 可复算表 **10** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **113** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
 
-要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把"从桌面版 ISO 自己造分档镜像"这件事做通并留下完整证据：三条构建路径、九个镜像、711 格实测能力矩阵、五道验收门禁。
+要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把"从桌面版 ISO 自己造分档镜像"这件事做通并留下完整证据：三条构建路径、九个镜像、648 格实测能力矩阵、五道验收门禁。
 
 **完整报告：[`report.md`](report.md)**
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 主要结论
+## 1. 主要结论
 
 | # | 结论 | 证据 |
 |---|---|---|
@@ -18,36 +18,36 @@
 | 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
 | 3 | **商业桌面线的官方容器镜像一个都没有。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot） | [§2](report.md#2-国产桌面-os-的官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
-| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源内 4731 个包全是应用商店 GUI 应用，连 `nano` 都没有），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
-| 6 | **麒麟的"没预装"与 UOS 的"硬缺口"性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14/14**、麒麟 V10 **14/14**、UOS V25 **0/14** | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
+| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源内 4758 个包名全是应用商店 GUI 应用，连 `nano` 都没有），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
+| 6 | **麒麟的"没预装"与 UOS 的"硬缺口"性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14 / 14**、麒麟 V10 **14 / 14**、UOS V25 **0 / 14**（判据用 `apt-cache madison` 而非 `policy` 的 Candidate，后者会把「已经装了」误计成「装得上」） | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 7 | **dpkg 段错误的真根因是厂商的安全插件，不是 IO 选项。** 麒麟 V11 的 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们。此前三次归因全错，其中一次是受控实验里的状态污染 | [§9.2](report.md#92-被推翻的判断与踩过的坑)、缺陷 D02 |
 | 8 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从 274 MB 涨到 420 MB。两项都已回退 | [§5.1](report.md#51-加包要看真实代价) |
 | 9 | **检查框架自己会假通过，所以变异测试是必需的而非锦上添花。** 本项目实测到三类：helper 函数未定义导致两条分支都是"命令未找到"、检查脚本挂死导致输出截断而缺失 key 被读成空值、负向断言不核对失败原因等于永真 | [§9.2](report.md#92-被推翻的判断与踩过的坑) |
 | 10 | **通用漏洞扫描器对这三个发行版没有有效覆盖，且失效方式很危险。** 麒麟 V11 被 trivy 判为 `none` 压根没扫，麒麟 V10 与 UOS 被**误判成 Debian**——拿厂商改过的版本号比 Debian 公告区间，比不出来就报 0。那是"没有数据"，不是"没有漏洞" | [§9.1](report.md#91-局限) |
 
-## 九个镜像
+## 2. 九个镜像
 
 | 发行版 | 构建路径 | micro | base | devel |
 |---|---|---|---|---|
 | 银河麒麟桌面 V11 | `mmdebstrap` | 88 MB / 71 包 | 248 MB / 206 包 | 498 MB / 255 包 |
 | 银河麒麟桌面 V10 SP1 | `selfhost` 两阶段自举 | 213 MB / 154 包 | 270 MB / 221 包 | 503 MB / 263 包 |
-| 统信 UOS V25 | `slice` squashfs 切片 | 98 MB / 67 包 | 187 MB / 161 包 | 444 MB / 205 包 |
+| 统信 UOS V25 | `slice` squashfs 切片 | 98 MB / 67 包 | 191 MB / 164 包 | 448 MB / 208 包 |
 
-尺寸为 rootfs tar 的字节流（构建的直接产物，被 manifest 的 sha256 锚定）。`docker images` 显示的是解包后按块占用，比它大三到四成，两个口径不能混用。
+尺寸为 rootfs tar 的字节流（构建的直接产物，被 manifest 的 sha256 锚定）。`docker images` 显示的是解包后按块占用，比它大四成上下（实测 38%–47%），两个口径不能混用。
 
 档位定位：`micro` 纯运行时（把别处编好的产物拷进来跑）、`base` 平台可用（有包管理、能排查）、`devel` 构建用（工具链齐备）。
 
 ![三档镜像的体积与包数](figures/fig04_tier_size.png)
 
-## 能力矩阵
+## 3. 能力矩阵
 
-79 项 × 9 镜像 = 711 格，全部在镜像内**真跑**：编译要真编译真执行，TLS 要真握手，apt 要真装真卸。支持 400 格、缺口 102 格、不适用 209 格。
+72 项 × 9 镜像 = 648 格，全部在镜像内**真跑**：编译要真编译真执行，TLS 要真握手，apt 要真装真卸。支持 391 格、缺口 56 格、不适用 201 格。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)
 
 三态判据（`scripts/analyze.py` 的 `NA_POLICY`）是矩阵表与热力图的唯一真源：**不适用**只在档位定位下确实不存在该需求时才用，不拿它掩盖缺口。
 
-## 验收
+## 4. 验收
 
 | 门禁 | 结果 | 防的是什么 |
 |---|---|---|
@@ -57,13 +57,17 @@
 | `make mutation` | 12 抓到 / 0 漏 | 检查集本身失效（"检查永远为真"的假通过） |
 | `make repro` | 6 / 6 逐位一致 | 构建不可复现 |
 
-## 复现
+## 5. 复现
 
 仓库不含镜像与 ISO（体积原因），但含完整构建链路。换一台 Linux 机器：
 
 ```bash
-# 0) 前提：docker（rootless 亦可）、python3、能访问三个发行版的官方软件源
-#    UOS 走切片路径，额外需要其 ISO —— 请自行从厂商渠道获取
+# 0) 前提：docker（rootless 亦可）、python3、能访问三个发行版的官方软件源。
+#    UOS 走切片路径，需要它的 squashfs：默认由 tools/fetch-squashfs.py 用 HTTP Range
+#    从 distros/uos25.conf 里的 ISO_URL 远程抽取（不下整个 ISO）；离线环境请自备 ISO
+#    并把 squashfs 放到 conf 指定位置，其 sha256 必须与 SQUASHFS_SHA256 相符。
+#    只重算分析与图表的话还需要：pip install -r requirements.txt，以及 CJK 字体
+#    （Debian/Ubuntu：apt install fonts-noto-cjk），否则图上中文会变成方框。
 
 # 1) 构建 builder 镜像（Debian 13 + mmdebstrap/debootstrap/squashfs-tools/gpgv）
 make builder-image
@@ -74,8 +78,7 @@ make localrepo
 # 3) 三条路径分别构建（各自的选择依据见 report.md §4）
 make kylin11        # mmdebstrap
 make kylin10        # selfhost 两阶段自举，跑在宿主上
-ROOT=$PWD tools/prepare-slice-src.sh uos25 /path/to/uos-v25.iso   # 先备切片源
-make uos25          # slice
+make uos25          # slice；该目标已包含 uos25-src（在 builder 里备好切片源）
 
 # 4) 导入 docker 并打 LABEL / STOPSIGNAL
 make import
@@ -103,12 +106,11 @@ python3 scripts/collect_d5_iso_and_defects.py
 
 所有 shell 脚本的 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
 
-## 目录结构
+## 6. 目录结构
 
 ```
 report.md                     学术正文（问题 → 官方镜像现状 → 分档 → 三条构建路径 →
                               精简与改造 → 能力矩阵 → 验收 → 可复现性 → 局限与过程记录）
-config/                       实验配置
 distros/                      三个发行版的构建参数：源、套件、期望 ABI 基线、档位包集、
   kylin11.conf                  以及每个厂商缺陷的绕法与理由
   kylin10.conf
@@ -130,7 +132,7 @@ tools/
 test/
   verify.sh                     全量验收（365 项，含检查总数基线断言）
   inner-checks.sh               在被测镜像内运行的检查集，结尾有完成哨兵
-  capabilities.sh               能力探针：79 项，全部真跑
+  capabilities.sh               能力探针：79 项全部真跑（其中 72 项进三态矩阵，6 项是环境指纹、1 项是完成哨兵）
   run-capabilities.sh           把探针跑遍九个镜像
   mutation.sh                   变异测试：故意破坏镜像，确认检查集真的会失败
   digest-chain.sh               manifest = tar = 镜像 三者对账
@@ -140,7 +142,7 @@ keys/                         麒麟 archive GPG keyring（来源与指纹见 re
 raw/                          一手数据，采集脚本的原始输出逐字保存
   d1_official_images.json       官方镜像可获得性与存在性探测
   d2_our_images.json            九个自建镜像的事实 + 官方镜像产品线对照
-  d3_capabilities.json          711 格能力矩阵的探针原始输出
+  d3_capabilities.json          能力探针原始输出（79 项 × 9 镜像；三态矩阵取其中 72 项 = 648 格）
   d4_gates.json                 五道门禁结果与九份 manifest 的审计锚点
   d5_iso_and_defects.json       三条路径的配置事实 + 12 条厂商缺陷
 derived/                      从 raw/ 重算，不手写
@@ -152,10 +154,10 @@ scripts/                      collect_d*.py 只采集不判断；analyze.py 只�
                               plot.py 只读 derived；verify.py 机器核对正文里的每个声明
 ```
 
-## 相关工作
+## 7. 相关工作
 
 同 org 的 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study) 研究的是"用哪个基座编、能落到哪些国产桌面上"的 ABI 选型，被试是既有镜像；本仓库研究的是"目标环境本身怎么造出来"。两者结论互补：前者结论 7 指出厂商 server 镜像可作为对应桌面版的 **ABI 预检代理**，本仓库 §2.1 指出它**不是**桌面版的等价环境——符号地板的单向预检与用户态环境的一致复现是两个不同强度的需求。
 
-## 许可
+## 8. 许可
 
 代码 MIT，文档与数据 CC BY 4.0。三个发行版的 ISO、软件包与 GPG keyring 版权归各厂商所有，本仓库不分发它们。

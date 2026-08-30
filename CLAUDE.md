@@ -28,11 +28,21 @@ python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.
 - `collect_d4_gates.py` 五道门禁结果与 manifest 审计锚点
 - `collect_d5_iso_and_defects.py` 三条路径配置 + 厂商缺陷清单
 
+## 分析层也要被变异测试
+
+`test/mutation.sh` 测的是**镜像内检查集**，`test/mutation-docs.sh` 测的是**分析层**——故意改坏 `derived/stats.json`、`artifacts/repro-evidence.txt` 与正文数字，确认 `scripts/verify.py` 真的会失败。两层都要跑。
+
+这条是审稿查出来的：分析层一度有五类假阴性——`in_text` 用裸子串匹配导致 `400→401` 撞上正文的「返回 401」、抬头数字单点改错不报（正文别处还有同一个数）、正文一批数字零覆盖、「断言总数自洽」只检查那句话存在却从不比对数值、图表引用检查被附录索引自动满足因而永不失败。**做了变异测试不等于覆盖了所有层。**
+
 ## 实验纪律
 
 - **三态判据只有一份。** 能力矩阵的「支持／不支持／不适用」判据写死在 `analyze.py` 的 `NA_POLICY`，矩阵表与热力图都从它派生。两处各写一份必然漂移。
 - **「不适用」不得用来掩盖缺口。** 只有在档位定位（`report.md` §3）下确实不存在该需求时才能标不适用。
 - **能力一律实测，不按包列表推断。** 装了 gcc 不等于能编出可跑的二进制——麒麟 V11 的 gcc 就会往 stderr 吐错误。
+- **repro 凭据必须与交付物对账。** `artifacts/repro-evidence.txt` 里的 sha256 要逐条等于对应 manifest 的 `tarball sha256`，`verify.py` 有交叉断言。曾经两条链锚在不同构建上（凭据来自更早一轮双构建，中间重构过产物），六份里五份对不上，而两条链各自都是绿的。
+- **改了镜像就要重跑 repro 并同步 `artifacts/`。** 否则上一条会当场报警——那正是它存在的意义。
+- **判据要选对：可装性用 `apt-cache madison`，不能用 `policy` 的 Candidate。** 后者对已安装但源里没有的包也报候选版本，会把「已经装了」误计成「装得上」。
+- **信息型探针不进三态矩阵。** 架构、版本号、计数这类是环境指纹不是能力，塞进「支持/不支持」的判据会凭空造出假缺口（曾经造出 49 个）。
 - **门禁不许与构建并发跑。** verify 读 `out/*.tar` 时若有构建在覆写同一文件，会产生假失败。踩过一次。
 - **判定口径写死在代码里。** 改 `test/inner-checks.sh` 或 `NA_POLICY` 就等于改实验定义，必须同步更新 `report.md` 的对应小节。
 - **架构不外推。** 全部实验在 x86_64 上完成，arm64 / loongarch64 的结论不得从这里推出去。

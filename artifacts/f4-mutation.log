@@ -1,0 +1,16 @@
+变异测试基准镜像: kylin-desktop-v11:base
+  ✅ 删 nsswitch.conf — 检查如期报警
+  ✅ 植入 ssh host key — 检查如期报警
+  ✅ 删 CA 证书 — 检查如期报警
+  ✅ 删 zh_CN locale — 检查如期报警
+  ✅ status 断链(历史假通过) — 检查如期报警
+  ⊘ mtab — 跳过（运行时会自动补，运行时不可观测；已改为 tarball 层检查）
+  ✅ 删 copyright(全部) — 检查如期报警
+  ✅ 只删 bash 的 copyright — 检查如期报警
+  ✅ 删 policy-rc.d — 检查如期报警
+  ✅ 植入依赖缺失的 .so — 检查如期报警
+  ✅ 改 /etc/localtime 到上海 — 检查如期报警
+  ✅ machine-id 写入内容 — 检查如期报警
+  ✅ 植入清单外悬空软链 — 检查如期报警
+
+✅ 12 项变异全部被检查抓到（检查集有效）

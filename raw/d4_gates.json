@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T06:05:23Z",
+  "collected_at": "2026-08-30T06:46:34Z",
   "gates": {
     "verify": {
       "passed": 365,
@@ -7,12 +7,12 @@
       "warned": 0,
       "baseline": 360,
       "failures": [],
-      "log_tail": "── uos-desktop-v25:base  (274MB)  Uos  包=161\n── uos-desktop-v25:devel  (631MB)  Uos  包=205\n\n══ 汇总: 通过 365 / 失败 0 / 警告 0\n   检查总数 365（基线 360）\n✅ 全部必过项通过"
+      "log_tail": "── uos-desktop-v25:base  (281MB)  Uos  包=164\n── uos-desktop-v25:devel  (638MB)  Uos  包=208\n\n══ 汇总: 通过 365 / 失败 0 / 警告 0\n   检查总数 365（基线 360）\n✅ 全部必过项通过"
     },
     "digest_chain": {
       "passed": 9,
       "failed": 0,
-      "log_tail": "  ✅ uos25-devel  manifest=tar=镜像  (044af9b3b51b… → 044af9b3b51b1b5375e8677d1a922d66031\n══ 摘要链: 通过 9 / 失败 0\n✅ 九个镜像的 manifest / tar / 镜像三者一致"
+      "log_tail": "  ✅ uos25-devel  manifest=tar=镜像  (164b08afb77e… → 164b08afb77eb409d0e3593316904fa41d9\n══ 摘要链: 通过 9 / 失败 0\n✅ 九个镜像的 manifest / tar / 镜像三者一致"
     },
     "sbom": {
       "rows": [
@@ -60,14 +60,14 @@
         ],
         [
           "uos-desktop-v25:base",
-          "161",
-          "163",
+          "164",
+          "166",
           "✅"
         ],
         [
           "uos-desktop-v25:devel",
-          "205",
-          "207",
+          "208",
+          "210",
           "✅"
         ],
         [
@@ -77,7 +77,7 @@
         ]
       ],
       "all_ok": true,
-      "log_tail": "uos-desktop-v25:devel        205        207        ✅\n\n✅ 全部镜像可生成 SBOM"
+      "log_tail": "uos-desktop-v25:devel        208        210        ✅\n\n✅ 全部镜像可生成 SBOM"
     },
     "mutation": {
       "caught": 12,
@@ -103,7 +103,7 @@
     "repro": {
       "identical": 6,
       "mismatched": 0,
-      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-29T20:35:58Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=967426f09bc605497444b1bb19b3730025c406b8449b77640edd2cc20f6641ed\nkylin11-base     一致  sha256=7323191215ce88d1391a151af36731c0697940da8a4f2b1f3200cad7cb478078\nkylin11-devel    一致  sha256=558ed80fd5ece6b38d03b1d5f045140e4f6a6dc202570fba27f4c28163e49923\nuos25-micro      一致  sha256=64fe0d62e26fa5929b089dec9477d0e8701a7d1fc17201d4aa9fa4c929bab576\nuos25-base       一致  sha256=f751529450d9a97992fafe0144dfcd31604b54450fc742c29c84a3ee94919b89\nuos25-devel      一致  sha256=b08df67e1f2cc4789c511166072e6cc026cefe8703bfdb264fac5cbd51b891b9\n"
+      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T06:32:40Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=967426f09bc605497444b1bb19b3730025c406b8449b77640edd2cc20f6641ed\nkylin11-base     一致  sha256=aadad84ac7c44808270c32841fb99db1b962848da3a41f63617a85259b576ed3\nkylin11-devel    一致  sha256=ba3da0e4b80e424048a8dd2f2d4c4d17797984034bf0ee673c555f488cffea2c\nuos25-micro      一致  sha256=61e03d26e3ceaf67afae895294d56725fce6cffdee7be7439795a8995a7f60cd\nuos25-base       一致  sha256=6d9a057d07bdea7d8e90fa5c33db816b2bef1286c85093d934df04e8073b8b78\nuos25-devel      一致  sha256=164b08afb77eb409d0e3593316904fa41d9a342f7b4b80ee67257adbe180703e\n"
     }
   },
   "manifests": {
@@ -144,16 +144,16 @@
       "package_lines": 71
     },
     "uos25-base": {
-      "tarball_sha256": "b740c3685f1197f406f0377be0d4a3118af742924340d3f935b38db31a08cdb3",
+      "tarball_sha256": "6d9a057d07bdea7d8e90fa5c33db816b2bef1286c85093d934df04e8073b8b78",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
-      "package_lines": 161
+      "package_lines": 164
     },
     "uos25-devel": {
-      "tarball_sha256": "044af9b3b51b1b5375e8677d1a922d66031278e67042531facf6b1ddff9d141a",
+      "tarball_sha256": "164b08afb77eb409d0e3593316904fa41d9a342f7b4b80ee67257adbe180703e",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
-      "package_lines": 205
+      "package_lines": 208
     },
     "uos25-micro": {
       "tarball_sha256": "61e03d26e3ceaf67afae895294d56725fce6cffdee7be7439795a8995a7f60cd",
