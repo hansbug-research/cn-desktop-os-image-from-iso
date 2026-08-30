@@ -36,6 +36,10 @@ except FileNotFoundError:
     d8 = None
 S = {}
 S["census_present"] = d8 is not None
+# 全局引用表：report 里每处 [Rn] 都指向它。放在 config/ 而不是 raw/，
+# 因为它是文献而非测量 —— title_source 字段区分「抓自该页 <title>」与「人工标注」。
+REFS = json.loads((ROOT / "config" / "references.json").read_text())["references"]
+REF_BY_ID = {r["id"]: r for r in REFS}
 
 # ── T01 官方容器镜像可获得性 ────────────────────────────────────────────────
 rows = []
@@ -102,24 +106,29 @@ S["distros"] = sorted({r["distro_id"] for r in d2["ours"]})
 # t15 是**我们的实测**（registry 存在性，判据是退出码）。
 # 合成一张会让读者无法分辨哪一格可以复核、哪一格只能溯源到厂商说法。
 if d8:
-    # 名录表用**紧凑字段**（s_lineage/s_version/s_desktop），长注释走表下编号注。
-    # 早先每格塞一整段，结果 21 行里项目的三个被试反而最不显眼，读者以为名录里没有它们。
+    # 名录表：每个单元格自带引用标记（论文式），标记指向全局引用表 t16。
+    # 早先是整行末尾堆一串 [[1]][[2]]、每行重新从 1 数起 —— 读者无法判断哪条支撑哪格。
+    def _c(e, field):
+        ids = e.get("refs", {}).get(field, [])
+        return "".join(f"[{i}](#{i})" for i in ids)
+
     rows = []
     for e in d8["entries"]:
+        img = "有（非桌面）" if e["name"] in S.get("census_os_with_any_image", []) else "未公开"
         rows.append(["★" if e.get("subject") else "",
                      e["name"],
                      "商业" if e["type"].startswith("商业") else "社区开源",
                      e["vendor"],
-                     e.get("s_lineage", e["lineage"]),
-                     e.get("s_version", e["latest_version"]),
-                     e.get("s_desktop", e["desktop"]),
+                     e.get("s_lineage", e["lineage"]) + _c(e, "s_lineage"),
+                     e.get("s_version", e["latest_version"]) + _c(e, "s_version"),
+                     e.get("s_desktop", e["desktop"]) + _c(e, "s_desktop"),
                      e["maintained"].split("（")[0].split("：")[0],
-                     " ".join(e["sources"])])
+                     img + _c(e, "image"),
+                     _c(e, "general")])
     csv("t14_os_census.csv",
         ["subject", "os", "type", "vendor", "lineage", "latest_version", "desktop",
-         "maintained", "sources"], rows)
+         "maintained", "official_image", "other_refs"], rows)
 
-    # t14b 保留完整长文，供需要逐字核对的人查——紧凑表牺牲的细节不能凭空消失
     rows = []
     for e in d8["entries"]:
         rows.append([e["name"], e["lineage"], e["latest_version"], e["desktop"],
@@ -138,6 +147,21 @@ if d8:
     csv("t15_os_image_probes.csv",
         ["os", "ref", "result", "method", "pkg_format", "os_name", "version_id",
          "evidence"], rows)
+
+    # t16 参考来源表。title_source 一列必须留着 —— 它区分「标题抓自该页」与
+    # 「该页没有 title、标题是我们写的」，读者据此判断这条引用的可核对程度。
+    csv("t16_references.csv",
+        ["id", "publisher", "title", "url", "title_source", "accessed", "note"],
+        [[r["id"], r["publisher"], r["title"], r["url"],
+          r["title_source"], r["accessed"], r.get("note", "")] for r in REFS])
+    S["references_total"] = len(REFS)
+    S["references_title_from_page"] = sum(1 for r in REFS if r["title_source"] == "page")
+    S["references_title_manual"] = sum(1 for r in REFS if r["title_source"] == "manual")
+    S["census_field_citations"] = sum(len(v) for e in d8["entries"]
+                                      for v in e.get("refs", {}).values())
+    # 名录里的引用必须都能在引用表里找到 —— 悬空引用等于假引用
+    _cited = {i for e in d8["entries"] for v in e.get("refs", {}).values() for i in v}
+    S["census_dangling_refs"] = sorted(_cited - set(REF_BY_ID))
 
     S["census_os_count"] = len(d8["entries"])
     S["census_commercial"] = sum(1 for e in d8["entries"] if e["type"].startswith("商业"))

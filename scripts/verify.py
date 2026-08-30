@@ -455,6 +455,44 @@ in_text("银河麒麟桌面 V10 SP1、银河麒麟桌面 V11、统信 UOS V25", 
 ok("材料可得性" in REPORT,
    "ISO 授权这条限制必须如实写成材料可得性，不许包装成技术理由")
 
+# ── 引用体系：论文式 cite 的要求是双向闭合 ────────────────────────────────
+# ① 正文/名录里出现的每个 [Rn] 都必须在参考来源表里有条目（否则是假引用）；
+# ② 参考来源表里的每条都必须至少被引用一次（否则是凑数的参考文献）；
+# ③ 每条引用必须标明标题是抓自页面还是人工标注 —— 后者的标题不是原文，
+#    混在一起会让读者把我们写的描述当成该页的正式名称。
+_REFS = json.loads((ROOT / "config" / "references.json").read_text())["references"]
+_ref_ids = {r["id"] for r in _REFS}
+ok(len(_ref_ids) == len(_REFS), "参考来源编号不许重复")
+ok(S["references_total"] == len(_REFS), "stats 里的引用总数应与 config 一致")
+ok(S["references_title_from_page"] + S["references_title_manual"] == len(_REFS),
+   "每条引用都必须标明标题来源（page 或 manual），不许有第三种或缺失")
+ok(all(r.get("url", "").startswith("http") for r in _REFS), "每条引用必须有 URL")
+ok(all(r.get("accessed") for r in _REFS), "每条引用必须有访问日期")
+
+_cited_in_text = set(re.findall(r"\[(R\d+)\]\(#R\d+\)", REPORT))
+_cited_in_census = {i for e in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
+                    for v in e.get("refs", {}).values() for i in v}
+_all_cited = _cited_in_text | _cited_in_census
+ok(S["census_dangling_refs"] == [],
+   f'名录里不许有悬空引用（悬空：{S["census_dangling_refs"]}）')
+_dangling_text = sorted(_cited_in_text - _ref_ids)
+ok(_dangling_text == [], f"正文里不许有悬空引用（悬空：{_dangling_text}）")
+_unused = sorted(_ref_ids - _all_cited, key=lambda x: int(x[1:]))
+ok(_unused == [], f"参考来源表里不许有从未被引用的条目（未引用：{_unused[:12]}）")
+ok(S["census_field_citations"] >= 90,
+   f'名录的字段级引用应不少于 90 处，实际 {S["census_field_citations"]}')
+# 名录表里每个 OS 至少要有一处字段级引用，不许有整行裸奔
+_no_ref = [e["name"] for e in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
+           if not e.get("refs")]
+ok(_no_ref == [], f"名录里每个 OS 都必须至少有一处字段级引用（缺：{_no_ref}）")
+# markdown 脚注已统一并入 [Rn]，不许再出现两套引用体系
+ok(not re.search(r"^\[\^\w+\]:", REPORT, re.M),
+   "不许残留 markdown 脚注式引用（已统一为 [Rn]，两套并存会让编号对不上）")
+in_text(S["references_total"], label="正文写明的引用条数",
+        ctx=rf"共 {S['references_total']} 条")
+in_text(S["census_field_citations"], label="正文写明的字段级引用处数",
+        ctx=rf"共 {S['census_field_citations']} 处字段级引用")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -469,7 +507,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "252"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "266"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

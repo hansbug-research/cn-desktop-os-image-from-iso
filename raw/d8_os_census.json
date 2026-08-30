@@ -29,7 +29,24 @@
       "order": 1,
       "s_lineage": "Debian/Ubuntu 系（⚠️ 官方未声明，注 1）",
       "s_version": "V11（2025-08）/ V10 SP1 2503（2025-04）",
-      "s_desktop": "V10 SP1 = UKUI；V11 未公开（注 2）"
+      "s_desktop": "V10 SP1 = UKUI；V11 未公开（注 2）",
+      "refs": {
+        "s_lineage": [
+          "R64",
+          "R65"
+        ],
+        "s_version": [
+          "R76",
+          "R64"
+        ],
+        "s_desktop": [
+          "R64"
+        ],
+        "image": [
+          "R7",
+          "R8"
+        ]
+      }
     },
     {
       "name": "统信桌面操作系统 V25（UOS）",
@@ -55,7 +72,23 @@
       "order": 2,
       "s_lineage": "Debian 系（⚠️ 官方未书面确认，注 3）",
       "s_version": "V25（2026-04-15）；V20 线 1070u4",
-      "s_desktop": "DDE（V25 起 Treeland + Qt6）"
+      "s_desktop": "DDE（V25 起 Treeland + Qt6）",
+      "refs": {
+        "s_lineage": [
+          "R14"
+        ],
+        "s_version": [
+          "R53"
+        ],
+        "s_desktop": [
+          "R53"
+        ],
+        "image": [
+          "R80",
+          "R46",
+          "R47"
+        ]
+      }
     },
     {
       "name": "openKylin（开放麒麟）",
@@ -85,7 +118,23 @@
       "order": 3,
       "s_lineage": "Debian 系",
       "s_version": "3.0「黄河」（2026-08-28）",
-      "s_desktop": "UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）"
+      "s_desktop": "UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）",
+      "refs": {
+        "s_lineage": [
+          "R40"
+        ],
+        "s_version": [
+          "R73"
+        ],
+        "s_desktop": [
+          "R73"
+        ],
+        "image": [
+          "R74",
+          "R16",
+          "R30"
+        ]
+      }
     },
     {
       "name": "deepin（深度）",
@@ -116,7 +165,25 @@
       "order": 4,
       "s_lineage": "Debian 系",
       "s_version": "25.2.1（2026-08-04，仅在线更新）",
-      "s_desktop": "DDE 7.0 + Treeland"
+      "s_desktop": "DDE 7.0 + Treeland",
+      "refs": {
+        "s_lineage": [
+          "R4"
+        ],
+        "s_version": [
+          "R57",
+          "R4"
+        ],
+        "s_desktop": [
+          "R57"
+        ],
+        "image": [
+          "R31"
+        ],
+        "general": [
+          "R14"
+        ]
+      }
     },
     {
       "name": "openEuler",
@@ -148,7 +215,24 @@
       "order": 5,
       "s_lineage": "独立选型，rpm/dnf",
       "s_version": "24.03 LTS SP4（2026-06-30）",
-      "s_desktop": "无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）"
+      "s_desktop": "无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）",
+      "refs": {
+        "s_lineage": [
+          "R71"
+        ],
+        "s_version": [
+          "R71"
+        ],
+        "s_desktop": [
+          "R13",
+          "R49"
+        ],
+        "image": [
+          "R32",
+          "R17",
+          "R48"
+        ]
+      }
     },
     {
       "name": "麒麟信安操作系统（KylinSec）",
@@ -170,7 +254,18 @@
       "order": 6,
       "s_lineage": "openEuler 系",
       "s_version": "V6 SP1（2026-06）",
-      "s_desktop": "自研 Kiran / KiranUI"
+      "s_desktop": "自研 Kiran / KiranUI",
+      "refs": {
+        "s_lineage": [
+          "R72"
+        ],
+        "s_version": [
+          "R72"
+        ],
+        "s_desktop": [
+          "R66"
+        ]
+      }
     },
     {
       "name": "方德桌面操作系统 V5.0",
@@ -191,7 +286,19 @@
       "order": 7,
       "s_lineage": "deb 系（⚠️ 官方未声明，注 6）",
       "s_version": "V5.0（2022-06）；Pro 版 2025-09 过评",
-      "s_desktop": "⚠️ 未公开（疑 MATE 衍生）"
+      "s_desktop": "⚠️ 未公开（疑 MATE 衍生）",
+      "refs": {
+        "s_lineage": [
+          "R50"
+        ],
+        "s_version": [
+          "R63",
+          "R70"
+        ],
+        "s_desktop": [
+          "R50"
+        ]
+      }
     },
     {
       "name": "Ubuntu Kylin（优麒麟）",
@@ -215,7 +322,19 @@
       "order": 8,
       "s_lineage": "Ubuntu 直系",
       "s_version": "26.04.1 LTS（2026-08-27，支持 3 年）",
-      "s_desktop": "UKUI"
+      "s_desktop": "UKUI",
+      "refs": {
+        "s_lineage": [
+          "R5"
+        ],
+        "s_version": [
+          "R6",
+          "R79"
+        ],
+        "s_desktop": [
+          "R78"
+        ]
+      }
     },
     {
       "name": "Loongnix（龙芯）",
@@ -242,7 +361,21 @@
       "order": 9,
       "s_lineage": "Debian 系（25 线⚠️推断 trixie，注 7）",
       "s_version": "25.1（2026-08-20）/ 20.7（2026-07-17）",
-      "s_desktop": "KDE"
+      "s_desktop": "KDE",
+      "refs": {
+        "s_lineage": [
+          "R69"
+        ],
+        "s_version": [
+          "R69"
+        ],
+        "s_desktop": [
+          "R69"
+        ],
+        "image": [
+          "R9"
+        ]
+      }
     },
     {
       "name": "凝思安全操作系统",
@@ -262,7 +395,21 @@
       "order": 10,
       "s_lineage": "Debian 系（证据最硬，注 8）",
       "s_version": "V6.0.80-20250816；并行 V6.0.100",
-      "s_desktop": "⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE"
+      "s_desktop": "⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE",
+      "refs": {
+        "s_lineage": [
+          "R67"
+        ],
+        "s_version": [
+          "R67"
+        ],
+        "s_desktop": [
+          "R67"
+        ],
+        "general": [
+          "R68"
+        ]
+      }
     },
     {
       "name": "Anolis OS（龙蜥）",
@@ -291,7 +438,23 @@
       "order": 11,
       "s_lineage": "RHEL 兼容系",
       "s_version": "23.5（官方公告未同步）",
-      "s_desktop": "无桌面 ISO；有独立 DDE 仓库"
+      "s_desktop": "无桌面 ISO；有独立 DDE 仓库",
+      "refs": {
+        "s_lineage": [
+          "R44"
+        ],
+        "s_version": [
+          "R41"
+        ],
+        "s_desktop": [
+          "R42",
+          "R41"
+        ],
+        "image": [
+          "R18",
+          "R33"
+        ]
+      }
     },
     {
       "name": "OpenCloudOS",
@@ -323,7 +486,23 @@
       "order": 12,
       "s_lineage": "自主演进，RHEL 系包管理",
       "s_version": "9.6（2026-07-13）",
-      "s_desktop": "无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE"
+      "s_desktop": "无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE",
+      "refs": {
+        "s_lineage": [
+          "R11"
+        ],
+        "s_version": [
+          "R43",
+          "R11"
+        ],
+        "s_desktop": [
+          "R12",
+          "R19"
+        ],
+        "image": [
+          "R34"
+        ]
+      }
     },
     {
       "name": "新支点桌面操作系统（NewStart NSDL）",
@@ -344,7 +523,19 @@
       "order": 13,
       "s_lineage": "⚠️ 未查到官方结论",
       "s_version": "V4.5.2（⚠️ 官方未标日期）",
-      "s_desktop": "EX-NDE 超凡桌面（Qt 自研）"
+      "s_desktop": "EX-NDE 超凡桌面（Qt 自研）",
+      "refs": {
+        "s_version": [
+          "R59"
+        ],
+        "s_desktop": [
+          "R60",
+          "R19"
+        ],
+        "s_lineage": [
+          "R83"
+        ]
+      }
     },
     {
       "name": "AOSC OS（安同 OS）",
@@ -367,7 +558,22 @@
       "order": 14,
       "s_lineage": "完全独立自建，自研 oma",
       "s_version": "滚动（下载页 2026-06-21）",
-      "s_desktop": "KDE Plasma"
+      "s_desktop": "KDE Plasma",
+      "refs": {
+        "s_lineage": [
+          "R1"
+        ],
+        "s_version": [
+          "R1"
+        ],
+        "s_desktop": [
+          "R1"
+        ],
+        "image": [
+          "R35",
+          "R20"
+        ]
+      }
     },
     {
       "name": "RevyOS",
@@ -389,7 +595,21 @@
       "order": 15,
       "s_lineage": "Debian 13 trixie；RISC-V",
       "s_version": "镜像站 20260504（文档滞后）",
-      "s_desktop": "Xfce4"
+      "s_desktop": "Xfce4",
+      "refs": {
+        "s_lineage": [
+          "R39"
+        ],
+        "general": [
+          "R51"
+        ],
+        "s_version": [
+          "R82"
+        ],
+        "s_desktop": [
+          "R82"
+        ]
+      }
     },
     {
       "name": "Bianbu OS",
@@ -410,7 +630,18 @@
       "order": 16,
       "s_lineage": "Ubuntu 26.04；RISC-V",
       "s_version": "v4.0.6（2026-08-26）",
-      "s_desktop": "⚠️ 未核实"
+      "s_desktop": "⚠️ 未核实",
+      "refs": {
+        "s_lineage": [
+          "R2"
+        ],
+        "s_version": [
+          "R2"
+        ],
+        "s_desktop": [
+          "R2"
+        ]
+      }
     },
     {
       "name": "FydeOS",
@@ -433,7 +664,19 @@
       "order": 17,
       "s_lineage": "Chromium OS + Gentoo Portage",
       "s_version": "v23（openFyde r144）",
-      "s_desktop": "ChromeOS 风格自研 shell"
+      "s_desktop": "ChromeOS 风格自研 shell",
+      "refs": {
+        "s_lineage": [
+          "R45",
+          "R21"
+        ],
+        "s_version": [
+          "R15"
+        ],
+        "s_desktop": [
+          "R45"
+        ]
+      }
     },
     {
       "name": "普华桌面操作系统",
@@ -454,7 +697,19 @@
       "order": 18,
       "s_lineage": "⚠️ 官方未声明",
       "s_version": "⚠️ 官方两处不一致：V4.0 / V5.0（注 9）",
-      "s_desktop": "V4.1 = KDE 5.4；V5.0 未查到"
+      "s_desktop": "V4.1 = KDE 5.4；V5.0 未查到",
+      "refs": {
+        "s_lineage": [
+          "R62"
+        ],
+        "s_version": [
+          "R61",
+          "R54"
+        ],
+        "s_desktop": [
+          "R61"
+        ]
+      }
     },
     {
       "name": "中标麒麟桌面操作系统（NeoKylin）",
@@ -480,7 +735,25 @@
       "order": 19,
       "s_lineage": "⚠️ 未查到；历史被归为 RHEL 系",
       "s_version": "⚠️ 未查到 V7 之后新版本",
-      "s_desktop": "未查到"
+      "s_desktop": "未查到",
+      "refs": {
+        "s_lineage": [
+          "R81"
+        ],
+        "s_version": [
+          "R81"
+        ],
+        "s_desktop": [
+          "R81"
+        ],
+        "general": [
+          "R10"
+        ],
+        "image": [
+          "R36",
+          "R37"
+        ]
+      }
     },
     {
       "name": "一铭桌面操作系统（EmindDesktop）",
@@ -500,7 +773,18 @@
       "order": 20,
       "s_lineage": "⚠️ 官方未声明",
       "s_version": "4.0 SP1（2016-06）",
-      "s_desktop": "未查到"
+      "s_desktop": "未查到",
+      "refs": {
+        "s_lineage": [
+          "R58"
+        ],
+        "s_version": [
+          "R55"
+        ],
+        "s_desktop": [
+          "R58"
+        ]
+      }
     },
     {
       "name": "EulerOS（华为）",
@@ -521,7 +805,18 @@
       "order": 21,
       "s_lineage": "openEuler 商业/闭源对应物",
       "s_version": "未公开",
-      "s_desktop": "未见桌面版"
+      "s_desktop": "未见桌面版",
+      "refs": {
+        "s_lineage": [
+          "R72"
+        ],
+        "s_version": [
+          "R72"
+        ],
+        "s_desktop": [
+          "R72"
+        ]
+      }
     }
   ],
   "probes": [
