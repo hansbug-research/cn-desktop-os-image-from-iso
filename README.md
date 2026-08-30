@@ -20,9 +20,9 @@
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
 | 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源索引只有 2496 个条目、全来自应用商店，连 `nano` 都查不到候选），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 6 | **麒麟的「没预装」与 UOS 的「硬缺口」性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14 / 14**、麒麟 V10 **14 / 14**、UOS V25 **0 / 14**（判据用 `apt-cache madison` 而非 `policy` 的 Candidate，后者会把「已经装了」误计成「装得上」） | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
-| 7 | **dpkg 段错误的真根因是厂商的安全插件，不是 IO 选项。** 麒麟 V11 的 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们。此前三次归因全错，其中一次是受控实验里的状态污染 | [§9.2](report.md#92-被推翻的判断与踩过的坑)、缺陷 D02 |
-| 8 | **ISO 可得性不是商业与社区的分界线，而且我们最初判反了。** 21 个 OS 逐个直连实测：**直接下载 15 家**（含凝思 7138705408 B、openKylin 8068329472 B、麒麟信安 4508876800 B、中标麒麟 3482347520 B、统信 UOS 7282405376 B）、需申请授权 **0 家**。最初版本写着「商业侧 8 家需授权」，全错——四个误判来源：代理把大陆主机打成 000、目录索引 401 被当成文件受限、ISO 仓库路径找错（`openkylin/` 是 apt 源，ISO 在 `openkylin-cdimage/`）、UI 看着像门槛但提取码明文写在页面里 | [§2.1](report.md#21-名录主要的国产桌面-os) |
-| 9 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从约 281 MB 涨到 420 MB。两项都已回退。⚠️ 这四个数用 `docker images` 解包口径，与本仓库其余处的 rootfs tar 口径不同；只有起点 345 MB 有现存锚点，其余是回退前的一次性观察 | [§5.1](report.md#51-加包要看真实代价) |
+| 7 | **dpkg 段错误的真根因是厂商的安全插件，不是 IO 选项。** 麒麟 V11 的 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们。此前三次归因三次归因均错，其中一次是受控实验里的状态污染 | [§9.2](report.md#92-被推翻的判断与踩过的坑)、缺陷 D02 |
+| 8 | **ISO 可得性不是商业与社区的分界线，而且我们最初判反了。** 21 个 OS 逐个直连实测：**直接下载 15 家**（含凝思 7138705408 B、openKylin 8068329472 B、麒麟信安 4508876800 B、中标麒麟 3482347520 B、统信 UOS 7282405376 B）、需申请授权 **0 家**。这一列的判定推翻过一整轮，四类误判来源：代理把大陆主机打成 000、目录索引 401 被当成文件受限、ISO 仓库路径找错（`openkylin/` 是 apt 源，ISO 在 `openkylin-cdimage/`）、UI 看着像门槛但提取码明文写在页面里 | [§2.1](report.md#21-名录主要的国产桌面-os) |
+| 9 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从约 281 MB 涨到 420 MB。两项都已回退。这四个数用 `docker images` 解包口径，与本仓库其余处的 rootfs tar 口径不同；只有起点 345 MB 有现存锚点，其余是回退前的一次性观察 | [§5.1](report.md#51-加包要看真实代价) |
 | 10 | **检查框架自己会假通过，所以门禁本身也要被门禁。** 本项目实测到三类：helper 函数未定义导致两条分支都是「命令未找到」、检查脚本挂死导致输出截断而缺失 key 被读成空值、负向断言不核对失败原因等于永真 | [§9.2](report.md#92-被推翻的判断与踩过的坑) |
 | 11 | **通用漏洞扫描器对这三个发行版没有有效覆盖：实测 9 个镜像有效覆盖 0 个。** 麒麟 V11 三档被 trivy 判为 `none` 根本没扫，麒麟 V10 与 UOS 六档被**误判成 Debian**——拿厂商改过的版本号比 Debian 公告区间，比不出来就报 0（九镜像 HIGH/CRITICAL 合计为 0）。那是「没有数据」，不是「没有漏洞」 | [§9.1](report.md#91-局限)、[`t13`](derived/tables/t13_cve_coverage.csv) |
 
@@ -62,7 +62,7 @@
 
 ## 5. 复现
 
-> ⚠️ 本地 `make verify` 只做镜像层验收，**不重新导出** `raw/d3_capabilities.json` 与 `raw/d4_gates.json`——这两份是从 `artifacts/` 里的探针输出与门禁日志导出的，改了日志而不重导不会有任何东西报警。CI（`.github/workflows/verify.yml`）会重导这两份并比对漂移，所以本地改完请一并跑 `python3 scripts/collect_d3_capabilities.py` 与 `collect_d4_gates.py`，或直接依赖 CI 兜住。
+> 本地 `make verify` 只做镜像层验收，**不重新导出** `raw/d3_capabilities.json` 与 `raw/d4_gates.json`——这两份是从 `artifacts/` 里的探针输出与门禁日志导出的，改了日志而不重导不会有任何东西报警。CI（`.github/workflows/verify.yml`）会重导这两份并比对漂移，所以本地改完请一并跑 `python3 scripts/collect_d3_capabilities.py` 与 `collect_d4_gates.py`，或直接依赖 CI 兜住。
 
 仓库不含镜像与 ISO（体积原因），但含完整构建链路。换一台 Linux 机器：
 

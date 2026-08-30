@@ -27,7 +27,7 @@
       ],
       "subject": true,
       "order": 1,
-      "s_lineage": "Debian/Ubuntu 系（⚠️ 官方未声明，注 1）",
+      "s_lineage": "Debian/Ubuntu 系（官方未声明，注 1）",
       "s_version": "V11（2025-08）/ V10 SP1 2503（2025-04）",
       "s_desktop": "V10 SP1 = UKUI；V11 未公开（注 2）",
       "refs": {
@@ -56,7 +56,7 @@
         ]
       },
       "s_iso_access": "公开列出·直链未解引用",
-      "iso_access_note": "**先前误判为「需申请授权」，实测是错的。** 官网试用页 `www.kylinos.cn/support/trial/` **未登录即可看到 27 个下载中间页**，其中桌面版有 `Kylin-Desktop-V11-2603-Release-20260228-X86_64.iso`（7.64 GB）、同版 ARM64（7.81 GB）/ Loong64（5.51 GB）/ SW64（5.70 GB），以及 `Kylin-Desktop-V10-SP1-2503-Release-20250430-X86_64.iso`（4.45 GB）与其 HWE/HWE-PP/ARM64/LoongArch64/SW64/mips64el 各版本；中间页逐个给出文件名、大小、**SHA256 与 SM3**。⚠️ 「立即下载」的最终字节流直链由客户端拼装，本轮未解引用到，故不记为「直接下载」——文件信息公开可见是实测的，字节数取自页面而非我们 HEAD 到的",
+      "iso_access_note": "官网试用页未登录即可看到 27 个下载中间页，桌面版含 `Kylin-Desktop-V11-2603-Release-20260228-X86_64.iso`（7.64 GB）、同版 ARM64（7.81 GB）/ Loong64（5.51 GB）/ SW64（5.70 GB），以及 `Kylin-Desktop-V10-SP1-2503-Release-20250430-X86_64.iso`（4.45 GB）与其 HWE、HWE-PP、ARM64、LoongArch64、SW64、mips64el 各版本；每页给出文件名、大小、SHA256 与 SM3。「立即下载」的最终字节流直链由客户端拼装，本轮未解引用，故这些字节数取自页面而非我们 HEAD 到的结果。",
       "s_customers": "党政·金融·电力·运营商·交通·教育·医疗·制造（厂商自述）｜**安可桌面 4 批在列**",
       "customers_note": "客户群体与场景为厂商自述：党政机关、金融、能源电力、电信运营商、交通（轨交 AFC 已在北京/天津/深圳/上海/重庆/武汉部署）、教育、医疗、制造业，以及硬件厂商预装与芯片适配方；2022 年以第一名中标中国移动桌面 OS 集采、占比 70%（厂商自述）。场景：信创办公终端替代、云桌面/瘦客户端、教育机房、工控与生产终端（ETC 门架、ATM、PLC/数控/半导体装备）、开发工作站。第三方核实部分：安可桌面附表连续 4 批在列——2023 年第 1 号（V10）、2024 年第 1 号（V10 SP1）、2025 年第 1 号（V10 SP1，该批桌面仅此一款）、2025 年第 3 号（V11，内核 6.6，Ⅰ级）。⚠️「军 B+ 级/公安部四级结构化保护」只见二手来源，官网未见，不引用。"
     },
@@ -82,7 +82,7 @@
       ],
       "subject": true,
       "order": 2,
-      "s_lineage": "Debian 系（⚠️ 官方未书面确认，注 3）",
+      "s_lineage": "Debian 系（官方未书面确认，注 3）",
       "s_version": "V25（2026-04-15）；V20 线 1070u4",
       "s_desktop": "DDE（V25 起 Treeland + Qt6）",
       "refs": {
@@ -109,7 +109,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前误判为「需申请授权」，实测是错的，而且与本仓库自身的构建脚本矛盾**——`distros/uos25.conf` 的 `ISO_URL` 就是一个公开 URL，`tools/fetch-squashfs.py` 正是匿名用 HTTP Range 从它抽取 squashfs 的。实测 `uos-desktop-25-professional-2500-amd64-202604.iso`：HTTP **200**、`content-length` **7282405376 B（6.78 GB）**、`content-type: application/octet-stream`、`accept-ranges: bytes`，无需登录。⚠️ 其上级目录返回 403（不可列目录），但文件 URL 本身匿名可取",
+      "iso_access_note": "`uos-desktop-25-professional-2500-amd64-202604.iso` HTTP 200 / **7282405376 B（6.78 GB）** / `content-type: application/octet-stream` / `accept-ranges: bytes`，无需登录；本项目切片路径的 `ISO_URL` 就是它，`tools/fetch-squashfs.py` 用 HTTP Range 从中抽取 squashfs。其上级目录返回 403，即不可列目录但文件可取。",
       "s_customers": "党政·央国企·金融·教育·医疗·邮政（厂商自述）｜**安可桌面 3 批在列**",
       "customers_note": "厂商自述：党政（公安、法院有专门方案）、央国企、部委、金融（银行柜面）、教育、医疗、邮政物流；渗透率「70% 党政、80% 央国企、90% 金融、90% 教育」为 2023 生态大会口述、无第三方审计。实证规模：中国邮政 30 万套独家中标、北京丰台区教委 2 万套、4000 余所学校。场景：信创办公终端替代、公安办公、智慧法院庭审、银行柜面、教育机房（网络同传还原、开机自动还原）、云桌面、企业级桌面管控。第三方核实：安可桌面附表 3 批在列——2023 年第 1 号（V20）、2024 年第 1 号（V20）、2026 年第 1 号（V25，内核 6.6，Ⅰ级）。"
     },
@@ -141,7 +141,7 @@
       "order": 3,
       "s_lineage": "Debian 系",
       "s_version": "3.0「黄河」（2026-08-28）",
-      "s_desktop": "UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）",
+      "s_desktop": "UKUI 4.24（桌面 ISO 仅三架构，注 4）",
       "refs": {
         "s_lineage": [
           "R40"
@@ -165,7 +165,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前记为「直链未实测」，原因是我找错了仓库。** 镜像站上有两个彼此独立的路径：`<mirror>/openkylin/` 是 **apt 软件仓库**（只有 `dists/`、`pool/`、`project/`，没有 ISO——这就是我在南大镜像站看到的），`<mirror>/openkylin-cdimage/` 才是 **ISO 仓库**，规范源是 `releases.openkylin.top/<版本>/`。实测 `openKylin-Desktop-V3.0-20260827-x86_64.iso` HTTP 200 / **8068329472 B（8.07 GB）**；arm64 6748999680 B、loong64 4391073792 B。⚠️ 另一处误判：南大镜像站对 curl 全站 302 自环（连 `/` 都自环），那是它自己的反爬，与 openKylin 无关。",
+      "iso_access_note": "ISO 在 `<mirror>/openkylin-cdimage/` 下，规范源是 `releases.openkylin.top/<版本>/`；`<mirror>/openkylin/` 是 apt 软件仓库，只有 `dists/`、`pool/`、`project/`。实测 `openKylin-Desktop-V3.0-20260827-x86_64.iso` HTTP 200 / **8068329472 B（8.07 GB）**，arm64 6748999680 B、loong64 4391073792 B。",
       "s_customers": "共建方与衍生方·高校科研·个人开发者·芯片生态（社区自述）",
       "customers_note": "社区根发行版，官方口径讲「共建方」与「衍生方」而非行业客户：基础软硬件企业、非营利与社团组织、高等院校、科研机构、个人开发者；开放原子开源基金会孵化运营（麒麟软件 2024-09 完成捐赠，央企开源捐赠首例）。规模（麒麟软件官网，截至 2026-02-28）：社区用户超 230 万、会员 2070 家、开发者超 2.1 万、151 个 SIG。场景：个人电脑/笔记本/平板日常桌面、嵌入式与开发板及 RISC-V 生态验证、芯片适配验证、WSL、AI 智能体。下游行业客户由衍生发行版承接（银河麒麟桌面即其商业发行版）。⚠️ openKylin 本身未查到进入任何政府采购或测评名录。"
     },
@@ -329,7 +329,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前误判为「需申请授权」。** 官网下载页 UI 表面是「网盘 + 提取码 + 表单」，但真实 URL 明文写在 `<a>` 的 `file_id` 属性里、提取码全是「无」或「N/A」；`mirrorlists.kylinsec.com.cn/iso/` 是匿名可列 autoindex（9 个版本目录）。实测无 cookie 无 referer 直取 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` HTTP 200 / **4508876800 B（4.51 GB）**。",
+      "iso_access_note": "下载页 UI 是「网盘 + 提取码 + 表单」，但真实 URL 明文写在 `<a>` 的 `file_id` 属性里、提取码全填「无」或「N/A」；`mirrorlists.kylinsec.com.cn/iso/` 是匿名可列 autoindex，含 9 个版本目录。无 cookie 无 referer 直取 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 得 HTTP 200 / **4508876800 B（4.51 GB）**。",
       "s_customers": "电力·航天测发控（1 万余套）·党政·金融·交通·医疗（厂商自述）｜**桌面版不在安可桌面附表**",
       "customers_note": "官网「党政、能源、交通、航天、电信、金融、邮政、教育」；能源电力是核心盘。航天测发控案例页原文「已在航天测发控体系各场所的后台服务器、前端桌面得到大面积应用，已成功部署 10000 余套」；累计「在电力、航天等重要领域部署 30 余万套」。场景：桌面版官方定位「面向 PC、笔记本及业务终端的通用型桌面系统，可支持办公、应用开发、云桌面等多种场景」；电力调度安全云工作站（替代传统 KVM 矩阵人机方案）、电力生产控制终端、涉密/高安全内网终端。⚠️ 安可 2024 年第 1 号入围的是麒麟信安**服务器**操作系统 V3，桌面版不在桌面附表内。⚠️ 等保四级次数官网两页口径不一致（「连续 8 次」vs「连续七次」），均无证书编号。"
     },
@@ -350,9 +350,9 @@
         "https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html"
       ],
       "order": 7,
-      "s_lineage": "deb 系（⚠️ 官方未声明，注 6）",
+      "s_lineage": "deb 系（官方未声明，注 6）",
       "s_version": "V5.0（2022-06）；Pro 版 2025-09 过评",
-      "s_desktop": "⚠️ 未公开（疑 MATE 衍生）",
+      "s_desktop": "未公开（疑 MATE 衍生）",
       "refs": {
         "s_lineage": [
           "R50"
@@ -374,7 +374,7 @@
         ]
       },
       "s_iso_access": "未查到公开下载",
-      "iso_access_note": "**先前记为「需申请授权」，订正为「未查到公开下载」——差别在于我们并未看到任何门槛，是根本找不到条目。** 官网「镜像下载」栏目 HTTP 200 但主内容区为空（`download_div` 计数 0，对照「资料下载」栏目有 22 个）；「产品试用申请」返回「表单模型不存在」，申请通道本身已坏；两台公开更新服务器递归爬完（900 + 119 个目录）**无任何桌面 ISO**。同厂**服务器**版反而匿名可下：`NFSCNS-4-0-230108-AN-x86_64-DVD.iso` HTTP 200 / **3745536000 B（3.75 GB）**。⚠️ 搜索引擎摘要声称该站「需手机号 + 验证码下载」并给出具体桌面 ISO 文件名，在实际抓取的页面里 grep 零命中且与实测矛盾，不采信（见 §9.2）。",
+      "iso_access_note": "官网「镜像下载」栏目 HTTP 200 但主内容区为空（`download_div` 计数 0，对照「资料下载」栏目有 22 个）；「产品试用申请」返回「表单模型不存在」。两台公开更新服务器递归爬完 900 与 119 个目录，无任何桌面 ISO。同厂服务器版匿名可下：`NFSCNS-4-0-230108-AN-x86_64-DVD.iso` HTTP 200 / **3745536000 B（3.75 GB）**。",
       "s_customers": "党政·医疗（500+ 医院）·电信·教育·金融·军工院所（厂商自述）｜**安可桌面 3 批在列**",
       "customers_note": "厂商自述：党政机关、医疗、电信、教育、金融；近两年落地重心明显偏医疗——全国 500 余家医院规模化部署（浙江省人民医院富阳院区、吉林大学第一医院、一汽总医院等），另有军工/船舶设计院（中国船舶集团第七〇八研究所等）。场景：信创办公终端替代、医疗信创终端（HIS/PACS 等 25 款核心系统 + 15 类医疗外设适配，靠鸳鸯火锅平台容器化跑原 Windows 应用）、工业设计工作站（已适配 100 余款工业设计软件）、教育机房、瘦客户端/ATM/智能大屏。第三方核实：安可桌面附表 3 批在列——2023 年第 1 号（V3.1）、2024 年第 1 号（V5.0）、2025 年第 3 号（Pro 版 V5.0，内核 6.6，Ⅰ级）。",
       "iso_access_qualifier": "服务器版 ISO 匿名可下，桌面版查不到"
@@ -448,7 +448,7 @@
         "https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true"
       ],
       "order": 9,
-      "s_lineage": "Debian 系（25 线⚠️推断 trixie，注 7）",
+      "s_lineage": "Debian 系（25 线推断 trixie，注 7）",
       "s_version": "25.1（2026-08-20）/ 20.7（2026-07-17）",
       "s_desktop": "KDE",
       "refs": {
@@ -495,7 +495,7 @@
       "order": 10,
       "s_lineage": "Debian 系（证据最硬，注 8）",
       "s_version": "V6.0.80-20250816；并行 V6.0.100",
-      "s_desktop": "⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE",
+      "s_desktop": "无桌面版产品名，可选 GNOME/KDE/MATE/XFCE",
       "refs": {
         "s_lineage": [
           "R67"
@@ -518,7 +518,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前误判为「需申请授权」，根因是代理**——`www.linx-info.com` 经代理返回 000、直连返回 200（见 §9.2）。实测该站 `download/` 是完全开放的 Apache autoindex，22 个 ISO 匿名可下：最新欧拉版 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` HTTP 200 / **7138705408 B（7.14 GB）** / `application/x-iso9660-image`。⚠️ 唯有官网主推的最新 V8 与 6.0-g2 目录返回 401 Basic auth，同级 6.0.99 是 200。",
+      "iso_access_note": "官网 `download/` 是完全开放的 Apache autoindex，22 个 ISO 匿名可下：最新欧拉版 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` HTTP 200 / **7138705408 B（7.14 GB）** / `application/x-iso9660-image`。最新 V8 与 6.0-g2 目录返回 401 Basic auth，同级 6.0.99 是 200。",
       "s_customers": "电力调度（国网/南网/发电集团）·涉密内网·运营商·军队列装（厂商自述）｜**桌面身份从未入安可**",
       "customers_note": "官网原文「国家电网、南方电网、中国铁路总公司、三大电信运营商、中央办公厅等党和国家政府机构大量采用」，累计部署数十万套。电力是绝对主力：国网调度中心、南网总调、六大分中心、20 余省调及地市调度中心，电力系统总装机超二十万套。⚠️ 关键区分：其「桌面」场景是**电力调度终端与变电站综自后台的图形工作站席位**（调度台/监控席），不是通用办公 PC——官网四大场景为服务器/图形工作站/装置专用/工业互联网。第三方核实（深交所公开问询回复）：国网调度与配电招标要求供应商取得公安部等保四级，「截至本回复出具之日，仅包括公司在内的 6 家操作系统达到等级保护第四级」；2021 年在中国电力行业服务器 OS 市占 26.9%、国产厂商第一。⚠️ 安可 2024 年第 1 号入围的是「凝思安全操作系统欧拉版 V6.0.99」，归在**服务器**类；凝思从未以桌面 OS 身份进入任何一期安可公告。"
     },
@@ -644,7 +644,7 @@
       "lineage": "⚠️ 官方只说「基于 Linux 稳定内核」。桌面线血统第三方说法互相矛盾（Debian 系 vs RHEL 系），不下结论。同厂服务器线 CGSL V7 明确基于 6.6 内核",
       "latest_version": "官网下载中心 x86 最新为 V4.5.2；此前 V4.4.0 提供 X86/ARM/MIPS/LoongArch 四架构。⚠️ 官方未标任何发布日期。桌面 V4.x 与服务器 V7 是两套版本号体系",
       "desktop": "EX-NDE 超凡桌面（Qt 自研 + NDE-Wayland；支持桌面/服务器/平板三种交互模式）。该桌面 2023-04 在 OpenCloudOS V9 发布会上开源，Gitee 组织 opencloudos-exnde，安装包约 104MB，目前只支持 OpenCloudOS 8",
-      "maintained": "⚠️ 品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体",
+      "maintained": "品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体",
       "image_candidates": [],
       "identify": [],
       "official_image_note": "未公开。官网仅一句「支持容器化场景」。查过官网 downloads/support、镜像站 nsosmirrors.gd-linux.com（实测 403 需登录）、cr./registry.gd-linux.com（不解析）、Docker Hub newstart（0 仓库）。",
@@ -654,8 +654,8 @@
         "https://gitee.com/opencloudos-exnde"
       ],
       "order": 13,
-      "s_lineage": "⚠️ 未查到官方结论",
-      "s_version": "V4.5.2（⚠️ 官方未标日期）",
+      "s_lineage": "未查到官方结论",
+      "s_version": "V4.5.2（官方未标日期）",
       "s_desktop": "EX-NDE 超凡桌面（Qt 自研）",
       "refs": {
         "s_version": [
@@ -677,7 +677,7 @@
         ]
       },
       "s_iso_access": "网盘分发",
-      "iso_access_note": "**先前「镜像站 403 需登录」是误读**：`nsosmirrors.gd-linux.com` 的**目录索引**返回 401/403，但**文件 URL 是 200**——实测服务器版 `NewStart-CGSL-7.02.06B7-x86_64-dvd.iso` HTTP 200 / **3935305728 B（3.94 GB）**。桌面 V4.5.2 本体则确实无 HTTP 直链，只有网盘（百度网盘与微云），且**提取码明文印在未登录可见的下载页上**；部分 aarch64 路径的 Basic 账密同样明文写在前端 JS 里。所以「网盘分发」这个分类针对的是桌面版，不是这家厂商整体。",
+      "iso_access_note": "桌面 V4.5.2 无 HTTP 直链，只经百度网盘与微云分发，提取码明文印在未登录可见的下载页上。同厂服务器版是真直链：`NewStart-CGSL-7.02.06B7-x86_64-dvd.iso` HTTP 200 / **3935305728 B（3.94 GB）**——该镜像站的目录索引返回 401，文件 URL 返回 200。",
       "s_customers": "政务办公·电力·金融·通信·教育（厂商自述）｜**桌面版从未入安可**",
       "customers_note": "公司口径「政府、电力、金融、通信、教育、汽车电子、工业控制、轨道交通，在全球 160 多个国家稳定运行 20 年」；官网四大场景化方案为电力、金融、政务办公、教育。通信是基因来源（三大运营商核心网络与业务平台）。⚠️ 关键区分：近两年所有公开落地与中标都在**服务器/嵌入式侧，桌面侧无新案例**；公司动态正文「桌面」二字零命中。第三方核实：中央国家机关 2020-2021 年 Linux 操作系统协议供货（GC-HGD200886）桌面标段曾入围（新支点操作系统 V4）；安可 2024 年第 1 号与 2026 年第 1 号入围的都是**服务器** OS（V6、V7），桌面版从未进入安可公告。",
       "iso_access_qualifier": "桌面版本体走网盘；同厂服务器版是 HTTP 直链"
@@ -797,7 +797,7 @@
       "order": 16,
       "s_lineage": "Ubuntu 26.04；RISC-V",
       "s_version": "v4.0.6（2026-08-26）",
-      "s_desktop": "⚠️ 未核实",
+      "s_desktop": "未核实",
       "refs": {
         "s_lineage": [
           "R2"
@@ -824,7 +824,7 @@
     {
       "name": "FydeOS",
       "type": "商业（其开源上游 openFyde 为社区开源，同厂主导）",
-      "vendor": "燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实）",
+      "vendor": "燧炻创新 / Fyde Innovations（工商全称未核实）",
       "lineage": "Chromium OS 衍生 + Gentoo Portage overlay 体系。openFyde 宣称 0 闭源组件，FydeOS 含闭源组件并提供自动更新",
       "latest_version": "商业版 FydeOS v23「Chromatic Cadence」（对应 Chromium OS r150，⚠️ 精确发布日期未查到）；开源版 openFyde r144",
       "desktop": "ChromeOS 风格自研 shell（Chromium OS Ash/Aura），非传统 Linux DE，无 X11/Wayland 传统 DE 概念",
@@ -863,7 +863,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前记的「下载页 403」是错的**——`fydeos.com` 与 `openfyde.io` 代理与直连都是 200，403 只在裸 UA 时被 WAF 拦。实测 `download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip` HTTP 200 / `application/zip` / **2581036906 B（2.58 GB）**，页面公示 SHA-256 `478a4b84…`。FydeOS **不发 .iso**，官网专设一节说明为何以 raw disk image（早期 `.img.xz`、现 `.bin.zip`）发布。企业版原文：「本页面提供的下载镜像仅面向个人用户。若需在企业、学校或组织内批量部署，请注册 FydeOS 账号，并在云集管平台下载企业镜像」。openFyde 只提供 15 个硬件 overlay 的源码仓库，无整机预编译镜像。",
+      "iso_access_note": "`download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip` HTTP 200 / `application/zip` / **2581036906 B（2.58 GB）**，页面公示 SHA-256 `478a4b84…`。FydeOS 以 raw disk image 发布而非 `.iso`（早期 `.img.xz`、现 `.bin.zip`），官网专设一节说明理由。企业版另走通道：「本页面提供的下载镜像仅面向个人用户。若需在企业、学校或组织内批量部署，请注册 FydeOS 账号，并在云集管平台下载企业镜像」。openFyde 只提供 15 个硬件 overlay 的源码仓库，无整机预编译镜像。",
       "s_customers": "个人 PC 用户·旧机复活·教育机房·企业与机构（厂商自述）｜**安可未在列**",
       "customers_note": "个人版（免费/低价、官网直接下载）面向个人 PC 用户、旧电脑/Surface 类设备换系统者、ARM 卡片机玩家；企业与机构客户走注册 + 云集管平台通道（企业镜像不公开下载），行业划分为教育、IT、政府、金融。场景：旧 PC/捐赠硬件复活成课堂终端（官网具名一手案例：捷克布拉格 6 区 J. A. Komenského 学校，479 名学生，10 台擦除的 Surface Pro 7，ChromeOS Flex 驱动不了触控屏、装 FydeOS 后全部可用）、教育机房集中管控、自助终端 Kiosk 与数字标牌、政务办公上云、平板/触控形态。⚠️ 其中文企业材料里引用的 Arcadia 联合学区等是 **Google Chromebook 的海外案例，不是 FydeOS 客户**，极易被误读。",
       "iso_access_qualifier": "个人版免费镜像；企业版需注册；不发 .iso 而是 raw disk image"
@@ -875,7 +875,7 @@
       "lineage": "⚠️ 官方未声明，只写「以开源 Linux 为基础」。服务器线（现名普华太极）明确融合 openEuler，桌面线是否同源官方未说",
       "latest_version": "⚠️ 两个官方来源不一致，如实并列：官网产品详情页是 V4.0（4.4 内核，V4.0 系列发布于 2016 年）；Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0。V5.0 的发布日期、内核、桌面环境全部未查到",
       "desktop": "V4.1 = KDE 5.4（Plasma）；V5.0 未查到",
-      "maintained": "⚠️ 桌面线沉寂但未 EOL：官网近两年新闻全是车用 AUTOSAR / 开源小满 EasyXMen 方向，首页版权信息只到 2009–2022，但未见任何停售或 EOL 公告，产品页仍在架",
+      "maintained": "桌面线沉寂但未 EOL：官网近两年新闻全是车用 AUTOSAR / 开源小满 EasyXMen 方向，首页版权信息只到 2009–2022，但未见任何停售或 EOL 公告，产品页仍在架",
       "image_candidates": [],
       "identify": [],
       "official_image_note": "未公开。查过官网、AtomHub、Docker Hub isoft（只有无关的 master 一个仓库）、registry.i-soft.com.cn（域名不解析）。",
@@ -885,8 +885,8 @@
         "http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html"
       ],
       "order": 18,
-      "s_lineage": "⚠️ 官方未声明",
-      "s_version": "⚠️ 官方两处不一致：V4.0 / V5.0（注 9）",
+      "s_lineage": "官方未声明",
+      "s_version": "官方两处不一致：V4.0 / V5.0（注 9）",
       "s_desktop": "V4.1 = KDE 5.4；V5.0 未查到",
       "refs": {
         "s_lineage": [
@@ -908,10 +908,9 @@
         ]
       },
       "s_iso_access": "未实测或未查到",
-      "iso_access_note": "⚠️ 官网产品页在架但未见下载入口",
+      "iso_access_note": "官网 `www.i-soft.com.cn` 本机直连多路径持续返回 HTTP 502（`Server: WAF`），未能访问在线页面，名录内容取自 Wayback 2026 年快照。快照显示 `/service/download.html` 页尾内联 `window.location.href=\"/login\"`，匿名被强制跳转登录页。",
       "s_customers": "中国电科体系涉密网/办公网·国家电网试点·邮储·海关（第三方调研，2019 年）｜**安可从未在列**",
-      "customers_note": "官网自述面向政府部门与企事业单位，「2016 年产品在近 60 个部委得到推广，在国家电网连续三期试点」。第三方调研（2019 年，安全内参）：已部署在中国电科总部及电科院、11 所、14 所、54 所等直属单位的涉密网终端、办公网计算机、涉密单机、笔记本、工控机；另有邮储银行定制终端、中国邮政农资门店收银、海关总署、新疆生产建设兵团；同调研指出桌面 OS 收入占比不到 10%。⚠️ 时效性存疑（2019 年数据）。⚠️ 第三方反向核实：普华从未出现在任何一期安可公告——按财库〔2023〕29 号，乡镇以上党政机关采购台式机须把「操作系统符合安全可靠测评要求」列为实质性要求，普华目前不满足该准入。",
-      "iso_access_qualifier": "⚠️ 官网 www.i-soft.com.cn 本机直连多路径持续返回 HTTP 502（CDN 错误页），属「未能访问」而非「站点下线」；内容取自 Wayback 2026 年快照"
+      "customers_note": "官网自述面向政府部门与企事业单位，「2016 年产品在近 60 个部委得到推广，在国家电网连续三期试点」。第三方调研（2019 年，安全内参）：已部署在中国电科总部及电科院、11 所、14 所、54 所等直属单位的涉密网终端、办公网计算机、涉密单机、笔记本、工控机；另有邮储银行定制终端、中国邮政农资门店收银、海关总署、新疆生产建设兵团；同调研指出桌面 OS 收入占比不到 10%。⚠️ 时效性存疑（2019 年数据）。⚠️ 第三方反向核实：普华从未出现在任何一期安可公告——按财库〔2023〕29 号，乡镇以上党政机关采购台式机须把「操作系统符合安全可靠测评要求」列为实质性要求，普华目前不满足该准入。"
     },
     {
       "name": "中标麒麟桌面操作系统（NeoKylin）",
@@ -935,8 +934,8 @@
         "https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64"
       ],
       "order": 19,
-      "s_lineage": "⚠️ 未查到；历史被归为 RHEL 系",
-      "s_version": "⚠️ 未查到 V7 之后新版本",
+      "s_lineage": "未查到；历史被归为 RHEL 系",
+      "s_version": "未查到 V7 之后新版本",
       "s_desktop": "未查到",
       "refs": {
         "s_lineage": [
@@ -963,7 +962,7 @@
         ]
       },
       "s_iso_access": "直接下载",
-      "iso_access_note": "**先前误判为「未查到公开下载」。** 官网是停更遗留站（footer © 2015-2016）且 `/support/trial.html` 与 `/scheme/product.html` 双双 HTTP 500，但 `download.cs2c.com.cn` 是开放 autoindex：实测 `NeoKylin-Linux-Desktop-6.0-x86_64-B045-20141201.iso` HTTP 200 / **3482347520 B（3.48 GB）**，i386 版 3667734528 B。⚠️ 桌面 7.x 无公开 ISO（定向探 14 个 iso/ 路径全 404）。",
+      "iso_access_note": "`download.cs2c.com.cn` 是开放 autoindex：`NeoKylin-Linux-Desktop-6.0-x86_64-B045-20141201.iso` HTTP 200 / **3482347520 B（3.48 GB）**，i386 版 3667734528 B。桌面 7.x 无公开 ISO（定向探 14 个 `iso/` 路径全 404）。官网是停更遗留站，`/support/trial.html` 与 `/scheme/product.html` 均返回 HTTP 500。",
       "s_customers": "国防·政府·企业·电力·金融·少数民族语言地区（厂商自述）｜**安可从未在列**",
       "customers_note": "官网原文「支撑着国防、政府、企业、电力和金融等各领域的应用」，用户覆盖三十多个省市自治区；另点名教育、公共服务、医疗、交通、保险、公安、档案，以及少数民族语言地区信息化（藏文/维哈柯文/蒙古文版）。场景：政府/企业软件正版化办公终端、行业定制终端、瘦客户端/云桌面（自述「保证企业涉密资料不外泄」）；形态含台式机、笔记本、一体机、车载机。⚠️ 第三方反向核实：中标麒麟从未出现在任何一期安可公告（同集团送测主体是麒麟软件的银河麒麟）。厂商自述的 2017 年央采协议供货入围未给文号。",
       "iso_access_qualifier": "官网自己的下载页已 HTTP 500"
@@ -975,7 +974,7 @@
       "lineage": "⚠️ 官方未声明。第三方称基于 Ubuntu 但未找到官方一手出处；官方历史表述只有「基于国家 Linux 标准开发」",
       "latest_version": "⚠️ 最后可查桌面版本为 EmindDesktop 4.0 / 4.0 SP1（2016 年 6 月）",
       "desktop": "未查到",
-      "maintained": "⚠️ 疑似停止：桌面版最后公开版本 2016 年，官网 Wayback 最后可用快照 2023-04-01，2023–2025 无新版本/新闻/中标公示。未查到工商注销或吊销证据，公司是否存续未确认。部分省级软件正版化平台仍列该条目，属存量采购目录，不代表在维护",
+      "maintained": "疑似停止：桌面版最后公开版本 2016 年，官网 Wayback 最后可用快照 2023-04-01，2023–2025 无新版本/新闻/中标公示。未查到工商注销或吊销证据，公司是否存续未确认。部分省级软件正版化平台仍列该条目，属存量采购目录，不代表在维护",
       "image_candidates": [],
       "identify": [],
       "official_image_note": "未公开（无任何相关命名空间，无自建 registry）。",
@@ -984,7 +983,7 @@
         "http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/"
       ],
       "order": 20,
-      "s_lineage": "⚠️ 官方未声明",
+      "s_lineage": "官方未声明",
       "s_version": "4.0 SP1（2016-06）",
       "s_desktop": "未查到",
       "refs": {
@@ -1005,7 +1004,7 @@
         ]
       },
       "s_iso_access": "未实测或未查到",
-      "iso_access_note": "⚠️ 官网最后可用快照为 2023-04-01，桌面版最后公开版本停在 2016 年",
+      "iso_access_note": "`emindsoft.com.cn` 解析到 171.108.41.73，但 http 与 https 直连与经代理均返回 000，TCP 21/22/80/443 全部 SYN 超时；`emindos.org` 及其 `www`、`bbs` 子域全部 NXDOMAIN。",
       "s_customers": "县市级党政与文体广电系统正版化（厂商自述）｜**央采未通过符合性审查·安可从未在列**",
       "customers_note": "官网「成功案例」页以县市级党政机关与文体广电系统为主、成建制铺开（广西、湖北宜昌片区、宁夏吴忠市、贵州毕节片区），中央级仅广电总局信息中心一家。场景：政府软件正版化替换办公终端、国家版权局主导的国产软件应用试点、中国—东盟小语种翻译办公。⚠️ 第三方核实（负面）：中央国家机关 2020-2021 年 Linux 操作系统协议供货（GC-HGD200886）第一包（桌面）与第二包（服务器）均「不满足采购需求中的实质性要求，未通过符合性审查」；安可全 8 期均无一铭。公司状态：因最近三个会计年度经审计期末净资产均为负值，2023-08-21 终止新三板挂牌（股转发〔2023〕78 号）。⚠️ 其自述的「武器装备承制单位名录」「重庆市公安局采购」等表述只见于企业报送简介转载，无原文佐证，不引用。"
     },
@@ -1049,7 +1048,7 @@
         ]
       },
       "s_iso_access": "未查到公开下载",
-      "iso_access_note": "**订正：原判「需注册/登录/申请」撤回。** 复核方补齐 API 路径后用零 header 裸 curl 复现了关键正对照：同一个企业支持 API 上，TaiShan 产品节点匿名可取到 **98 个版本**，而 EulerOS 三个节点（`EulerOS for Server`、`CloudBU EulerOS`、`Euler OS for Cloud BU`）的版本数组**全为空**（`tip` 分别是 `softwareEos` 与 `actualNoSoft`）。这个正对照排除了「空是匿名 ACL 造成的假象」，所以不是「ISO 藏在登录墙后」，而是**门户里根本没有 EulerOS 的 ISO 条目**。官方基础设施确实是登录墙（`/dl/download.do` 对任意 nid 返回 `x-login-url: https://uniportal.huawei.com/uniportal1/`，实测 3 个 nid 一致），但 EulerOS 在这套体系里无条目；镜像站 `repo.huaweicloud.com/euler/` 有 2.0～2.10 各版本的 RPM 仓库（`2.10/os/x86_64/` 为 200）而 `iso/` 与 `ISO/` 均 404。历史上约 2022 年前曾可直接下载，承载直链的 OBS 桶现返回 `NoSuchBucket`。⚠️ 华为企业软件页面「44 个下载按钮全为 `javascript:void(0)` + `title=\"暂无权限，请先提升权限\"`」这一条依赖 headless Chrome 渲染，不属纯 HTTP 可复现。",
+      "iso_access_note": "官方门户里没有 EulerOS 的 ISO 条目。判据是一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点（`EulerOS for Server`、`CloudBU EulerOS`、`Euler OS for Cloud BU`）的版本数组全为空（`tip` 为 `softwareEos` 与 `actualNoSoft`），排除了匿名 ACL 的可能。该体系的下载端点本身是登录墙（`/dl/download.do` 对任意 nid 返回 `x-login-url: https://uniportal.huawei.com/uniportal1/`），但 EulerOS 在其中无条目。镜像站 `repo.huaweicloud.com/euler/` 有 2.0～2.10 各版本的 RPM 仓库（`2.10/os/x86_64/` 为 200），`iso/` 与 `ISO/` 均 404。约 2022 年前曾可直接下载，承载直链的 OBS 桶现返回 `NoSuchBucket`。",
       "s_customers": "**无桌面客群**（服务器/云/存储）",
       "customers_note": "EulerOS 是华为基于 openEuler 的内部商用发行版，官网定位面向企业 IT 基础设施与云计算，应用场景三类全部是服务器侧（TaiShan 服务器、PaaS 容器平台、企业存储），官网自称属华为内部商用系统「并不对外承载开源义务」。未查到官方桌面版产品。⚠️ EulerOS 本身未见于任何一期安可公告；同门在服务器附表的是华为云欧拉 V2.0/V3。桌面附表中华为系只有 HarmonyOS V1.0（2026 年第 1 号，Ⅱ级），且因不满足财库〔2023〕34 号桌面分册第 1 条带星指标「同源兼容多 CPU 平台架构」未通过 2026 年度央采桌面框架协议初审。"
     }
