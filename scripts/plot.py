@@ -38,7 +38,11 @@ def save(fig, name):
              "xlabel": ax.get_xlabel(), "ylabel": ax.get_ylabel(),
              "xticklabels": [t.get_text() for t in ax.get_xticklabels()],
              "yticklabels": [t.get_text() for t in ax.get_yticklabels()],
-             "texts": [t.get_text() for t in ax.texts],
+             # ax.texts 的顺序依 matplotlib 版本而变（饼图的 label 与 autopct
+             # 插入次序在 runner 上就与本地相反，值一模一样只是排列不同），
+             # 而这里要盯的是「画进去的值对不对」，次序不承载信息 —— 故排序。
+             # tick label 不排序：它们的顺序是确定的，且顺序本身有意义。
+             "texts": sorted(t.get_text() for t in ax.texts),
              # patch 不止 Rectangle：fig05 用了饼图，Wedge 没有 width/height。
              # 按类型各取自己的数据量，取不到的记类型名，别让一种图形拖垮整份侧车。
              "bars": [_patch_data(p) for p in ax.patches],
