@@ -39,13 +39,28 @@ jobs:
             exit 1
           fi
 
-      - name: Rebuild figures
-        run: python3 scripts/plot.py
+      # 光重画不比对等于没查。图必须逐字节复现（plot.py 已清掉 matplotlib
+      # 默认写入的 Software/CreationDate 元数据），且必须真的比到 6 张——
+      # 「遍历后报成功」在空集合上恒真，本地实测踩过一次。
+      - name: Rebuild figures and fail on drift
+        run: |
+          python3 scripts/plot.py
+          if ! git diff --quiet -- figures/; then
+            echo "::error::figures/ 与 raw/ 不一致——请在本地重跑 scripts/plot.py 并提交结果"
+            git diff --stat -- figures/
+            exit 1
+          fi
+          n=$(git ls-files 'figures/*.png' | wc -l)
+          [ "$n" -eq 6 ] || { echo "::error::图基线 6 张，实际 $n 张（改了张数请同步基线与正文）"; exit 1; }
+          echo "figures: $n 张逐字节零漂移"
 
       - name: Shell syntax check on the whole build chain
         run: |
-          fail=0
-          for f in $(git ls-files '*.sh'); do bash -n "$f" || fail=1; done
+          fail=0; n=0
+          for f in $(git ls-files '*.sh'); do bash -n "$f" || fail=1; n=$((n+1)); done
+          # 同上：git ls-files 一旦返回空，循环零次、exit 0，语法检查就整段空转。
+          [ "$n" -ge 20 ] || { echo "::error::只检查了 $n 个脚本，低于基线 20"; fail=1; }
+          echo "bash -n: $n 个脚本"
           exit $fail
 
       # raw/d4_gates.json 自称来自 artifacts/f4-*.log，但那一步从不在 CI 里重跑，

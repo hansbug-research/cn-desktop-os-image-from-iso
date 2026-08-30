@@ -73,6 +73,7 @@ def main():
             "tarball_sha256": (re.search(r"# tarball sha256: ([0-9a-f]{64})", t) or [None, None])[1],
             "source_date_epoch": (re.search(r"# SOURCE_DATE_EPOCH: (\d+)", t) or [None, None])[1],
             "inrelease_sha256": (re.search(r"# InRelease sha256: ([0-9a-f]{64})", t) or [None, None])[1],
+            "image_id": (re.search(r"# image id: ([0-9a-f]{12})", t) or [None, None])[1],
             "package_lines": sum(1 for l in t.splitlines() if l and not l.startswith("#")),
         }
     # 失败即退出，绝不写盘。早先版本在源目录不存在时照样 exit 0 写出一份全是 null 的

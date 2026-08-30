@@ -22,7 +22,7 @@
 
 `cr.kylinos.cn` 上确实有匿名可拉的官方镜像，容易让人以为麒麟桌面版的容器化问题已经解决。实测下来不是这么回事。
 
-另一组 8 条是针对桌面 tag 的存在性探测（表 [`t02`](derived/tables/t02_registry_existence_probes.csv)，与上面那 8 个候选引用不是同一套，只有 `docker.io/uniontech/uos:latest` 同时在两表）。在这 8 条里，`cr.kylinos.cn` 上唯一拉得到的是 `kylin/kylin-server-minimal:v10sp1`；`kylin-desktop` 的 v10、v11、latest 三个 tag 全部不存在，`kylin-linux-desktop:v10` 不存在，连服务器线的 `kylin-server-minimal:v11` 也不存在。
+另一组 8 条是针对桌面 tag 的存在性探测（表 [`t02`](derived/tables/t02_registry_existence_probes.csv)，与上面那 8 个候选引用不是同一套，两表的交集只有 2 条（`cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1` 与 `docker.io/uniontech/uos:latest`），并集共 14 个不同的引用）。在这 8 条里，`cr.kylinos.cn` 上唯一拉得到的是 `kylin/kylin-server-minimal:v10sp1`；`kylin-desktop` 的 v10、v11、latest 三个 tag 全部不存在，`kylin-linux-desktop:v10` 不存在，连服务器线的 `kylin-server-minimal:v11` 也不存在。
 
 而那个唯一拉得到的镜像，与桌面版不是一条产品线：
 
@@ -118,7 +118,7 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 一类是标准的容器精简：`policy-rc.d` 返回 101 阻止装包时起服务、apt 配置去掉缓存与翻译文件、`/usr/share/doc` 按 `path-exclude` + `path-include copyright` 只保留版权声明（GPL 要求）、清空 `machine-id`、删除 ssh host key 与 `resolv.conf`、去掉内核与固件。
 
-另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个，它们的 micro 里连 systemd 单元目录都没有，`default.target` 也因此为空（缺陷 D12）。
+另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个——不是「没有单元目录」（`/lib/systemd/system` 里其实还有个别包丢进去的几个单元），而是**没有 `multi-user.target`**：改造的守卫先判 `multi-user.target` 是否存在，判空就整段不进；而那 13 条候选单元在 micro 档里一条都不在，本来也无从 mask。`default.target` 也因此为空（缺陷 D12）。
 
 还有一类是补齐，理由是"缺了会让语义不自洽"。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是"今天"，否则可复现性当场报废。
 
@@ -159,7 +159,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 72 项里有一项要特别说明：**`sudo` 在九档全部判为「不适用」，而探针实测九档全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。这里写明是因为它曾经被处理错过：早先版本把 `sudo` 整项从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」，与数据相反，效果是把缺口数从 61 压到 52。现在改回按档位定位归入 NA 集，不再做删除。
 
-198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)，三个数由 `analyze.py` 算出、落在 `stats.json` 并有断言守）：**172 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`，即前置条件不存在——其中 9 格是三个 micro 档的 apt 三项、6 格是 `cc_clean_stderr`（micro 与 base 各三家，没有编译器就无所谓 stderr 干净）；**11 格**探针实测为 `Y`，也就是该档位实际具备、但按定位不计入的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 172+15+11=198。所以这个矩阵两个方向都要提醒：只看「缺口 52」会低估未满足面（172 格实测不通过被归入不适用），只看「支持 398」也会低估已具备的能力（另有 11 格实测通过但没计入）。
+198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)，三个数由 `analyze.py` 算出、落在 `stats.json` 并有断言守）：**173 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`，即前置条件不存在——其中 9 格是三个 micro 档的 apt 三项、6 格是 `cc_clean_stderr`（micro 与 base 各三家，没有编译器就无所谓 stderr 干净）；**10 格**探针实测为 `Y`，也就是该档位实际具备、但按定位不计入的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 173+15+10=198。所以这个矩阵两个方向都要提醒：只看「缺口 52」会低估未满足面（173 格实测不通过被归入不适用），只看「支持 398」也会低估已具备的能力（另有 10 格实测通过但没计入）。
 
 648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 

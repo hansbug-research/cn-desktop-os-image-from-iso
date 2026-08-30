@@ -5,6 +5,6 @@ kylin11,devel,kylin-desktop-v11:devel,498,686MB,255,v11,2.38-1ok6.9k0.5,SIGRTMIN
 kylin10,micro,kylin-desktop-v10:micro,213,308MB,154,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,136ef44865d23c4a
 kylin10,base,kylin-desktop-v10:base,270,394MB,221,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,e5cde2f5ceb84a36
 kylin10,devel,kylin-desktop-v10:devel,503,710MB,263,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,3e2931b0be262390
-uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,974cba17ccf8201a
+uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,e97182343fb36cf7
 uos25,base,uos-desktop-v25:base,191,281MB,164,25,2.38-6deepin19,SIGRTMIN+3,f80abeda86511b60
 uos25,devel,uos-desktop-v25:devel,448,638MB,208,25,2.38-6deepin19,SIGRTMIN+3,bcd57e55fd3fc30d

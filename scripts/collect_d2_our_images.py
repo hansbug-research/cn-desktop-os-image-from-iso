@@ -34,6 +34,8 @@ def facts(img):
         #   unpacked_human docker images SIZE  —— 解包后按块占用（含文件系统开销）
         #   tar_bytes（见下）rootfs tar 的字节流 —— 构建的直接产物，被 manifest 的 sha256 锚定
         # 正文一律以 tar_bytes 为准，因为只有它既可复现又有哈希锚点。
+        # 镜像 ID：用来和 manifest 记的 ID 对账，发现「采集之后又重建」
+        "image_id": run(f"docker image inspect {img} --format '{{{{.Id}}}}'")[7:19],
         "content_bytes": run(f"docker image inspect {img} --format '{{{{.Size}}}}'"),
         "unpacked_human": run(f"docker images {img} --format '{{{{.Size}}}}'"),
         "os_release": sh("cat /etc/os-release 2>/dev/null"),
@@ -68,9 +70,15 @@ def facts(img):
         # ⚠️ 只 wc sources.list 是不够的：真正的源清单可以在 sources.list.d/ 下。
         # 上一轮就是因为只量了那一个文件，uos25:micro 带着一条 active appstore 源
         # 却全绿通过。改成数**未注释的 deb 行**，覆盖两处。
-        "active_deb_lines": sh("cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list "
-                               "/etc/apt/sources.list.d/*.sources 2>/dev/null "
-                               "| grep -cE '^[[:space:]]*deb' || echo 0"),
+        # ⚠️ `grep -c ... || echo 0` 会输出两行：grep 计数为 0 时退出码非零，
+        # `|| echo 0` 也跟着执行，于是拿到 "0\n0" 而 int() 直接抛异常。
+        # 用 `{ ...; true; }` 吞掉退出码，保证只有一行。
+        # 另：deb822 格式（sources.list.d/*.sources 里的 `Types: deb`）也要数，
+        # 否则就是「度量看不见另一种形态」的下一个形态。
+        "active_deb_lines": sh("{ cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list "
+                               "2>/dev/null | grep -cE '^[[:space:]]*deb[[:space:]]'; } 2>/dev/null | head -1"),
+        "active_deb822_lines": sh("{ cat /etc/apt/sources.list.d/*.sources 2>/dev/null "
+                                  "| grep -cE '^[[:space:]]*Types:.*deb'; } 2>/dev/null | head -1"),
         "keyrings_unowned": sh("for f in /usr/share/keyrings/*.gpg; do [ -e \"$f\" ] || continue; "
                                "dpkg -S \"$f\" >/dev/null 2>&1 || basename \"$f\"; done "
                                "| sort | tr '\\n' ' '"),

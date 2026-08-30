@@ -280,6 +280,12 @@ for r in d2["ours"]:
 csv("t12_hardening_surface.csv", ["distro", "tier", "masked_units", "setuid_bins"], rows)
 # 信任面：每个镜像装了哪些 keyring。麒麟两版走在线源、需要它自己那把；
 # UOS 走切片、不该出现麒麟的 key。
+# 「采集之后又重建」这一类，mtime 守卫抓不到（它比的是采集时刻记下的两个时间，
+# 镜像在采集之后重建时那一对永远自洽）。用镜像 ID 与 manifest 记录的 ID 对账才行。
+S["image_id_mismatches"] = sorted(
+    f'{r["distro_id"]}:{r["tier"]}' for r in d2["ours"]
+    if r.get("image_id") and d4["manifests"].get(f'{r["distro_id"]}-{r["tier"]}', {}).get("image_id")
+    and r["image_id"] != d4["manifests"][f'{r["distro_id"]}-{r["tier"]}']["image_id"])
 S["keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
                           sorted((r.get("keyrings") or "").split())
                           for r in d2["ours"]}
@@ -291,8 +297,17 @@ S["injected_keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
 S["alien_keyring_images"] = sorted(
     k for k, v in S["keyrings_by_image"].items()
     if k.startswith("uos25") and any("kylin" in x for x in v))
-S["micro_active_deb_lines"] = {f'{r["distro_id"]}:{r["tier"]}': int(r.get("active_deb_lines") or 0)
-                               for r in d2["ours"] if r["tier"] == "micro"}
+# ⚠️ 不能写 `r.get(...) or 0` —— 字段不在落盘数据里时读成 0，断言就变成空转
+# （实测：collect_d2 改了但 d2 没重采，三档全 0 全绿）。缺键必须显式失败。
+_missing_adl = [f'{r["distro_id"]}:{r["tier"]}' for r in d2["ours"]
+                if r["tier"] == "micro" and r.get("active_deb_lines") is None]
+S["micro_active_deb_missing"] = _missing_adl
+S["micro_active_deb_lines"] = {
+    f'{r["distro_id"]}:{r["tier"]}':
+        int((r["active_deb_lines"] or "0").strip().splitlines()[0] or 0)
+        + int((r.get("active_deb822_lines") or "0").strip().splitlines()[0] or 0)
+    for r in d2["ours"]
+    if r["tier"] == "micro" and r.get("active_deb_lines") is not None}
 S["micro_sources_list_bytes"] = {f'{r["distro_id"]}:{r["tier"]}': int(r.get("sources_list_bytes") or 0)
                                  for r in d2["ours"] if r["tier"] == "micro"}
 S["masked_units_by_distro"] = {r["distro_id"]: len((r.get("masked_units") or "").split())

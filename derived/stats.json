@@ -13,8 +13,8 @@
   "capability_items": 72,
   "cells_gap": 52,
   "cells_na": 198,
-  "cells_na_from_N": 172,
-  "cells_na_from_Y": 11,
+  "cells_na_from_N": 173,
+  "cells_na_from_Y": 10,
   "cells_na_from_na": 15,
   "cells_supported": 398,
   "cve_effective_coverage": 0,
@@ -41,6 +41,7 @@
   ],
   "existence_found": 1,
   "existence_probes": 8,
+  "image_id_mismatches": [],
   "images_built": 9,
   "info_probes": 6,
   "injected_keyrings_by_image": {
@@ -105,6 +106,7 @@
     "kylin11:micro": 0,
     "uos25:micro": 0
   },
+  "micro_active_deb_missing": [],
   "micro_sources_list_bytes": {
     "kylin10:micro": 0,
     "kylin11:micro": 0,

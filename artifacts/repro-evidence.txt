@@ -1,5 +1,5 @@
 # 可复现性实测凭据
-# 生成时间: 2026-08-30T11:36:02Z
+# 生成时间: 2026-08-30T12:26:26Z
 # 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256
 # 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，
 #       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。
@@ -7,6 +7,6 @@
 kylin11-micro    一致  sha256=4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb
 kylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac
 kylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161
-uos25-micro      一致  sha256=974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1
+uos25-micro      一致  sha256=e97182343fb36cf77a13b030a1a95884d834be59f311d4de2a83f24a9a00c99d
 uos25-base       一致  sha256=f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0
 uos25-devel      一致  sha256=bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0

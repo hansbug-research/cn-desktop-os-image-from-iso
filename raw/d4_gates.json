@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T12:01:42Z",
+  "collected_at": "2026-08-30T12:29:22Z",
   "gates": {
     "verify": {
       "passed": 365,
@@ -16,7 +16,7 @@
       "kylin10-micro": "136ef44865d2",
       "kylin10-base": "e5cde2f5ceb8",
       "kylin10-devel": "3e2931b0be26",
-      "uos25-micro": "974cba17ccf8",
+      "uos25-micro": "e97182343fb3",
       "uos25-base": "f80abeda8651",
       "uos25-devel": "bcd57e55fd3f"
     },
@@ -114,7 +114,7 @@
     "repro": {
       "identical": 6,
       "mismatched": 0,
-      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T11:36:02Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1\nuos25-base       一致  sha256=f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0\nuos25-devel      一致  sha256=bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0\n"
+      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T12:26:26Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=e97182343fb36cf77a13b030a1a95884d834be59f311d4de2a83f24a9a00c99d\nuos25-base       一致  sha256=f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0\nuos25-devel      一致  sha256=bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0\n"
     }
   },
   "manifests": {
@@ -122,54 +122,63 @@
       "tarball_sha256": "e5cde2f5ceb84a3600d01b50fdac73f11bae6d757f992546fd29d07687d326ea",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
+      "image_id": "b56422e4f333",
       "package_lines": 221
     },
     "kylin10-devel": {
       "tarball_sha256": "3e2931b0be26239090e38ca524393d61fe01e92efe415786cd8881aa40fb49e0",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
+      "image_id": "8812afc7e4d6",
       "package_lines": 263
     },
     "kylin10-micro": {
       "tarball_sha256": "136ef44865d23c4ab8743c4c688fada7dd3d18cb9a22ca9c02f0969850841e38",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
+      "image_id": "c9ac8dffa98d",
       "package_lines": 154
     },
     "kylin11-base": {
       "tarball_sha256": "543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac",
       "source_date_epoch": "1756113384",
       "inrelease_sha256": "dda9ec67d00da50f9f0d67ebbbc63743b24c7f34326558391ffcc547abc812c9",
+      "image_id": "85630949b2a1",
       "package_lines": 206
     },
     "kylin11-devel": {
       "tarball_sha256": "ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161",
       "source_date_epoch": "1756113384",
       "inrelease_sha256": "dda9ec67d00da50f9f0d67ebbbc63743b24c7f34326558391ffcc547abc812c9",
+      "image_id": "6b7aa6aa21c2",
       "package_lines": 255
     },
     "kylin11-micro": {
       "tarball_sha256": "4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb",
       "source_date_epoch": "1756113384",
       "inrelease_sha256": "dda9ec67d00da50f9f0d67ebbbc63743b24c7f34326558391ffcc547abc812c9",
+      "image_id": "6422c7a08844",
       "package_lines": 71
     },
     "uos25-base": {
       "tarball_sha256": "f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
+      "image_id": "5d7fb8b930e6",
       "package_lines": 164
     },
     "uos25-devel": {
       "tarball_sha256": "bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
+      "image_id": "6745f71d59f0",
       "package_lines": 208
     },
     "uos25-micro": {
-      "tarball_sha256": "974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1",
+      "tarball_sha256": "e97182343fb36cf77a13b030a1a95884d834be59f311d4de2a83f24a9a00c99d",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
+      "image_id": "f73a36e12752",
       "package_lines": 67
     }
   }

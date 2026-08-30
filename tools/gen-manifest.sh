@@ -15,6 +15,8 @@ OUT="$ROOT/out/$DID-$TIER.manifest"
     echo "# tarball sha256: $(sha256sum "$ROOT/out/$DID-$TIER.tar" | cut -d' ' -f1)"
     # 字节数也记下来：仓库不分发 tar，别人只能靠 manifest 复核体积
     echo "# tarball bytes: $(stat -c %s "$ROOT/out/$DID-$TIER.tar")"
+    # 镜像 ID：让「采集之后又重建」这类漂移可被机器发现 —— mtime 守卫抓不到它
+    echo "# image id: $(docker image inspect "$IMG" --format '{{.Id}}' 2>/dev/null | cut -c8-19)"
   else
     echo "# tarball sha256: n/a（该路径不产 tarball）"
   fi

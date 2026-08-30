@@ -51,9 +51,19 @@ for k in ("cells_supported", "cells_gap", "cells_na"):
 # 198 格不适用的三分拆：三者之和必须等于 cells_na，且三个数都要在正文出现
 ok(S["cells_na_from_N"] + S["cells_na_from_na"] + S["cells_na_from_Y"] == S["cells_na"],
    "NA 三分拆之和应等于 cells_na")
-in_text(S["cells_na_from_N"], label="NA 中探针为 N 的格数", ctx=rf"\*\*{S['cells_na_from_N']} 格\*\*探针实测为")
-in_text(S["cells_na_from_na"], label="NA 中探针为 n/a 的格数", ctx=rf"\*\*{S['cells_na_from_na']} 格\*\*探针本身输出")
-in_text(S["cells_na_from_Y"], label="NA 中探针为 Y 的格数", ctx=rf"\*\*{S['cells_na_from_Y']} 格\*\*探针实测为")
+# ⚠️ ctx 必须带上 `N`/`Y` 的极性：只写「格**探针实测为」两条模式互相可满足，
+# 把 172 与 11 对调、连「三类合计」一起改也全绿（与 9↔6 那次同型）。
+in_text(S["cells_na_from_N"], label="NA 中探针为 N 的格数",
+        ctx=rf"\*\*{S['cells_na_from_N']} 格\*\*探针实测为 `N`")
+in_text(S["cells_na_from_na"], label="NA 中探针为 n/a 的格数",
+        ctx=rf"\*\*{S['cells_na_from_na']} 格\*\*探针本身输出 `n/a`")
+in_text(S["cells_na_from_Y"], label="NA 中探针为 Y 的格数",
+        ctx=rf"\*\*{S['cells_na_from_Y']} 格\*\*探针实测为 `Y`")
+ok(re.search(rf"三类合计 {S['cells_na_from_N']}\+{S['cells_na_from_na']}\+{S['cells_na_from_Y']}="
+             rf"{S['cells_na']}", REPORT) is not None, "三类合计式必须与三个分量一致")
+# X2：档位口径也要钉住，否则「三档均为 11」可被写回「base/devel 各 11」
+ok("麒麟 V10 三档均为 11 个" in REPORT,
+   "麒麟 V10 的 masked 单元是三档均 11（t12 可查），不得写成只有 base/devel")
 # n/a 那批的成因必须写对：apt 三项 × 3 micro = 9，cc_clean_stderr × 6 = 6
 ok(S["na_na_by_item"].get("cc_clean_stderr") == 6,
    f"n/a 明细里 cc_clean_stderr 应为 6 格，实际 {S['na_na_by_item']}")
@@ -289,6 +299,12 @@ ok(S["anchor_mismatches"] == [],
 ok(S["anchored_records"] >= 12, f"d6/d7 应有锚点的记录数过少：{S['anchored_records']}")
 ok(S["anchor_pairs_checked"] == 12,
    f"实际比过的锚点对数应为 12，实际 {S['anchor_pairs_checked']} —— 少了就是有对账被静默跳过")
+ok(S["micro_active_deb_missing"] == [],
+   f"这些 micro 档的 active_deb_lines 字段没采到（缺键会让断言空转）：{S['micro_active_deb_missing']}")
+ok(len(S["micro_active_deb_lines"]) == 3,
+   f"三个 micro 档都应有 active_deb_lines，实际 {len(S['micro_active_deb_lines'])}")
+ok(S["image_id_mismatches"] == [],
+   f"这些镜像的当前 ID 与 manifest 记录不符（采集之后又重建了）：{S['image_id_mismatches']}")
 ok(S["digest_log_prefixes_checked"] == 9,
    f"应从 f4-digest.log 抽出 9 条 sha256 前缀对账，实际 {S['digest_log_prefixes_checked']}")
 ok(S["anchor_bad_hex"] == [], f"d2 的 tar_sha256 必须都是 64 位 hex，异常：{S['anchor_bad_hex']}")
@@ -332,7 +348,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "185"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "190"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

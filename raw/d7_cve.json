@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T11:39:28Z",
+  "collected_at": "2026-08-30T12:30:05Z",
   "scanner": "aquasec/trivy:0.70.0",
   "images": [
     {
@@ -78,7 +78,7 @@
       "distro_id": "uos25",
       "image": "uos-desktop-v25:micro",
       "real_os_id": "uos",
-      "anchor_tar_sha256": "974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1",
+      "anchor_tar_sha256": "e97182343fb36cf77a13b030a1a95884d834be59f311d4de2a83f24a9a00c99d",
       "trivy_os_family": "debian",
       "trivy_os_name": "bookworm/sid",
       "results": 1,

@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T11:38:46Z",
+  "collected_at": "2026-08-30T12:29:22Z",
   "source_dir": "/data/dosbuild/out",
   "probes": {
     "kylin11:micro": {
@@ -82,7 +82,7 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:24:46.660083+00:00",
+      "_probe_mtime": "2026-08-30T12:23:40.331138+00:00",
       "_image_created": "2026-08-30T18:14:10.275204+08:00",
       "_probe_complete": "Y"
     },
@@ -166,7 +166,7 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:24:52.797035+00:00",
+      "_probe_mtime": "2026-08-30T12:23:46.148094+00:00",
       "_image_created": "2026-08-30T16:10:59.895210+08:00",
       "_probe_complete": "Y"
     },
@@ -250,7 +250,7 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:00.326976+00:00",
+      "_probe_mtime": "2026-08-30T12:23:52.926043+00:00",
       "_image_created": "2026-08-30T16:11:13.577065+08:00",
       "_probe_complete": "Y"
     },
@@ -334,7 +334,7 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:01.508967+00:00",
+      "_probe_mtime": "2026-08-30T12:23:53.961035+00:00",
       "_image_created": "2026-08-30T19:23:46.318837+08:00",
       "_probe_complete": "Y"
     },
@@ -418,7 +418,7 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:07.929916+00:00",
+      "_probe_mtime": "2026-08-30T12:23:59.990990+00:00",
       "_image_created": "2026-08-30T19:23:53.465291+08:00",
       "_probe_complete": "Y"
     },
@@ -502,7 +502,7 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:14.738863+00:00",
+      "_probe_mtime": "2026-08-30T12:24:07.028937+00:00",
       "_image_created": "2026-08-30T19:24:06.730556+08:00",
       "_probe_complete": "Y"
     },
@@ -520,7 +520,7 @@
       "tls": "Y",
       "dpkg_query": "Y",
       "apt": "N",
-      "sources_list": "Y",
+      "sources_list": "N",
       "apt_keyring": "N",
       "apt_update": "n/a",
       "apt_roundtrip": "n/a",
@@ -586,8 +586,8 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:15.449857+00:00",
-      "_image_created": "2026-08-30T18:14:38.663439+08:00",
+      "_probe_mtime": "2026-08-30T12:24:07.774931+00:00",
+      "_image_created": "2026-08-30T19:59:27.246917+08:00",
       "_probe_complete": "Y"
     },
     "uos25:base": {
@@ -670,7 +670,7 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:18.114837+00:00",
+      "_probe_mtime": "2026-08-30T12:24:10.541910+00:00",
       "_image_created": "2026-08-30T18:35:00.302101+08:00",
       "_probe_complete": "Y"
     },
@@ -754,7 +754,7 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T11:25:20.464818+00:00",
+      "_probe_mtime": "2026-08-30T12:24:12.876893+00:00",
       "_image_created": "2026-08-30T18:35:12.756625+08:00",
       "_probe_complete": "Y"
     }

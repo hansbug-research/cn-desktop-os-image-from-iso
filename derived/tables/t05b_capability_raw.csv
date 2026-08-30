@@ -60,7 +60,7 @@ sh,Y,Y,Y,Y,Y,Y,Y,Y,Y
 shadow_files,Y,Y,Y,Y,Y,Y,Y,Y,Y
 signal_trap,Y,Y,Y,Y,Y,Y,Y,Y,Y
 sock_tools,N,Y,Y,N,Y,Y,N,Y,Y
-sources_list,N,Y,Y,N,Y,Y,Y,Y,Y
+sources_list,N,Y,Y,N,Y,Y,N,Y,Y
 static_link,N,N,Y,N,N,Y,N,N,Y
 strace,N,N,N,N,N,N,N,N,N
 su_to_user,N,Y,Y,Y,Y,Y,N,Y,Y
