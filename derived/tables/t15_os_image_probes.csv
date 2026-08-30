@@ -1,0 +1,29 @@
+os,ref,result,method,pkg_format,os_name,version_id,evidence
+openEuler,docker.io/openeuler/openeuler:24.03-lts,存在,docker manifest inspect,rpm,openEuler,24.03,—（探测成功，无 stderr）
+openEuler,docker.io/openeuler/desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+openEuler,docker.io/openeuler/devstation:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+openEuler,docker.io/openeuler/ukui:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+openEuler,docker.io/openeuler/dde:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+openKylin（开放麒麟）,docker.io/openkylin/openkylin:3.0,存在,docker manifest inspect,dpkg,openKylin,3.0,—（探测成功，无 stderr）
+openKylin（开放麒麟）,docker.io/openkylin/openkylin:2.0,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+openKylin（开放麒麟）,docker.io/openkylin/openkylin-desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+openKylin（开放麒麟）,docker.io/openkylin/ukui:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+deepin（深度）,docker.io/linuxdeepin/deepin:25,存在,docker manifest inspect,dpkg,Deepin,25,—（探测成功，无 stderr）
+deepin（深度）,docker.io/linuxdeepin/beige:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+deepin（深度）,docker.io/linuxdeepin/apricot:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+deepin（深度）,docker.io/deepin/deepin-core:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+deepin（深度）,docker.io/linuxdeepin/deepin-desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+deepin（深度）,docker.io/linuxdeepin/dde:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+Ubuntu Kylin（优麒麟）,docker.io/ubuntukylin/ubuntukylin:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+Anolis OS（龙蜥）,docker.io/openanolis/anolisos:8.6,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+Anolis OS（龙蜥）,docker.io/openanolis/anolisos:latest,存在,docker manifest inspect,rpm,Anolis OS,8.8,—（探测成功，无 stderr）
+Anolis OS（龙蜥）,docker.io/openanolis/anolisos-desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+OpenCloudOS,docker.io/opencloudos/opencloudos9-minimal:latest,存在,docker manifest inspect,rpm,OpenCloudOS,9.6,—（探测成功，无 stderr）
+OpenCloudOS,docker.io/opencloudos/opencloudos9-microdnf:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+OpenCloudOS,docker.io/opencloudos/opencloudos9-init:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+OpenCloudOS,docker.io/opencloudos/opencloudos9-busybox:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+OpenCloudOS,docker.io/opencloudos/opencloudos8-minimal:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+OpenCloudOS,docker.io/opencloudos/opencloudos9-desktop:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+AOSC OS（安同 OS）,docker.io/aosc/aosc-os:latest,存在,docker manifest inspect,,,,—（探测成功，无 stderr）
+麒麟信安操作系统（KylinSec）,docker.io/kylinsec/kylinsec:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required
+EulerOS（华为）,docker.io/euleros/euleros:latest,不存在,docker manifest inspect,,,,unauthorized: authentication required

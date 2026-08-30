@@ -1,0 +1,464 @@
+{
+  "collected_at": "2026-08-30T15:07:22Z",
+  "vantage_note": "采集主机出口在中国大陆，境外站点经本地代理。registry 探测失败需区分网络位置与策略拒绝；厂商命名空间为空只能证明「该处未公开」，不能证明厂商没有私有 registry。",
+  "census_revision": "2026-08-30",
+  "entries": [
+    {
+      "name": "openEuler",
+      "type": "社区开源（厂商主导：华为发起，开放原子开源基金会运营）",
+      "vendor": "openEuler 社区",
+      "lineage": "独立选型，早期 RHEL/CentOS 血统、现自主演进；rpm/dnf",
+      "latest_version": "24.03 LTS SP4（2026-06-30）；创新版 25.09（2025-09-30）",
+      "desktop": "无桌面版 ISO；UKUI/DDE/Kiran 以软件包提供（曾有 GNOME/Xfce，文档已下架）；DevStation 为官方开发者桌面 ISO",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/openeuler/openeuler:24.03-lts",
+        "docker.io/openeuler/desktop:latest",
+        "docker.io/openeuler/devstation:latest",
+        "docker.io/openeuler/ukui:latest",
+        "docker.io/openeuler/dde:latest"
+      ],
+      "identify": [
+        "docker.io/openeuler/openeuler:24.03-lts"
+      ],
+      "official_image_note": "官方基础镜像在 Docker Hub 与 Quay，均为服务器/基础镜像；453 个仓库中零桌面。唯一桌面向的官方容器交付物是 DevStation 的 rootfs tar.xz，只放在 repo.openeuler.org、不在任何 registry，且仅 24.03 LTS SP3 一版有。",
+      "sources": [
+        "https://www.openeuler.org/zh/download/",
+        "https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html",
+        "https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/",
+        "https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/",
+        "https://gitee.com/openeuler/openeuler-docker-images",
+        "https://hub.docker.com/r/openeuler/openeuler"
+      ]
+    },
+    {
+      "name": "openKylin（开放麒麟）",
+      "type": "社区开源（厂商主导：麒麟软件为核心贡献方，开放原子开源基金会孵化）",
+      "vendor": "openKylin 社区",
+      "lineage": "Debian 系（apt，dists 代号 yangtze/nile/huanghe）",
+      "latest_version": "3.0「黄河」（2026-08-28）",
+      "desktop": "UKUI 4.24（自研）",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/openkylin/openkylin:3.0",
+        "docker.io/openkylin/openkylin:2.0",
+        "docker.io/openkylin/openkylin-desktop:latest",
+        "docker.io/openkylin/ukui:latest"
+      ],
+      "identify": [
+        "docker.io/openkylin/openkylin:3.0"
+      ],
+      "official_image_note": "Docker Hub 侧账号类型为个人（User）而非 Organization、无 open_source badge，但官网有容器镜像页、Gitee 有 openkylin-docker-images 仓；官方性高度可信但缺官网直链证据。镜像为基础镜像，非桌面版。",
+      "sources": [
+        "https://www.openkylin.top/news/4099-en.html",
+        "https://www.openkylin.top/support/docker_images.html",
+        "https://gitee.com/openkylin/openkylin-docker-images",
+        "https://mirror.nju.edu.cn/openkylin/dists/",
+        "https://hub.docker.com/r/openkylin/openkylin"
+      ]
+    },
+    {
+      "name": "deepin（深度）",
+      "type": "社区开源（厂商主导：统信软件，深度科技为其全资子公司；deepin 与 UOS 为社区版↔商业版关系）",
+      "vendor": "深度科技 / deepin 社区",
+      "lineage": "Debian 系（代号 apricot/beige/crimson）",
+      "latest_version": "25.2.0（2026-07-08）",
+      "desktop": "DDE（自研）+ Treeland（Wayland 合成器）",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/linuxdeepin/deepin:25",
+        "docker.io/linuxdeepin/beige:latest",
+        "docker.io/linuxdeepin/apricot:latest",
+        "docker.io/deepin/deepin-core:latest",
+        "docker.io/linuxdeepin/deepin-desktop:latest",
+        "docker.io/linuxdeepin/dde:latest"
+      ],
+      "identify": [
+        "docker.io/linuxdeepin/deepin:25"
+      ],
+      "official_image_note": "linuxdeepin 是 deepin 官方代码组织名、org profile 指向 deepin.org，但未找到官网指向该 Hub 命名空间的直链，官方性记为中等。均为基础镜像。旧的 deepin/deepin-core 最后更新 2017-01-10。",
+      "sources": [
+        "https://www.deepin.org/en/deepin-25-2-release/",
+        "https://cdimage.deepin.com/releases/",
+        "https://faq.uniontech.com/desktop/f435/install/da34",
+        "https://hub.docker.com/r/linuxdeepin/deepin"
+      ]
+    },
+    {
+      "name": "Ubuntu Kylin（优麒麟）",
+      "type": "社区开源（Canonical 官方 flavor，中方由麒麟软件主导开发）",
+      "vendor": "Canonical / 麒麟软件 CCN 联合实验室",
+      "lineage": "Ubuntu 直系（ISO 托管在 cdimage.ubuntu.com 的 Canonical 自有基础设施）",
+      "latest_version": "26.04.1 LTS（2026-08-27）",
+      "desktop": "UKUI",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/ubuntukylin/ubuntukylin:latest"
+      ],
+      "identify": [],
+      "official_image_note": "Docker Hub ubuntukylin 命名空间 0 个仓库，无官方容器镜像；实际使用上游 docker.io/library/ubuntu。",
+      "sources": [
+        "https://cdimage.ubuntu.com/ubuntukylin/releases/",
+        "https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/",
+        "https://www.ubuntukylin.com/downloads/"
+      ]
+    },
+    {
+      "name": "Anolis OS（龙蜥）",
+      "type": "社区开源（厂商主导：阿里巴巴发起，龙蜥社区理事会运营）",
+      "vendor": "OpenAnolis 龙蜥社区",
+      "lineage": "RHEL/CentOS 兼容系；ANCK 内核；rpm/dnf",
+      "latest_version": "23.5（镜像站已上线；官方发布动态只到 23.3 GA / 2025-06，23.4/23.5 发布日期未公开）",
+      "desktop": "无桌面版 ISO（实测 23.3/23.4/23.5 只有 boot.iso 与 dvd.iso）；官网仅称仓库集成/兼容 GNOME、DDE",
+      "maintained": "活跃（镜像站），但官方发布动态未同步",
+      "image_candidates": [
+        "docker.io/openanolis/anolisos:8.6",
+        "docker.io/openanolis/anolisos:latest",
+        "docker.io/openanolis/anolisos-desktop:latest"
+      ],
+      "identify": [
+        "docker.io/openanolis/anolisos:latest"
+      ],
+      "official_image_note": "gitee.com/anolis/docker-images 的 README 明示官方并给出 Hub 地址（反向证据）；均为基础镜像。README 只声明 8.6/latest，而产品已到 23.5，镜像严重滞后。",
+      "sources": [
+        "https://openanolis.cn/anolisos/23",
+        "https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/",
+        "https://gitee.com/anolis/docker-images",
+        "https://hub.docker.com/r/openanolis/anolisos"
+      ]
+    },
+    {
+      "name": "OpenCloudOS",
+      "type": "社区开源（厂商主导：腾讯发起，联合中兴新支点等）",
+      "vendor": "OpenCloudOS 社区",
+      "lineage": "自主演进选型，RHEL 系包管理（rpm/dnf，8/9 双系列）",
+      "latest_version": "9.6（镜像快照 2026-07-13）",
+      "desktop": "无桌面版 ISO（实测 9.6 只有 boot/everything/minimal）；桌面靠中兴新支点开源的超凡桌面 EX-NDE 按包组安装，9.2 起为实验性支持",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/opencloudos/opencloudos9-minimal:latest",
+        "docker.io/opencloudos/opencloudos9-microdnf:latest",
+        "docker.io/opencloudos/opencloudos9-init:latest",
+        "docker.io/opencloudos/opencloudos9-busybox:latest",
+        "docker.io/opencloudos/opencloudos8-minimal:latest",
+        "docker.io/opencloudos/opencloudos9-desktop:latest"
+      ],
+      "identify": [
+        "docker.io/opencloudos/opencloudos9-minimal:latest"
+      ],
+      "official_image_note": "org 带 open_source badge、profile 指向 opencloudos.org，官方性明确。提供 busybox/microdnf/minimal/init 四档，对应 RHEL UBI 的分档惯例，但四档全为服务器/基础镜像，无桌面档。旧的 opencloudos/opencloudos 已自行标注废弃。",
+      "sources": [
+        "https://docs.opencloudos.org/release/v9.6/",
+        "https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/",
+        "https://gitee.com/OpenCloudOS/SIG-EX-NDE",
+        "https://docs.opencloudos.org/faq/",
+        "https://hub.docker.com/u/opencloudos"
+      ]
+    },
+    {
+      "name": "AOSC OS（安同 OS）",
+      "type": "社区开源（纯社区，无厂商主导）",
+      "vendor": "安同开源社区",
+      "lineage": "完全独立自建，不属 Debian/RHEL 任一系；自研包管理器 oma",
+      "latest_version": "滚动发布，下载页标注 2026-06-21",
+      "desktop": "下载页未列具体桌面环境（本体定位为桌面 OS）",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/aosc/aosc-os:latest"
+      ],
+      "identify": [],
+      "official_image_note": "org profile 指向 aosc.io，另有 AOSC-Dev/aosc-os-docker-files；为基础镜像。",
+      "sources": [
+        "https://aosc.io/downloads/",
+        "https://github.com/AOSC-Dev/aosc-os-docker-files",
+        "https://hub.docker.com/r/aosc/aosc-os"
+      ]
+    },
+    {
+      "name": "麒麟信安操作系统（KylinSec）",
+      "type": "商业",
+      "vendor": "湖南麒麟信安科技",
+      "lineage": "openEuler 系（列于 openEuler 官方商业发行版页）",
+      "latest_version": "V6 SP1（2026-06）",
+      "desktop": "自研 Kiran / KiranUI",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/kylinsec/kylinsec:latest"
+      ],
+      "identify": [],
+      "official_image_note": "Docker Hub kylinsec 命名空间 0 个仓库。只能证明该处未公开，不能证明厂商无私有 registry。",
+      "sources": [
+        "https://www.openeuler.org/zh/download/commercial-release/",
+        "https://www.kylinsec.com.cn/detail/13151/1.html"
+      ]
+    },
+    {
+      "name": "EulerOS（华为）",
+      "type": "商业",
+      "vendor": "华为",
+      "lineage": "openEuler 的商业/闭源对应物",
+      "latest_version": "未公开（面向服务器与华为云 B2B）",
+      "desktop": "未见桌面版",
+      "maintained": "活跃（服务器向）",
+      "image_candidates": [
+        "docker.io/euleros/euleros:latest"
+      ],
+      "identify": [],
+      "official_image_note": "Docker Hub euleros 命名空间 0 个仓库。未见桌面版产品线。",
+      "sources": [
+        "https://www.openeuler.org/zh/download/commercial-release/"
+      ]
+    }
+  ],
+  "probes": [
+    {
+      "ref": "docker.io/openeuler/openeuler:24.03-lts",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "NAME=\"openEuler\"\nVERSION=\"24.03 (LTS)\"\nID=\"openEuler\"\nVERSION_ID=\"24.03\"\nPRETTY_NAME=\"openEuler 24.03 (LTS)\"\nANSI_COLOR=\"0;31\"",
+      "pkg_format": "rpm",
+      "glibc": "ldd (GNU libc) 2.38",
+      "size_bytes": "65241489",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/devstation:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/ukui:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/dde:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openkylin/openkylin:3.0",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "NAME=\"openKylin\"\nFULL_NAME=\"openKylin\"\nVERSION=\"3.0 (huanghe)\"\nVERSION_US=\"3.0 (huanghe)\"\nID=openkylin\nPRETTY_NAME=\"openKylin 3.0\"\nVERSION_ID=\"3.0\"\nHOME_URL=\"https://www.openkylin.top/\"\nVERSION_CODENAME=huanghe\nPRODUCT_FEATURES=3",
+      "pkg_format": "dpkg",
+      "glibc": "ldd (Ubuntu GLIBC 2.43-ok2) 2.43",
+      "size_bytes": "35726196",
+      "for_os": "openKylin（开放麒麟）"
+    },
+    {
+      "ref": "docker.io/openkylin/openkylin:2.0",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "openKylin（开放麒麟）"
+    },
+    {
+      "ref": "docker.io/openkylin/openkylin-desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openKylin（开放麒麟）"
+    },
+    {
+      "ref": "docker.io/openkylin/ukui:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openKylin（开放麒麟）"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/deepin:25",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "PRETTY_NAME=\"Deepin 25\"\nNAME=\"Deepin\"\nVERSION_CODENAME=crimson\nID=deepin\nHOME_URL=\"https://www.deepin.org/\"\nBUG_REPORT_URL=\"https://bbs.deepin.org\"\nVERSION_ID=\"25\"\nVERSION=\"25\"",
+      "pkg_format": "dpkg",
+      "glibc": "ldd (Debian GLIBC 2.38-6deepin21) 2.38",
+      "size_bytes": "95363179",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/beige:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/apricot:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/deepin/deepin-core:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/deepin-desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/dde:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "deepin（深度）"
+    },
+    {
+      "ref": "docker.io/ubuntukylin/ubuntukylin:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "Ubuntu Kylin（优麒麟）"
+    },
+    {
+      "ref": "docker.io/openanolis/anolisos:8.6",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "Anolis OS（龙蜥）"
+    },
+    {
+      "ref": "docker.io/openanolis/anolisos:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "NAME=\"Anolis OS\"\nVERSION=\"8.8\"\nID=\"anolis\"\nID_LIKE=\"rhel fedora centos\"\nVERSION_ID=\"8.8\"\nPLATFORM_ID=\"platform:an8\"\nPRETTY_NAME=\"Anolis OS 8.8\"\nANSI_COLOR=\"0;31\"\nHOME_URL=\"https://openanolis.cn/\"",
+      "pkg_format": "rpm",
+      "glibc": "ldd (GNU libc) 2.28",
+      "size_bytes": "82825607",
+      "for_os": "Anolis OS（龙蜥）"
+    },
+    {
+      "ref": "docker.io/openanolis/anolisos-desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "Anolis OS（龙蜥）"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos9-minimal:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "NAME=\"OpenCloudOS\"\nVERSION=\"9.6\"\nID=\"opencloudos\"\nID_LIKE=\"opencloudos\"\nVERSION_ID=\"9.6\"\nPLATFORM_ID=\"platform:oc9\"\nPRETTY_NAME=\"OpenCloudOS 9.6\"\nANSI_COLOR=\"0;31\"\nCPE_NAME=\"cpe:/o:opencloudos:opencloudos:9\"\nHOME_URL=\"https://www.opencloudos.org/\"\nBUG_REPORT_URL=\"https://bugs.opencloudos.tech/\"",
+      "pkg_format": "rpm",
+      "glibc": "ldd (GNU libc) 2.38",
+      "size_bytes": "56283593",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos9-microdnf:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos9-init:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos9-busybox:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos8-minimal:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/opencloudos/opencloudos9-desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "OpenCloudOS"
+    },
+    {
+      "ref": "docker.io/aosc/aosc-os:latest",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "for_os": "AOSC OS（安同 OS）"
+    },
+    {
+      "ref": "docker.io/kylinsec/kylinsec:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "麒麟信安操作系统（KylinSec）"
+    },
+    {
+      "ref": "docker.io/euleros/euleros:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "EulerOS（华为）"
+    }
+  ]
+}

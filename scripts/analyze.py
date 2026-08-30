@@ -27,7 +27,15 @@ def csv(name, header, rows):
 d1, d2, d3, d4, d5, d6, d7 = (load(f"d{i}_{n}.json") for i, n in
     [(1, "official_images"), (2, "our_images"), (3, "capabilities"), (4, "gates"),
      (5, "iso_and_defects"), (6, "installability"), (7, "cve")])
+# d8 是国产桌面 OS 全名录 + 镜像实测。它比其余数据集晚加入，且可能在名录还没定稿时
+# 就有人跑 analyze —— 缺就跳过对应表，但**不静默**：缺了要在 stats 里留痕，
+# 否则「表没生成」与「表生成了但是空的」在输出上不可区分。
+try:
+    d8 = load("d8_os_census.json")
+except FileNotFoundError:
+    d8 = None
 S = {}
+S["census_present"] = d8 is not None
 
 # ── T01 官方容器镜像可获得性 ────────────────────────────────────────────────
 rows = []
@@ -88,6 +96,43 @@ csv("t04_built_images.csv",
 S["images_built"] = len(d2["ours"])
 S["tiers"] = sorted({r["tier"] for r in d2["ours"]})
 S["distros"] = sorted({r["distro_id"] for r in d2["ours"]})
+
+# ── T14/T15 国产桌面 OS 全名录 ──────────────────────────────────────────────
+# 刻意拆成两张表：t14 是**文献事实**（引官网/公告，每条带 source），
+# t15 是**我们的实测**（registry 存在性，判据是退出码）。
+# 合成一张会让读者无法分辨哪一格可以复核、哪一格只能溯源到厂商说法。
+if d8:
+    rows = []
+    for e in d8["entries"]:
+        rows.append([e["name"], e["type"], e["vendor"], e["lineage"],
+                     e["latest_version"], e["desktop"], e["maintained"],
+                     " ".join(e["sources"])])
+    csv("t14_os_census.csv",
+        ["os", "type", "vendor", "lineage", "latest_version", "desktop",
+         "maintained", "sources"], rows)
+
+    rows = []
+    for pr in d8["probes"]:
+        o = osrel(pr.get("os_release", ""))
+        rows.append([pr["for_os"], pr["ref"], "存在" if pr["exists"] else "不存在",
+                     pr.get("probe_method", ""), pr.get("pkg_format", ""),
+                     o.get("NAME", ""), o.get("VERSION_ID", ""),
+                     (pr.get("stderr_tail", "") or "—（探测成功，无 stderr）")])
+    csv("t15_os_image_probes.csv",
+        ["os", "ref", "result", "method", "pkg_format", "os_name", "version_id",
+         "evidence"], rows)
+
+    S["census_os_count"] = len(d8["entries"])
+    S["census_commercial"] = sum(1 for e in d8["entries"] if e["type"].startswith("商业"))
+    S["census_community"] = sum(1 for e in d8["entries"] if e["type"].startswith("社区"))
+    S["census_probes"] = len(d8["probes"])
+    S["census_probes_exist"] = sum(1 for p in d8["probes"] if p["exists"])
+    # 名录里每条都必须有出处 —— 这是本节的立论基础，不能有一条裸奔
+    S["census_entries_without_source"] = [e["name"] for e in d8["entries"]
+                                          if not e.get("sources")]
+    # 「有官方镜像」与「有桌面版官方镜像」是两件事，分开计
+    S["census_os_with_any_image"] = sorted(
+        {p["for_os"] for p in d8["probes"] if p["exists"]})
 
 # ── T05 能力矩阵（三态）──────────────────────────────────────────────────────
 # 三态语义：Y=支持（实测通过）／N=不支持（该档位确有此需求却不满足，是缺口）／

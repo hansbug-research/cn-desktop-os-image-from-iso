@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **219** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **14** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **234** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **16** 张
 
 要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把「从桌面版 ISO 自己造分档镜像」这件事做通并留下完整证据：三条构建路径、九个镜像、648 格逐格判定的能力矩阵、五道验收门禁。
 
@@ -14,9 +14,9 @@
 
 | # | 结论 | 证据 |
 |---|---|---|
-| 1 | **麒麟「有官方容器镜像」是个误读。** `cr.kylinos.cn` 上匿名可拉的唯一镜像是 `kylin-server-minimal:v10sp1`，它是 **rpm** 包格式、glibc `2.28-36.1.p24.ky10`、软件源在 `update.cs2c.com.cn`；而桌面 V10/V11 是 **dpkg**、glibc `2.31-0kylin9.1k20.3` / `2.38-1ok6.9k0.5`、源在 `archive.kylinos.cn`。包格式、glibc、软件源三样全不同 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`fig02`、[`t03`](derived/tables/t03_product_line_comparison.csv) |
-| 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
-| 3 | **麒麟与统信的桌面线官方容器镜像匿名拉不到。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot）。⚠️ 证明的是「从单一网络位置匿名不可获得」，不能证明厂商内部或授权渠道没有；也只探了这两家，不外推到整个品类 | [§2](report.md#2-国产桌面-os-的官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
+| 1 | **麒麟「有官方容器镜像」是个误读。** `cr.kylinos.cn` 上匿名可拉的唯一镜像是 `kylin-server-minimal:v10sp1`，它是 **rpm** 包格式、glibc `2.28-36.1.p24.ky10`、软件源在 `update.cs2c.com.cn`；而桌面 V10/V11 是 **dpkg**、glibc `2.31-0kylin9.1k20.3` / `2.38-1ok6.9k0.5`、源在 `archive.kylinos.cn`。包格式、glibc、软件源三样全不同 | [§2.1](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`fig02`、[`t03`](derived/tables/t03_product_line_comparison.csv) |
+| 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
+| 3 | **麒麟与统信的桌面线官方容器镜像匿名拉不到。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot）。⚠️ 证明的是「从单一网络位置匿名不可获得」，不能证明厂商内部或授权渠道没有；也只探了这两家，不外推到整个品类 | [§2](report.md#2-国产桌面-os-的分布与官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
 | 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源索引只有 2496 个条目、全来自应用商店，连 `nano` 都查不到候选），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 6 | **麒麟的「没预装」与 UOS 的「硬缺口」性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14 / 14**、麒麟 V10 **14 / 14**、UOS V25 **0 / 14**（判据用 `apt-cache madison` 而非 `policy` 的 Candidate，后者会把「已经装了」误计成「装得上」） | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
@@ -154,7 +154,7 @@ raw/                          一手数据，采集脚本的原始输出逐字�
   d7_cve.json                   漏洞扫描器对九个镜像的覆盖判定（有效覆盖／误判／未识别）
 derived/                      从 raw/ 重算，不手写
   stats.json                    正文引用的全部统计量
-  tables/*.csv                  14 张可复算表
+  tables/*.csv                  16 张可复算表（含 t14 国产桌面 OS 名录、t15 镜像实测）
 figures/*.png                 6 张图
 figures/plotdata.json         每张图实际画进去的数值与文字（机器无关，CI 拿它防「图画着旧数据」）
 artifacts/                    审计凭据：九份 manifest、可复现性凭据、九份探针原始输出、

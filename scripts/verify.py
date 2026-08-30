@@ -390,6 +390,32 @@ _dead = sorted(_refs - _heads)
 ok(_dead == [], f"README 指向 report.md 的章节锚点必须都存在（断链：{_dead}）")
 ok(len(_refs) >= 7, f"README 应至少有 7 个 report 章节锚点，实际 {len(_refs)}")
 
+# ── §2 名录：这一节的立论基础是「每条信息都有出处」，必须硬守 ──────────────
+ok(S["census_present"] is True, "名录数据集 d8 必须存在")
+ok(S["census_entries_without_source"] == [],
+   f'名录里不许有缺出处的条目（缺：{S["census_entries_without_source"]}）')
+ok(S["census_os_count"] == S["census_commercial"] + S["census_community"],
+   "名录的商业/社区分类必须覆盖全部条目，不能有条目落在两类之外")
+in_text(S["census_os_count"], label="名录 OS 总数",
+        ctx=rf"合计 {S['census_os_count']} 个")
+in_text(S["census_commercial"], label="名录商业型个数",
+        ctx=rf"含\*\*商业 {S['census_commercial']} 个")
+in_text(S["census_community"], label="名录社区型个数",
+        ctx=rf"社区开源 {S['census_community']} 个")
+in_text(S["census_probes"], label="名录实测引用数",
+        ctx=rf"{S['census_probes']} 个引用中")
+in_text(S["census_probes_exist"], label="名录实测存在数",
+        ctx=rf"个引用中 {S['census_probes_exist']} 个存在")
+# 「桌面命名的引用一条都不存在」是本节的核心结论，单独绑
+_desk = [p for p in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["probes"]
+         if any(k in p["ref"] for k in ("desktop", "ukui", "dde"))]
+ok(len(_desk) == 9, f"桌面命名引用应为 9 条，实际 {len(_desk)}")
+ok(all(not p["exists"] for p in _desk), "桌面命名引用必须全部不存在（本节核心结论）")
+in_text("9 条，一条都不存在", label="桌面命名引用全不存在这句结论")
+# DevStation 那两个体积是本节唯一的一手数字，写死在正文里，必须与实测一致
+in_text("2066238156", label="DevStation rootfs 字节数")
+in_text("43690908", label="openEuler 基础镜像 rootfs 字节数")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -404,7 +430,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "219"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "234"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

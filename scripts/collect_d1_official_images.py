@@ -13,7 +13,18 @@ import json, subprocess, sys, time, urllib.request, urllib.error, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "raw" / "d1_official_images.json"
 
-HUB_NAMESPACES = ["openkylin", "deepin", "uniontech", "kylin", "linuxdeepin", "nfschina", "iSoftStone"]
+# Docker Hub 命名空间普查。列进来的既有真官方，也有**同名但无关的第三方** ——
+# 后者正是要留证据的对象：`kylin` 命名空间里是 Home Assistant 插件，`redflag` 里是
+# `docker-whale`/`first-image` 教程镜像，`linx` 里是 `apache`，`isoft` 里是 `master`。
+# 只看名字像就当官方，是这类调查最容易犯的错，所以每个命名空间的仓库列表都原样存下来。
+HUB_NAMESPACES = [
+    # 已知或待核的国产发行版相关命名空间
+    "openkylin", "deepin", "uniontech", "linuxdeepin",
+    "openeuler", "openanolis", "anolis", "opencloudos",
+    # 以下是「名字像厂商」的命名空间，留证据用
+    "kylin", "kylinsec", "nfschina", "iSoftStone", "isoft",
+    "linx", "newstart", "redflag",
+]
 
 # 直接探测的候选镜像：(厂商, 产品, registry 引用)
 CANDIDATES = [
