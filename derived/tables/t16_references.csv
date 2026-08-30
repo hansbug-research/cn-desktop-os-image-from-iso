@@ -114,3 +114,5 @@ R112,aosc.io,安同 OS 适合我吗？ | 安同开源社区 (AOSC),https://aosc.
 R113,www.loongnix.cn,龙芯开源社区,https://www.loongnix.cn/zh/,page,2026-08-31,
 R114,docs.revyos.dev,RevyOS,https://docs.revyos.dev/docs/intro/,page,2026-08-31,
 R115,ruyisdk.org,RuyiSDK · 为 100 万 RISC-V 软件开发人员做好准备 | RuyiSDK,https://ruyisdk.org/,page,2026-08-31,
+R116,repo.huaweicloud.com,"华为镜像站 EulerOS 目录（各版本只有 os/{x86_64,aarch64} 的 RPM 仓库，iso/ 与 ISO/ 实测 404）",https://repo.huaweicloud.com/euler/,manual,2026-08-31,标题为人工标注（该 URL 为目录页/API 端点，无 <title>）
+R117,support.huawei.com,华为企业支持 软件下载端点（对任意 nid 返回 Uniportal 统一认证跳转头）,https://support.huawei.com/dl/download.do?nid=1,manual,2026-08-31,标题为人工标注（该 URL 为目录页/API 端点，无 <title>）

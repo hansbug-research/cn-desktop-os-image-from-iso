@@ -572,6 +572,15 @@ for _did, _u in _iso_urls.items():
 ok(_contra == [], "名录不得与构建脚本矛盾：" + "；".join(_contra))
 ok(len(_iso_urls) >= 1, f"至少应有一个发行版在 conf 里记了 ISO_URL，实际 {len(_iso_urls)}")
 
+# 两条方法学纪律必须留在正文：搜索摘要伪造原文、证据要分「能否纯 HTTP 复现」。
+# 它们决定第三方复核时会不会把不可复现的东西当成已核实。
+ok("必须能在抓到的页面里 grep 命中才算" in REPORT,
+   "「原文引用必须 grep 命中」这条纪律必须写在正文")
+ok("能不能纯 HTTP 复现" in REPORT,
+   "证据分级（纯 HTTP 可复现 vs 依赖浏览器渲染）必须写在正文")
+ok("信心最低的一格" in REPORT,
+   "EulerOS 那格的低信心必须明示，不许含糊过去")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -586,7 +595,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "303"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "306"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

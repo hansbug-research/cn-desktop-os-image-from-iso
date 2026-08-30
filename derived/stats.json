@@ -35,7 +35,7 @@
   "census_community": 9,
   "census_dangling_refs": [],
   "census_entries_without_source": [],
-  "census_field_citations": 157,
+  "census_field_citations": 159,
   "census_os_count": 21,
   "census_os_with_any_image": [
     "AOSC OS（安同 OS）",
@@ -219,8 +219,8 @@
   "probe_provenance_recorded": 9,
   "probe_stale_vs_image": [],
   "references_title_from_page": 99,
-  "references_title_manual": 16,
-  "references_total": 115,
+  "references_title_manual": 18,
+  "references_total": 117,
   "repro_identical": 6,
   "sbom_passed": 9,
   "setuid_micro": {

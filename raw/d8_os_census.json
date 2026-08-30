@@ -1039,7 +1039,9 @@
           "R72"
         ],
         "s_iso_access": [
-          "R72"
+          "R117",
+          "R116",
+          "R105"
         ],
         "s_customers": [
           "R105",
@@ -1047,9 +1049,10 @@
         ]
       },
       "s_iso_access": "需申请授权或登录",
-      "iso_access_note": "⚠️ 面向服务器与华为云 B2B，未见公开桌面 ISO",
+      "iso_access_note": "实测（本轮亲手复核）：官方软件下载端点 `support.huawei.com/dl/download.do` 对任意 nid 都返回华为 Uniportal 统一认证跳转头 `x-login-url: https://uniportal.huawei.com/uniportal1/`，即卡在 Uniportal SSO；企业支持门户各路径对 curl 一律返回同一份 SPA 空壳，匿名看不到任何 ISO 文件名/大小/校验值；华为镜像站 `repo.huaweicloud.com/euler/` 匿名可列，含 2.0～2.10 各版本目录，`2.10/os/x86_64/` 返回 200（RPM 仓库），但 `2.10/iso/` 与 `2.10/ISO/` 均 **404**——有 RPM 无 ISO。历史入口 `developer.huaweicloud.com/euleros/download.html` 已 404。⚠️ **本轮无法区分「ISO 藏在登录墙后面」与「官方门户里根本没有 EulerOS 的 ISO 条目」这两种情况**，故按实测到的登录墙归类，并如实记下这一不确定；另注：华为自述 EulerOS 是「华为内部的商用操作系统，并不对外承载开源义务」，资源中心只提供软件包。",
       "s_customers": "**无桌面客群**（服务器/云/存储）",
-      "customers_note": "EulerOS 是华为基于 openEuler 的内部商用发行版，官网定位面向企业 IT 基础设施与云计算，应用场景三类全部是服务器侧（TaiShan 服务器、PaaS 容器平台、企业存储），官网自称属华为内部商用系统「并不对外承载开源义务」。未查到官方桌面版产品。⚠️ EulerOS 本身未见于任何一期安可公告；同门在服务器附表的是华为云欧拉 V2.0/V3。桌面附表中华为系只有 HarmonyOS V1.0（2026 年第 1 号，Ⅱ级），且因不满足财库〔2023〕34 号桌面分册第 1 条带星指标「同源兼容多 CPU 平台架构」未通过 2026 年度央采桌面框架协议初审。"
+      "customers_note": "EulerOS 是华为基于 openEuler 的内部商用发行版，官网定位面向企业 IT 基础设施与云计算，应用场景三类全部是服务器侧（TaiShan 服务器、PaaS 容器平台、企业存储），官网自称属华为内部商用系统「并不对外承载开源义务」。未查到官方桌面版产品。⚠️ EulerOS 本身未见于任何一期安可公告；同门在服务器附表的是华为云欧拉 V2.0/V3。桌面附表中华为系只有 HarmonyOS V1.0（2026 年第 1 号，Ⅱ级），且因不满足财库〔2023〕34 号桌面分册第 1 条带星指标「同源兼容多 CPU 平台架构」未通过 2026 年度央采桌面框架协议初审。",
+      "iso_access_qualifier": "⚠️ 本项是 ISO 获取列里信心最低的一格"
     }
   ],
   "probes": [

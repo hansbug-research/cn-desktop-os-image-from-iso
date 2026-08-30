@@ -1036,6 +1036,24 @@
    "title_source": "page",
    "accessed": "2026-08-31",
    "note": ""
+  },
+  {
+   "id": "R116",
+   "publisher": "repo.huaweicloud.com",
+   "title": "华为镜像站 EulerOS 目录（各版本只有 os/{x86_64,aarch64} 的 RPM 仓库，iso/ 与 ISO/ 实测 404）",
+   "url": "https://repo.huaweicloud.com/euler/",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
+  },
+  {
+   "id": "R117",
+   "publisher": "support.huawei.com",
+   "title": "华为企业支持 软件下载端点（对任意 nid 返回 Uniportal 统一认证跳转头）",
+   "url": "https://support.huawei.com/dl/download.do?nid=1",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
   }
  ]
 }
