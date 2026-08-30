@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T10:41:40Z",
+  "collected_at": "2026-08-30T11:38:55Z",
   "tools": [
     "iproute2",
     "iputils-ping",
@@ -131,7 +131,7 @@
         "gdb": "gdb: gdb | 9.1-0kylin1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
         "python3-dev": "python3-dev: python3-dev | 3.8.2-0kylin2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages"
       },
-      "anchor_tar_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
+      "anchor_tar_sha256": "e5cde2f5ceb84a3600d01b50fdac73f11bae6d757f992546fd29d07687d326ea",
       "raw": {
         "iproute2": {
           "madison": "iproute2 | 5.5.0-1kylin1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",

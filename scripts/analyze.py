@@ -160,7 +160,39 @@ S["capability_items"] = len(keys)
 S["info_probes"] = len(INFO_PROBES)
 S["capability_cells"] = len(keys) * len(order)
 S["probe_complete_all"] = all(v.get("_probe_complete") == "Y" for v in probes.values())
+# d3 的 provenance：探针输出必须不早于镜像。⚠️ 这条判据依赖 mtime，而 git 不保留 mtime
+# —— 新克隆里 caps 文件的 mtime 是签出时刻，必然晚于镜像，所以它只在「原地重采」这一种
+# 场景下有鉴别力，不能当作提交物的 provenance 保证。落进 stats 是为了至少让它可被断言、
+# 可被读者看见其局限；真正的内容锚点要由探针在运行时写入（见 report §6.1 的说明）。
+import datetime as _dt
+_stale = []
+for k, v in probes.items():
+    pm, ic = v.get("_probe_mtime"), v.get("_image_created")
+    if pm and ic and _dt.datetime.fromisoformat(pm) < _dt.datetime.fromisoformat(ic):
+        _stale.append(k)
+S["probe_stale_vs_image"] = sorted(_stale)
+S["probe_provenance_recorded"] = sum(
+    1 for v in probes.values() if v.get("_probe_mtime") and v.get("_image_created"))
 _tri = [tri(c, k) for k in keys for c in order]
+# 198 格「不适用」不是一类东西，按探针原始值拆开 —— 这三个数必须由这里算出来，
+# 不许在正文手写（CLAUDE.md 第一条）。早先手写时把 6 格 cc_clean_stderr 错归成了
+# apt 相关，README 那句因此是确凿错误。
+_na_by_raw = collections.Counter()
+_na_na_cells = []
+for k in keys:
+    for c in order:
+        if tri(c, k) != "NA":
+            continue
+        v = probes[c].get(k, "")
+        _na_by_raw["n/a" if v == "n/a" else ("Y" if v == "Y" else "N")] += 1
+        if v == "n/a":
+            _na_na_cells.append(f"{k}@{c}")
+S["cells_na_from_N"] = _na_by_raw["N"]
+S["cells_na_from_na"] = _na_by_raw["n/a"]
+S["cells_na_from_Y"] = _na_by_raw["Y"]
+# n/a 那 15 格的来源明细：哪些项、哪些档
+S["na_na_detail"] = sorted(_na_na_cells)
+S["na_na_by_item"] = dict(collections.Counter(x.split("@")[0] for x in _na_na_cells))
 S["cells_supported"] = _tri.count("Y")
 S["cells_gap"] = _tri.count("N")
 S["cells_na"] = _tri.count("NA")
@@ -259,6 +291,8 @@ S["injected_keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
 S["alien_keyring_images"] = sorted(
     k for k, v in S["keyrings_by_image"].items()
     if k.startswith("uos25") and any("kylin" in x for x in v))
+S["micro_sources_list_bytes"] = {f'{r["distro_id"]}:{r["tier"]}': int(r.get("sources_list_bytes") or 0)
+                                 for r in d2["ours"] if r["tier"] == "micro"}
 S["masked_units_by_distro"] = {r["distro_id"]: len((r.get("masked_units") or "").split())
                                for r in d2["ours"] if r["tier"] == "base"}
 S["setuid_micro"] = {r["distro_id"]: len((r.get("setuid_bins") or "").split())
@@ -285,19 +319,44 @@ S["cve_scanner"] = d7["scanner"]
 # 早先 d6/d7 只记镜像 tag，镜像一重建它们就悄悄锚在旧产物上，而任何门禁都发现不了
 # —— 正是 report §8 讲的「两条链锚在不同构建上，看着都绿其实接不起来」。
 _d2_tar = {f'{r["distro_id"]}:{r["tier"]}': r.get("tar_sha256") for r in d2["ours"]}
-_mismatch = []
+# ⚠️ 判据不能写成 `if a and ref and a != ref` —— ref 一空（tar 不在、manifest 格式变了
+# 都会让 d2 的 tar_sha256 变空串）整条对账就无声跳过，12 对悄悄变 11 对而仍然全绿。
+# 所以既要记**实际比过多少对**，也要校验两侧都是 64 位 hex。
+_mismatch = []; _pairs = 0; _badhex = []
+for k, v in _d2_tar.items():
+    if not (isinstance(v, str) and len(v) == 64 and all(c in "0123456789abcdef" for c in v)):
+        _badhex.append(k)
 for x in d6["images"].values():
     a = x.get("anchor_tar_sha256")
     ref = _d2_tar.get(x["image"].split(":")[0].replace("kylin-desktop-v11", "kylin11")
                       .replace("kylin-desktop-v10", "kylin10")
                       .replace("uos-desktop-v25", "uos25") + ":base")
-    if a and ref and a != ref:
-        _mismatch.append(("d6", x["image"]))
+    if not a or not ref:
+        _mismatch.append(("d6-锚点或参照缺失", x["image"]))
+    else:
+        _pairs += 1
+        if a != ref:
+            _mismatch.append(("d6", x["image"]))
 for x in d7["images"]:
     a = x.get("anchor_tar_sha256")
     ref = _d2_tar.get(f'{x["distro_id"]}:{x["image"].rsplit(":", 1)[1]}')
-    if a and ref and a != ref:
-        _mismatch.append(("d7", x["image"]))
+    if not a or not ref:
+        _mismatch.append(("d7-锚点或参照缺失", x["image"]))
+    else:
+        _pairs += 1
+        if a != ref:
+            _mismatch.append(("d7", x["image"]))
+# d2 ↔ d4 那条边原先缺着：三条链只连了两条边，三方同改成同一个假哈希就能全绿通过。
+# d4 在 CI 里是从已提交的 artifacts/*.manifest 反向重算的，补上这条边整个三角就闭合。
+_d4 = {k: v.get("tarball_sha256") for k, v in d4["manifests"].items()}
+for k, v in _d2_tar.items():
+    ref = _d4.get(k.replace(":", "-"))
+    if ref and v and ref != v:
+        _mismatch.append(("d2↔d4-manifest", k))
+    elif not ref:
+        _mismatch.append(("d4-manifest 缺失", k))
+S["anchor_pairs_checked"] = _pairs
+S["anchor_bad_hex"] = _badhex
 S["anchor_mismatches"] = _mismatch
 S["anchored_records"] = (sum(1 for x in d6["images"].values() if x.get("anchor_tar_sha256"))
                          + sum(1 for x in d7["images"] if x.get("anchor_tar_sha256")))

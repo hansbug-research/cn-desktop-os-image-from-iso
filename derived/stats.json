@@ -1,6 +1,8 @@
 {
   "alien_keyring_images": [],
+  "anchor_bad_hex": [],
   "anchor_mismatches": [],
+  "anchor_pairs_checked": 12,
   "anchored_records": 12,
   "build_methods": [
     "mmdebstrap",
@@ -11,6 +13,9 @@
   "capability_items": 72,
   "cells_gap": 52,
   "cells_na": 198,
+  "cells_na_from_N": 172,
+  "cells_na_from_Y": 11,
+  "cells_na_from_na": 15,
   "cells_supported": 398,
   "cve_effective_coverage": 0,
   "cve_high_critical_total": 0,
@@ -94,9 +99,37 @@
     "kylin11": 7,
     "uos25": 7
   },
+  "micro_sources_list_bytes": {
+    "kylin10:micro": 0,
+    "kylin11:micro": 0,
+    "uos25:micro": 0
+  },
   "mutation_caught": 12,
   "mutation_missed": 0,
   "mutation_skipped": 1,
+  "na_na_by_item": {
+    "apt_check": 3,
+    "apt_roundtrip": 3,
+    "apt_update": 3,
+    "cc_clean_stderr": 6
+  },
+  "na_na_detail": [
+    "apt_check@kylin10:micro",
+    "apt_check@kylin11:micro",
+    "apt_check@uos25:micro",
+    "apt_roundtrip@kylin10:micro",
+    "apt_roundtrip@kylin11:micro",
+    "apt_roundtrip@uos25:micro",
+    "apt_update@kylin10:micro",
+    "apt_update@kylin11:micro",
+    "apt_update@uos25:micro",
+    "cc_clean_stderr@kylin10:base",
+    "cc_clean_stderr@kylin10:micro",
+    "cc_clean_stderr@kylin11:base",
+    "cc_clean_stderr@kylin11:micro",
+    "cc_clean_stderr@uos25:base",
+    "cc_clean_stderr@uos25:micro"
+  ],
   "official_available": 6,
   "official_pkg_format": "rpm",
   "official_probed": 8,
@@ -105,6 +138,8 @@
     "dpkg"
   ],
   "probe_complete_all": true,
+  "probe_provenance_recorded": 9,
+  "probe_stale_vs_image": [],
   "repro_identical": 6,
   "sbom_passed": 9,
   "setuid_micro": {

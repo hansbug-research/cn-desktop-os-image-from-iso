@@ -79,7 +79,16 @@ if [ -f /dosbuild-lib/common.sh ]; then
   ASSETS_DIR=/dosbuild-assets
   KEYRING=/keys/kylin-archive-keyring.gpg
   . /dosbuild-lib/common.sh
-  SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
+  # micro 档没有 apt，出厂时不该留在线源配置。上面第 29-30 行那份是**构建期必需**的
+  # （阶段 3 要用 apt 装档位包），这里是出厂前的适配，要按档位清掉。
+  # ⚠️ keyring 文件不删：麒麟 V10 的 /usr/share/keyrings/kylin-archive-keyring.gpg
+  # 属厂商 kylin-keyring 包（我们的 cp 只是覆盖了同内容的同一路径），删它会破坏
+  # dpkg 的文件清单，也越过了「等价环境」的底线 —— 判据是属主，不是路径。
+  if [ "$TIER" = micro ]; then
+    SRCLIST=""
+  else
+    SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
+  fi
   adapt_container / "$SRCLIST" "${DID:-}"
   slim_locales /
   say "容器化适配: 复用 lib/common.sh::adapt_container"

@@ -70,7 +70,7 @@
 
 | 文件 | 来源 | 指纹 | 谁在用 |
 |---|---|---|---|
-| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:48` 与 `build/selfhost-inner.sh:30,82`（写进镜像的 `sources.list`） |
+| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:55` 与 `build/selfhost-inner.sh:30,82`（写进镜像的 `sources.list`） |
 
 实测该 keyring 单独即可验通麒麟 V11（`dists/11.0`）与 V10 SP1（`dists/10.1`）的 `InRelease`：
 
@@ -81,6 +81,14 @@ $ gpgv --keyring keys/kylin-archive-keyring.gpg InRelease   # 11.0 与 10.1 皆�
 三点要说明。其一，这是**首次使用即信任**（TOFU）：keyring 本身取自同一批软件源，无法用独立信道交叉验证，所以它证明的是「后续拉到的包与当初那份 keyring 同源」，不是「厂商官方身份已被第三方权威确认」。其二，该 key 的 uid 写的是 `For Kylin Arm64 Repo.`，而本研究只做 amd64——麒麟在 amd64 源上复用了这把 arm64 命名的 key，属厂商侧的命名问题，不影响验签结果，但审计时会看着奇怪，故记明。其三见下面这条更正。
 
 > **更正（审稿查出）**：早先构建实际使用的是 `keys/kylin-combined.gpg`，即上面这把 key 与 openKylin 的 `09FFC10E A273DD29 A986B110 8B313CEA FF592D96` 合并而成，而本节当时只记录了前者——**文档描述的文件与代码实际使用的文件不是同一个，第三方照着核会核错对象，且真实信任面比文档大一把 key**。补测后确认那把 openKylin key 对本项目的两个源没有任何作用（单用 `kylin-archive-keyring.gpg` 即可验通 11.0 与 10.1），于是把构建收窄到最小信任集，并从 `keys/` 里移除了 `kylin-combined.gpg` 与无消费方的 `openkylin-archive-keyring.gpg`。信任面该多大就多大，多一把没用的 key 就是多一份可被滥用的授权。
+
+#### 收窄到镜像里：谁真的需要这把 key
+
+把 `keys/` 收到单一 keyring 只是一半。审稿指出另一半：`adapt_container` 曾无条件把它拷进**每一个** rootfs，于是走切片路径、根本不从在线源拉包的 UOS 也被塞了一把麒麟的 key——它的 micro 档里那把还是 `/usr/share/keyrings/` 下唯一的文件。同一句「多一把没用的 key 就是多一份可被滥用的授权」在那里没落到底。
+
+现在按**路径与档位**双重判定：只有写了在线源的路径才拷（UOS 的切片路径不写），且 micro 档不写 `sources.list` 也不注入 keyring（它没有 apt，写了谁也不会读）。顺带清掉了一个更难看的残留——micro 档原先留着 bootstrap 期的宿主侧路径（`copy:///w/localrepo/…`、`signed-by=/w/keys/…`），那是构建机上的目录，出厂镜像里毫无意义还会误导使用者。
+
+有一处刻意不动：麒麟 V10 的 micro 档 `/usr/share/keyrings/kylin-archive-keyring.gpg` 属厂商 `kylin-keyring` 包（`dpkg -S` 查得到属主，md5 与包的 `.md5sums` 一致），我们的 `cp` 只是覆盖了同内容的同一路径。删它会破坏 dpkg 的文件清单，也越过了「等价环境」的底线。**判据是属主而不是路径**：`dpkg -S` 查得到的属发行版内容，查不到的才是我们注入的。落盘证据里 `keyrings`（全部）与 `keyrings_unowned`（注入的）分开记，断言只约束后者。
 
 UOS 走切片路径，不从在线源拉包，改为核对 squashfs 的 sha256（`distros/uos25.conf` 的 `SQUASHFS_SHA256`），信任根是 ISO 本身。
 
@@ -110,7 +118,7 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 一类是标准的容器精简：`policy-rc.d` 返回 101 阻止装包时起服务、apt 配置去掉缓存与翻译文件、`/usr/share/doc` 按 `path-exclude` + `path-include copyright` 只保留版权声明（GPL 要求）、清空 `machine-id`、删除 ssh host key 与 `resolv.conf`、去掉内核与固件。
 
-另一类是桌面 ISO 特有的、必须改的语义。三个发行版的 `default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元（udev、内核挂载、audit socket、厂商 LSM 守护）会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V11 与 UOS 各 7 个，麒麟 V10 是 11 个——它的镜像里还有 udev 那一组单元，而另两家根本没有这些单元文件，无从 mask（缺陷 D12）。
+另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元（udev、内核挂载、audit socket、厂商 LSM 守护）会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：base/devel 档里麒麟 V11 与 UOS 各 7 个、麒麟 V10 是 11 个；V11 与 UOS 的 micro 档是 0 个（它们的 micro 里没有 systemd 单元文件，无从 mask，`default.target` 也因此为空）——它的镜像里还有 udev 那一组单元，而另两家根本没有这些单元文件，无从 mask（缺陷 D12）。
 
 还有一类是补齐，理由是"缺了会让语义不自洽"。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是"今天"，否则可复现性当场报废。
 
@@ -135,7 +143,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
 
-72 项 × 9 个镜像 = 648 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=648`）。严格说其中 15 格是「前置条件不存在」而非「跑过了」——micro 档没有 apt，apt 相关的三项无从执行，探针如实输出 `n/a`，见下面对 198 格不适用的拆分。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
+72 项 × 9 个镜像 = 648 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=648`）。严格说其中 15 格是「前置条件不存在」而非「跑过了」：9 格是 micro 档的 apt 三项（没有 apt，`apt_update`/`apt_roundtrip`/`apt_check` 无从执行），6 格是 `cc_clean_stderr`（没有编译器就无所谓 stderr 干净不干净，micro 与 base 各三家）。探针对这两类如实输出 `n/a`，拆分见下。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 
 三态判据写死在 `scripts/analyze.py` 的 `NA_POLICY` 里，是矩阵表和热力图的唯一真源（两处各写一份必然漂移）：
 
@@ -147,7 +155,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 72 项里有一项要特别说明：**`sudo` 在九档全部判为「不适用」，而探针实测九档全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。这里写明是因为它曾经被处理错过：早先版本把 `sudo` 整项从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」，与数据相反，效果是把缺口数从 61 压到 52。现在改回按档位定位归入 NA 集，不再做删除。
 
-198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）：**171 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`（micro 档没有 apt，`apt_update`/`apt_roundtrip`/`apt_check` 这类前置条件不存在、根本没跑到）；还有 **12 格**探针实测为 `Y`——也就是**该档位实际具备、但按定位不计入**的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 171+15+12=198。所以这个矩阵有两个方向都要提醒：只看「缺口 52」会低估未满足面（171 格实测不通过被归入不适用），而只看「支持 398」也会低估已具备的能力（另有 12 格实测通过但没计入）。
+198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)，三个数由 `analyze.py` 算出、落在 `stats.json` 并有断言守）：**172 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`，即前置条件不存在——其中 9 格是三个 micro 档的 apt 三项、6 格是 `cc_clean_stderr`（micro 与 base 各三家，没有编译器就无所谓 stderr 干净）；**11 格**探针实测为 `Y`，也就是该档位实际具备、但按定位不计入的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 172+15+11=198。所以这个矩阵两个方向都要提醒：只看「缺口 52」会低估未满足面（172 格实测不通过被归入不适用），只看「支持 398」也会低估已具备的能力（另有 11 格实测通过但没计入）。
 
 648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 
@@ -284,3 +292,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 | [`t07`](derived/tables/t07_gates.csv) | 五道门禁结果 |
 | [`t08`](derived/tables/t08_vendor_defects.csv) | 厂商缺陷清单 |
 | [`t09`](derived/tables/t09_build_paths.csv) | 三条构建路径 |
+| [`t10`](derived/tables/t10_environment_fingerprint.csv) | 环境指纹（架构/glibc/setuid 数等，非能力） |
+| [`t11`](derived/tables/t11_tool_installability.csv) | 14 个工具在各自源里的可装性 |
+| [`t12`](derived/tables/t12_hardening_surface.csv) | masked 单元数与 setuid 面（逐档） |
+| [`t13`](derived/tables/t13_cve_coverage.csv) | 漏洞扫描器的覆盖判定 |

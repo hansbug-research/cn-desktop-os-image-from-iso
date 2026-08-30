@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T10:42:26Z",
+  "collected_at": "2026-08-30T11:39:28Z",
   "scanner": "aquasec/trivy:0.70.0",
   "images": [
     {
@@ -42,7 +42,7 @@
       "distro_id": "kylin10",
       "image": "kylin-desktop-v10:micro",
       "real_os_id": "kylin",
-      "anchor_tar_sha256": "67c07aa878d097e0dd33c482f4d846d2dfd4793e8f3cd80a0d03deffeea5acbb",
+      "anchor_tar_sha256": "136ef44865d23c4ab8743c4c688fada7dd3d18cb9a22ca9c02f0969850841e38",
       "trivy_os_family": "debian",
       "trivy_os_name": "bullseye/sid",
       "results": 1,
@@ -54,7 +54,7 @@
       "distro_id": "kylin10",
       "image": "kylin-desktop-v10:base",
       "real_os_id": "kylin",
-      "anchor_tar_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
+      "anchor_tar_sha256": "e5cde2f5ceb84a3600d01b50fdac73f11bae6d757f992546fd29d07687d326ea",
       "trivy_os_family": "debian",
       "trivy_os_name": "bullseye/sid",
       "results": 1,
@@ -66,7 +66,7 @@
       "distro_id": "kylin10",
       "image": "kylin-desktop-v10:devel",
       "real_os_id": "kylin",
-      "anchor_tar_sha256": "71fe8f64c435748be2b52de36759efc1d96d8c0213ec8416f1c98b5aa82809e9",
+      "anchor_tar_sha256": "3e2931b0be26239090e38ca524393d61fe01e92efe415786cd8881aa40fb49e0",
       "trivy_os_family": "debian",
       "trivy_os_name": "bullseye/sid",
       "results": 1,

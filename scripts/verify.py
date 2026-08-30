@@ -46,6 +46,18 @@ in_text(S["capability_items"], label="能力项数")
 for k in ("cells_supported", "cells_gap", "cells_na"):
     in_text(S[k], label=f"三态计数 {k}")
 
+# 198 格不适用的三分拆：三者之和必须等于 cells_na，且三个数都要在正文出现
+ok(S["cells_na_from_N"] + S["cells_na_from_na"] + S["cells_na_from_Y"] == S["cells_na"],
+   "NA 三分拆之和应等于 cells_na")
+in_text(S["cells_na_from_N"], label="NA 中探针为 N 的格数", ctx=rf"\*\*{S['cells_na_from_N']} 格\*\*探针实测为")
+in_text(S["cells_na_from_na"], label="NA 中探针为 n/a 的格数", ctx=rf"\*\*{S['cells_na_from_na']} 格\*\*探针本身输出")
+in_text(S["cells_na_from_Y"], label="NA 中探针为 Y 的格数", ctx=rf"\*\*{S['cells_na_from_Y']} 格\*\*探针实测为")
+# n/a 那批的成因必须写对：apt 三项 × 3 micro = 9，cc_clean_stderr × 6 = 6
+ok(S["na_na_by_item"].get("cc_clean_stderr") == 6,
+   f"n/a 明细里 cc_clean_stderr 应为 6 格，实际 {S['na_na_by_item']}")
+ok(sum(v for k, v in S["na_na_by_item"].items() if k.startswith("apt_")) == 9,
+   f"n/a 明细里 apt 相关应为 9 格，实际 {S['na_na_by_item']}")
+
 # ── 核心结论：麒麟官方镜像不是桌面产品线 ────────────────────────────────────
 ok(S["kylin_desktop_official_images"] == 0, "麒麟桌面官方镜像应为 0")
 ok(S["uos_official_images"] == 0, "UOS 官方镜像应为 0")
@@ -81,6 +93,10 @@ ok(S["repro_identical"] == 6, "可复现性应 6 个产物逐位一致")
 in_text(S["repro_identical"], label="逐位一致产物数")
 ok(S["manifests"] == 9, "应有 9 份 manifest")
 ok(S["probe_complete_all"] is True, "所有探针必须跑完（哨兵为 Y）")
+ok(S["probe_stale_vs_image"] == [],
+   f"这些镜像的探针输出早于镜像本身（数据比被测对象旧）：{S['probe_stale_vs_image']}")
+ok(S["probe_provenance_recorded"] == 9,
+   f"九个镜像都应记下探针时间与镜像创建时间，实际 {S['probe_provenance_recorded']}")
 
 # ── 可复现性凭据必须与交付物对账（本仓库最该有、却一度没有的那条断言）──────
 _re_ev = (ROOT / "artifacts" / "repro-evidence.txt")
@@ -113,12 +129,16 @@ ok(S["masked_units_by_distro"]["kylin10"] != S["masked_units_by_distro"]["kylin1
 # ── README 也要被核对（它承载十条主要结论，读者多半只看它）──────────────────
 # README 的可装性表用「N / 14」形式写，必须按这个形状断言 —— 只找裸数字会漏
 # （分析层变异测试实测：把 README 的 **0 / 14** 改成 **9 / 14** 曾经抓不到）。
-for k, lbl in (("installable_kylin11", "麒麟 V11"), ("installable_kylin10", "麒麟 V10"),
-               ("installable_uos25", "UOS V25")):
-    in_text(S[k], where="readme", label=f"README 可装性 {lbl}",
-            ctx=rf"\*\*{S[k]} / {S['installability_tools']}\*\*")
-    in_text(S[k], where="report", label=f"report 可装性 {lbl}",
-            ctx=rf"\*\*{S[k]} / {S['installability_tools']}\*\*")
+# ⚠️ ctx 必须把**主体**和数字绑在一起，只绑「数字↔短语」挡不住归属对调：
+# 把「麒麟 14/14、UOS 0/14」整体换成「UOS 14/14、麒麟 0/14」，两个数都还在、
+# 两个模式都能匹配，而本仓库最硬的一条定量结论就被反转了（审稿实测全绿）。
+_T = S["installability_tools"]
+in_text(S["installable_uos25"], where="readme", label="README 可装性三家归属",
+        ctx=rf"麒麟 V11 \*\*{S['installable_kylin11']} / {_T}\*\*、麒麟 V10 "
+            rf"\*\*{S['installable_kylin10']} / {_T}\*\*、UOS V25 \*\*{S['installable_uos25']} / {_T}\*\*")
+in_text(S["installable_uos25"], where="report", label="report 可装性三家归属",
+        ctx=rf"\*\*{S['installable_kylin11']} / {_T}\*\* \| \*\*{S['installable_kylin10']} / {_T}\*\* \| "
+            rf"\*\*{S['installable_uos25']} / {_T}\*\*")
 in_text(S["uos_iso_packages"], where="readme", label="README 的 UOS ISO 包数")
 for row in (ROOT / "derived" / "tables" / "t04_built_images.csv").read_text().splitlines()[1:]:
     c = row.split(",")
@@ -139,8 +159,9 @@ for d in ("D01", "D02", "D05", "D08", "D09", "D10", "D12"):
 # ── 覆盖 review 点名的零覆盖数字（都带上下文，避免裸子串撞车）──────────────
 for d, n in S["masked_units_by_distro"].items():
     nm = {"kylin10": "麒麟 V10", "kylin11": "麒麟 V11", "uos25": "UOS"}[d]
-    ok(re.search(rf"(?<![0-9]){n} 个", REPORT) is not None,
-       f"正文应写明 {nm} 的 masked 单元数 {n}（需带数字边界，否则 11 会被 111 满足）")
+    # 同样要绑主体：只防数字边界挡不住「V11 与 UOS 各 11 个、V10 是 7 个」这种对调
+    ok(re.search(rf"{nm}[^。]{{0,20}}?(?<![0-9]){n} 个", REPORT) is not None,
+       f"正文应把 {nm} 与它的 masked 单元数 {n} 绑在一起写（防归属对调）")
 in_text(S["setuid_micro"]["kylin10"], label="V10 micro 的 setuid 数",
         ctx=rf"V10 micro 档有 {S['setuid_micro']['kylin10']} 个")
 in_text(S["setuid_micro"]["kylin11"], label="micro 的 setuid 数",
@@ -230,6 +251,8 @@ for k, v in S["keyrings_by_image"].items():
         # 是发行版自带内容，删它就越过了「等价环境」的底线 —— 用属主区分，不一刀切。
         inj = S["injected_keyrings_by_image"].get(k, [])
         ok(inj == [], f"{k} 是纯运行时档、没有 apt，不该由构建注入 keyring，实际注入 {inj}")
+        nb = S["micro_sources_list_bytes"].get(k)
+        ok(nb == 0, f"{k} 没有 apt，出厂的 sources.list 应为空，实际 {nb} 字节")
     elif d.startswith("kylin"):
         ok(v == ["kylin-archive-keyring.gpg"],
            f"{k} 的 keyring 应只有 kylin-archive-keyring.gpg，实际 {v}")
@@ -238,6 +261,9 @@ for k, v in S["keyrings_by_image"].items():
 ok(S["anchor_mismatches"] == [],
    f"d6/d7 的锚点与 d2 的产物不符（锚在旧镜像上）：{S['anchor_mismatches']}")
 ok(S["anchored_records"] >= 12, f"d6/d7 应有锚点的记录数过少：{S['anchored_records']}")
+ok(S["anchor_pairs_checked"] == 12,
+   f"实际比过的锚点对数应为 12，实际 {S['anchor_pairs_checked']} —— 少了就是有对账被静默跳过")
+ok(S["anchor_bad_hex"] == [], f"d2 的 tar_sha256 必须都是 64 位 hex，异常：{S['anchor_bad_hex']}")
 
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
@@ -278,7 +304,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "168"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "177"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

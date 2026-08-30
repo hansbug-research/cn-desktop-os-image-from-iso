@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T10:41:40Z",
+  "collected_at": "2026-08-30T11:38:46Z",
   "gates": {
     "verify": {
       "passed": 365,
@@ -103,24 +103,24 @@
     "repro": {
       "identical": 6,
       "mismatched": 0,
-      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T10:35:28Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1\nuos25-base       一致  sha256=f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0\nuos25-devel      一致  sha256=bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0\n"
+      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T11:36:02Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1\nuos25-base       一致  sha256=f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0\nuos25-devel      一致  sha256=bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0\n"
     }
   },
   "manifests": {
     "kylin10-base": {
-      "tarball_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
+      "tarball_sha256": "e5cde2f5ceb84a3600d01b50fdac73f11bae6d757f992546fd29d07687d326ea",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
       "package_lines": 221
     },
     "kylin10-devel": {
-      "tarball_sha256": "71fe8f64c435748be2b52de36759efc1d96d8c0213ec8416f1c98b5aa82809e9",
+      "tarball_sha256": "3e2931b0be26239090e38ca524393d61fe01e92efe415786cd8881aa40fb49e0",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
       "package_lines": 263
     },
     "kylin10-micro": {
-      "tarball_sha256": "67c07aa878d097e0dd33c482f4d846d2dfd4793e8f3cd80a0d03deffeea5acbb",
+      "tarball_sha256": "136ef44865d23c4ab8743c4c688fada7dd3d18cb9a22ca9c02f0969850841e38",
       "source_date_epoch": null,
       "inrelease_sha256": "b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58",
       "package_lines": 154

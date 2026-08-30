@@ -62,6 +62,9 @@ def facts(img):
         # 属主决定性质：dpkg -S 查得到的是**厂商包自带**的（属发行版内容，动它就越过了
         # 「等价环境」的底线），查不到的才是我们注入的。麒麟 V10 的 micro 档带的那把
         # 就属 kylin-keyring 包，不能一刀切删掉。
+        # sources.list 的字节数：micro 档没有 apt，出厂时应为空。
+        # 早先只检查了 keyring，漏了这一半 —— 麒麟 V10 的 micro 档就一直留着一条 active 源。
+        "sources_list_bytes": sh("wc -c < /etc/apt/sources.list 2>/dev/null || echo 0"),
         "keyrings_unowned": sh("for f in /usr/share/keyrings/*.gpg; do [ -e \"$f\" ] || continue; "
                                "dpkg -S \"$f\" >/dev/null 2>&1 || basename \"$f\"; done "
                                "| sort | tr '\\n' ' '"),

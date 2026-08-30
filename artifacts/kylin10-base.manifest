@@ -1,13 +1,13 @@
 # 产物清单 kylin-desktop-v10:base
-# 生成时间(UTC): 2026-08-30T10:35:17Z
+# 生成时间(UTC): 2026-08-30T11:24:09Z
 # 构建方法: selfhost
 # 源: http://archive.kylinos.cn/kylin/KYLIN-ALL/ 10.1 main universe
-# tarball sha256: 6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562
+# tarball sha256: e5cde2f5ceb84a3600d01b50fdac73f11bae6d757f992546fd29d07687d326ea
 # tarball bytes: 270419968
 # SOURCE_DATE_EPOCH: n/a（该路径不归一时间戳，见 report.md §8（可复现性））
 # InRelease sha256: b6e464928c609af37c7325dff5ab1d6a25ebd57e8479064ba47277f707778b58
 # localrepo: container-stub_1.0_all.deb d96af0d56d744b4e40a45ef135a27a01551834d87796066e5df5df5850b1a7e4
-# 镜像 ID: 51b71f076510
+# 镜像 ID: b56422e4f333
 # 预期基线: glibc=2.31 libstdc++=6.0.28 GLIBCXX=3.4.28
 #
 adduser	3.118kylin2k7
