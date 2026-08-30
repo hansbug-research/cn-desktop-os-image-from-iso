@@ -110,7 +110,10 @@ if d8:
     # 早先是整行末尾堆一串 [[1]][[2]]、每行重新从 1 数起 —— 读者无法判断哪条支撑哪格。
     def _c(e, field):
         ids = e.get("refs", {}).get(field, [])
-        return "".join(f"[{i}](#{i})" for i in ids)
+        # GitHub 原生脚注语法：[^Rn]。GitHub 会自动渲染成上标编号，
+        # 并在文末生成带回跳链接的 Footnotes 区 —— 这是它的官方引用形态，
+        # 比手写 [Rn](#Rn) 锚点链接更正规（早先那版方向搞反了）。
+        return "".join(f"[^{i}]" for i in ids)
 
     rows = []
     for e in d8["entries"]:

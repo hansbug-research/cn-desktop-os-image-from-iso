@@ -469,7 +469,10 @@ ok(S["references_title_from_page"] + S["references_title_manual"] == len(_REFS),
 ok(all(r.get("url", "").startswith("http") for r in _REFS), "每条引用必须有 URL")
 ok(all(r.get("accessed") for r in _REFS), "每条引用必须有访问日期")
 
-_cited_in_text = set(re.findall(r"\[(R\d+)\]\(#R\d+\)", REPORT))
+# GitHub 原生脚注：引用处是 [^Rn]，定义处是行首 [^Rn]:。两者要分开数 ——
+# 只有定义没有引用，GitHub 根本不渲染那条；只有引用没有定义，渲染成死链。
+_cited_in_text = set(re.findall(r"\[\^(R\d+)\](?!:)", REPORT))
+_defined = set(re.findall(r"^\[\^(R\d+)\]:", REPORT, re.M))
 _cited_in_census = {i for e in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
                     for v in e.get("refs", {}).values() for i in v}
 _all_cited = _cited_in_text | _cited_in_census
@@ -485,9 +488,17 @@ ok(S["census_field_citations"] >= 90,
 _no_ref = [e["name"] for e in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
            if not e.get("refs")]
 ok(_no_ref == [], f"名录里每个 OS 都必须至少有一处字段级引用（缺：{_no_ref}）")
-# markdown 脚注已统一并入 [Rn]，不许再出现两套引用体系
-ok(not re.search(r"^\[\^\w+\]:", REPORT, re.M),
-   "不许残留 markdown 脚注式引用（已统一为 [Rn]，两套并存会让编号对不上）")
+# 引用形态必须是 GitHub 原生脚注：每条被引用的都要有定义，每条定义都要被引用，
+# 否则 GitHub 侧渲染出来是死链或干脆不显示。
+ok(_defined == _ref_ids,
+   f"脚注定义必须与引用表一一对应（多出：{sorted(_defined - _ref_ids)[:8]}；"
+   f"缺少：{sorted(_ref_ids - _defined)[:8]}）")
+_undef = sorted(_cited_in_text - _defined, key=lambda x: int(x[1:]))
+ok(_undef == [], f"正文引用的每个脚注都必须有定义（缺定义：{_undef[:8]}）")
+ok(not re.search(r"\[R\d+\]\(#R\d+\)", REPORT),
+   "不许残留手写锚点式引用（已统一为 GitHub 原生脚注 [^Rn]，两套并存会让编号对不上）")
+ok(len(_cited_in_text) >= 20,
+   f"正文里的脚注引用应不少于 20 处，实际 {len(_cited_in_text)}")
 in_text(S["references_total"], label="正文写明的引用条数",
         ctx=rf"共 {S['references_total']} 条")
 in_text(S["census_field_citations"], label="正文写明的字段级引用处数",
@@ -507,7 +518,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "266"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "269"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
