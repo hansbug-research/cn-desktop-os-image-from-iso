@@ -1,10 +1,10 @@
 distro,tier,image,rootfs_tar_mb,unpacked_size,packages,version_id,glibc,stopsignal,tar_sha256_16
-kylin11,micro,kylin-desktop-v11:micro,88,125MB,71,v11,2.38-1ok6.9k0.5,—,52aa05ed00484ad7
+kylin11,micro,kylin-desktop-v11:micro,88,125MB,71,v11,2.38-1ok6.9k0.5,—,4ac37272ca5328b0
 kylin11,base,kylin-desktop-v11:base,248,345MB,206,v11,2.38-1ok6.9k0.5,SIGRTMIN+3,543bb715cfbdfbaf
 kylin11,devel,kylin-desktop-v11:devel,498,686MB,255,v11,2.38-1ok6.9k0.5,SIGRTMIN+3,ffc161134d7ae6d0
 kylin10,micro,kylin-desktop-v10:micro,213,308MB,154,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,67c07aa878d097e0
 kylin10,base,kylin-desktop-v10:base,270,394MB,221,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,6b5da0085540aeaa
 kylin10,devel,kylin-desktop-v10:devel,503,710MB,263,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,71fe8f64c435748b
-uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,3f6180bee5387ab4
-uos25,base,uos-desktop-v25:base,191,281MB,164,25,2.38-6deepin19,SIGRTMIN+3,749075bcf19e8f8c
-uos25,devel,uos-desktop-v25:devel,448,638MB,208,25,2.38-6deepin19,SIGRTMIN+3,01fd60272a8fbcb6
+uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,974cba17ccf8201a
+uos25,base,uos-desktop-v25:base,191,281MB,164,25,2.38-6deepin19,SIGRTMIN+3,f80abeda86511b60
+uos25,devel,uos-desktop-v25:devel,448,638MB,208,25,2.38-6deepin19,SIGRTMIN+3,bcd57e55fd3fc30d

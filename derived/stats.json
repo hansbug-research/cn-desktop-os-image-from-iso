@@ -1,5 +1,7 @@
 {
   "alien_keyring_images": [],
+  "anchor_mismatches": [],
+  "anchored_records": 12,
   "build_methods": [
     "mmdebstrap",
     "selfhost",
@@ -35,6 +37,17 @@
   "existence_probes": 8,
   "images_built": 9,
   "info_probes": 6,
+  "injected_keyrings_by_image": {
+    "kylin10:base": [],
+    "kylin10:devel": [],
+    "kylin10:micro": [],
+    "kylin11:base": [],
+    "kylin11:devel": [],
+    "kylin11:micro": [],
+    "uos25:base": [],
+    "uos25:devel": [],
+    "uos25:micro": []
+  },
   "installability_tools": 14,
   "installable_kylin10": 14,
   "installable_kylin11": 14,
@@ -55,9 +68,7 @@
     "kylin11:devel": [
       "kylin-archive-keyring.gpg"
     ],
-    "kylin11:micro": [
-      "kylin-archive-keyring.gpg"
-    ],
+    "kylin11:micro": [],
     "uos25:base": [
       "deepin-app-store-home.gpg",
       "deepin-archive-camel-keyring.gpg",

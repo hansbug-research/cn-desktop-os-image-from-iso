@@ -45,7 +45,15 @@ fi
 fix_unconfigured_noscript_pkgs "$R" "$ADM"
 chroot "$R" /bin/sh -c 'dpkg --configure -a >/dev/null 2>&1; true' || true
 
-SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
+# micro 档没有 apt（定位就是纯运行时），给它写 sources.list 再塞一把 keyring 是纯粹的
+# 冗余：谁都不会去读它，而 keyring 是信任材料，留着就是白送一份可被滥用的授权。
+# 判据同时看路径与**档位** —— 早先只按路径判，于是 UOS micro 干净了、麒麟 micro 没干净，
+# 同一句「多一把没用的 key 就是多一份授权」在那里没落到底。
+if [ "$TIER" = micro ]; then
+  SRCLIST=""
+else
+  SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
+fi
 adapt_container "$R" "$SRCLIST" "$DID"
 slim_locales "$R"
 [ "$TIER" = micro ] && rm -rf "$R/var/lib/apt" "$R/var/cache/apt" 2>/dev/null || true

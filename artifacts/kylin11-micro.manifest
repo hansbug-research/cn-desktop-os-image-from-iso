@@ -1,14 +1,14 @@
 # 产物清单 kylin-desktop-v11:micro
-# 生成时间(UTC): 2026-08-30T09:48:02Z
+# 生成时间(UTC): 2026-08-30T10:35:21Z
 # 构建方法: mmdebstrap
 # 源: http://archive.kylinos.cn/kylin/KYLIN-ALL/ 11.0 main universe
-# tarball sha256: 52aa05ed00484ad70181ad88503b05a83119bb7dfe6f89ce2270224ac3b3140d
-# tarball bytes: 88419840
+# tarball sha256: 4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb
+# tarball bytes: 88409600
 # SOURCE_DATE_EPOCH: 1756113384
 # InRelease sha256: dda9ec67d00da50f9f0d67ebbbc63743b24c7f34326558391ffcc547abc812c9
 # localrepo: container-stub_1.0_all.deb d98ba5546fa8f41e8181cfacf3a0b959265be97a0bd81329506af04d983ac31d
 # localrepo: libboundscheck_1.0.0-ok3k0.1+nogccdep1_amd64.deb a40596c3a56e9535ec743179c7de7255e4f556aec1d39365d91ccfad4fd0f838
-# 镜像 ID: b04758a46b60
+# 镜像 ID: 6422c7a08844
 # 预期基线: glibc=2.38 libstdc++=6.0.32 GLIBCXX=3.4.32
 #
 base-files	13-ok2.2k0.4

@@ -1,25 +1,26 @@
 {
-  "collected_at": "2026-08-30T09:47:09Z",
+  "collected_at": "2026-08-30T10:48:27Z",
   "ours": [
     {
       "distro_id": "kylin11",
       "tier": "micro",
       "image": "kylin-desktop-v11:micro",
-      "content_bytes": "29183391",
+      "content_bytes": "29182470",
       "unpacked_human": "125MB",
       "os_release": "NAME=\"Kylin\"\nFULL_NAME=\"kylin\"\nVERSION=\"银河麒麟桌面操作系统V11\"\nVERSION_US=\"Kylin Linux Desktop V11\"\nID=kylin\nPRETTY_NAME=\"Kylin V11\"\nVERSION_ID=\"v11\"\nHOME_URL=\"http://www.kylinos.cn/\"\nVERSION_CODENAME=kylin\nPRODUCT_FEATURES=3\nKYLIN_RELEASE_ID=\"V11\"",
       "pkg_format": "dpkg",
       "pkg_count": "0\n71",
       "glibc_banner": "ldd (Ubuntu GLIBC 2.38-1ok6.9k0.5) 2.38",
       "glibc_pkg": "2.38-1ok6.9k0.5",
-      "repo_urls": "deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] http://archive.kylinos.cn/kylin/KYLIN-ALL/ 11.0 main universe",
+      "repo_urls": "",
       "stopsignal": "",
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
       "masked_units": "",
       "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
-      "keyrings": "kylin-archive-keyring.gpg",
-      "tar_bytes": 88419840,
-      "tar_sha256": "52aa05ed00484ad70181ad88503b05a83119bb7dfe6f89ce2270224ac3b3140d",
+      "keyrings": "",
+      "keyrings_unowned": "",
+      "tar_bytes": 88409600,
+      "tar_sha256": "4ac37272ca5328b010a0becc4ee49b029d8b93e30a3c8897bf22f1325ebf41eb",
       "tar_source": "本地 tar 实测"
     },
     {
@@ -39,6 +40,7 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "keyrings": "kylin-archive-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 248491520,
       "tar_sha256": "543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac",
       "tar_source": "本地 tar 实测"
@@ -60,6 +62,7 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "keyrings": "kylin-archive-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 497548800,
       "tar_sha256": "ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161",
       "tar_source": "本地 tar 实测"
@@ -81,6 +84,7 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "keyrings": "kylin-archive-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 213007872,
       "tar_sha256": "67c07aa878d097e0dd33c482f4d846d2dfd4793e8f3cd80a0d03deffeea5acbb",
       "tar_source": "本地 tar 实测"
@@ -102,6 +106,7 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "keyrings": "kylin-archive-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 270419968,
       "tar_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
       "tar_source": "本地 tar 实测"
@@ -123,6 +128,7 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
       "keyrings": "kylin-archive-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 502579712,
       "tar_sha256": "71fe8f64c435748be2b52de36759efc1d96d8c0213ec8416f1c98b5aa82809e9",
       "tar_source": "本地 tar 实测"
@@ -144,15 +150,16 @@
       "masked_units": "",
       "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
       "keyrings": "",
+      "keyrings_unowned": "",
       "tar_bytes": 98099200,
-      "tar_sha256": "3f6180bee5387ab4ca7789b079c3e454e818397d9b0a6da229f34641dc2143a5",
+      "tar_sha256": "974cba17ccf8201ac85c2f5f7c6c00a076e9e4551ab8274799f4608022851ed1",
       "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "base",
       "image": "uos-desktop-v25:base",
-      "content_bytes": "75756105",
+      "content_bytes": "75756269",
       "unpacked_human": "281MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
@@ -165,15 +172,16 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "keyrings": "deepin-app-store-home.gpg deepin-archive-camel-keyring.gpg deepin-archive-crimson-keyring.gpg deepin-archive-uranus-keyring.gpg deepin-pools-keyring.gpg uos-archive-snipe-keyring.gpg",
+      "keyrings_unowned": "",
       "tar_bytes": 191252480,
-      "tar_sha256": "749075bcf19e8f8c202f0a639fbd3b690dc237d0fe30459cf885d3c0f1fc02dc",
+      "tar_sha256": "f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0",
       "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "devel",
       "image": "uos-desktop-v25:devel",
-      "content_bytes": "165046700",
+      "content_bytes": "165046505",
       "unpacked_human": "638MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
@@ -186,8 +194,9 @@
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
       "keyrings": "deepin-app-store-home.gpg deepin-archive-camel-keyring.gpg deepin-archive-crimson-keyring.gpg deepin-archive-uranus-keyring.gpg deepin-pools-keyring.gpg uos-archive-snipe-keyring.gpg",
-      "tar_bytes": 448460800,
-      "tar_sha256": "01fd60272a8fbcb6153f47b823453131f76805228dcbcf728c004828b217b4c8",
+      "keyrings_unowned": "",
+      "tar_bytes": 448450560,
+      "tar_sha256": "bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0",
       "tar_source": "本地 tar 实测"
     }
   ],
@@ -206,6 +215,7 @@
     "labels": "{\"cn.kylinos.kylin-server-minimal.base_image\":\"\",\"cn.kylinos.kylin-server-minimal.build_id\":\"20260602\"}",
     "masked_units": "",
     "setuid_bins": "",
-    "keyrings": ""
+    "keyrings": "",
+    "keyrings_unowned": ""
   }
 }

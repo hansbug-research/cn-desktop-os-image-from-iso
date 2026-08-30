@@ -70,7 +70,7 @@
 
 | 文件 | 来源 | 指纹 | 谁在用 |
 |---|---|---|---|
-| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及三处 `signed-by=` |
+| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:48` 与 `build/selfhost-inner.sh:30,82`（写进镜像的 `sources.list`） |
 
 实测该 keyring 单独即可验通麒麟 V11（`dists/11.0`）与 V10 SP1（`dists/10.1`）的 `InRelease`：
 
@@ -135,7 +135,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
 
-72 项 × 9 个镜像 = 648 格，全部实测（`capability_items=72`、`capability_cells=648`）。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
+72 项 × 9 个镜像 = 648 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=648`）。严格说其中 15 格是「前置条件不存在」而非「跑过了」——micro 档没有 apt，apt 相关的三项无从执行，探针如实输出 `n/a`，见下面对 198 格不适用的拆分。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 
 三态判据写死在 `scripts/analyze.py` 的 `NA_POLICY` 里，是矩阵表和热力图的唯一真源（两处各写一份必然漂移）：
 
@@ -147,7 +147,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 72 项里有一项要特别说明：**`sudo` 在九档全部判为「不适用」，而探针实测九档全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。这里写明是因为它曾经被处理错过：早先版本把 `sudo` 整项从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」，与数据相反，效果是把缺口数从 61 压到 52。现在改回按档位定位归入 NA 集，不再做删除。
 
-同理，198 格「不适用」里绝大多数是探针实测为 `N`、再按档位定位改判的，只有少数是探针本身输出 `n/a`（micro 档无 apt 时的 `apt_update` 等）。读者若只看「缺口 52」会低估实际未满足面，完整原始值在 `t05b`。
+198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）：**171 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`（micro 档没有 apt，`apt_update`/`apt_roundtrip`/`apt_check` 这类前置条件不存在、根本没跑到）；还有 **12 格**探针实测为 `Y`——也就是**该档位实际具备、但按定位不计入**的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 171+15+12=198。所以这个矩阵有两个方向都要提醒：只看「缺口 52」会低估未满足面（171 格实测不通过被归入不适用），而只看「支持 398」也会低估已具备的能力（另有 12 格实测通过但没计入）。
 
 648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 

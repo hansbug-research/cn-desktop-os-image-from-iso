@@ -251,6 +251,11 @@ csv("t12_hardening_surface.csv", ["distro", "tier", "masked_units", "setuid_bins
 S["keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
                           sorted((r.get("keyrings") or "").split())
                           for r in d2["ours"]}
+# 我们注入的（无属主的）keyring —— 只有这些才受「不该多一把」的约束；
+# 厂商包自带的属发行版内容，动它就越过了「等价环境」的底线。
+S["injected_keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
+                                   sorted((r.get("keyrings_unowned") or "").split())
+                                   for r in d2["ours"]}
 S["alien_keyring_images"] = sorted(
     k for k, v in S["keyrings_by_image"].items()
     if k.startswith("uos25") and any("kylin" in x for x in v))
@@ -275,6 +280,27 @@ S["cve_misidentified"] = _v.get("误判", 0)
 S["cve_unrecognized"] = _v.get("未识别", 0)
 S["cve_high_critical_total"] = sum(x["high_critical"] for x in d7["images"])
 S["cve_scanner"] = d7["scanner"]
+
+# ── 锚点对账：d6/d7 记录的被测镜像必须与 d2 的产物同一批 ────────────────────
+# 早先 d6/d7 只记镜像 tag，镜像一重建它们就悄悄锚在旧产物上，而任何门禁都发现不了
+# —— 正是 report §8 讲的「两条链锚在不同构建上，看着都绿其实接不起来」。
+_d2_tar = {f'{r["distro_id"]}:{r["tier"]}': r.get("tar_sha256") for r in d2["ours"]}
+_mismatch = []
+for x in d6["images"].values():
+    a = x.get("anchor_tar_sha256")
+    ref = _d2_tar.get(x["image"].split(":")[0].replace("kylin-desktop-v11", "kylin11")
+                      .replace("kylin-desktop-v10", "kylin10")
+                      .replace("uos-desktop-v25", "uos25") + ":base")
+    if a and ref and a != ref:
+        _mismatch.append(("d6", x["image"]))
+for x in d7["images"]:
+    a = x.get("anchor_tar_sha256")
+    ref = _d2_tar.get(f'{x["distro_id"]}:{x["image"].rsplit(":", 1)[1]}')
+    if a and ref and a != ref:
+        _mismatch.append(("d7", x["image"]))
+S["anchor_mismatches"] = _mismatch
+S["anchored_records"] = (sum(1 for x in d6["images"].values() if x.get("anchor_tar_sha256"))
+                         + sum(1 for x in d7["images"] if x.get("anchor_tar_sha256")))
 
 (DER / "stats.json").write_text(json.dumps(S, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
 print(f"derived/：{len(list(TAB.glob('*.csv')))} 张表，stats.json {len(S)} 个统计量")

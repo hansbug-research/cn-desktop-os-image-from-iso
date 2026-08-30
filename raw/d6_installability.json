@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T08:48:08Z",
+  "collected_at": "2026-08-30T10:41:40Z",
   "tools": [
     "iproute2",
     "iputils-ping",
@@ -35,6 +35,7 @@
         "gdb": "gdb: gdb | 15.0.50.20240403-ok2k0.1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages",
         "python3-dev": "python3-dev: python3-dev | 3.12.2-ok1k0.1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages"
       },
+      "anchor_tar_sha256": "543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac",
       "raw": {
         "iproute2": {
           "madison": "iproute2 | 6.1.0-ok1k0.1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages",
@@ -130,6 +131,7 @@
         "gdb": "gdb: gdb | 9.1-0kylin1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
         "python3-dev": "python3-dev: python3-dev | 3.8.2-0kylin2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages"
       },
+      "anchor_tar_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
       "raw": {
         "iproute2": {
           "madison": "iproute2 | 5.5.0-1kylin1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
@@ -225,6 +227,7 @@
         "gdb": "NOREPO",
         "python3-dev": "NOREPO"
       },
+      "anchor_tar_sha256": "f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0",
       "raw": {
         "iproute2": {
           "madison": "NOREPO",

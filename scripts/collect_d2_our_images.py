@@ -59,6 +59,12 @@ def facts(img):
         # 而落盘证据里查不到这件事，门禁也只看仓库的 keys/ 不看镜像。
         "keyrings": sh("ls /usr/share/keyrings/*.gpg 2>/dev/null | xargs -r -n1 basename "
                        "| sort | tr '\\n' ' '"),
+        # 属主决定性质：dpkg -S 查得到的是**厂商包自带**的（属发行版内容，动它就越过了
+        # 「等价环境」的底线），查不到的才是我们注入的。麒麟 V10 的 micro 档带的那把
+        # 就属 kylin-keyring 包，不能一刀切删掉。
+        "keyrings_unowned": sh("for f in /usr/share/keyrings/*.gpg; do [ -e \"$f\" ] || continue; "
+                               "dpkg -S \"$f\" >/dev/null 2>&1 || basename \"$f\"; done "
+                               "| sort | tr '\\n' ' '"),
     }
 
 def main():

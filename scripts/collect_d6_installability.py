@@ -13,6 +13,18 @@
 import json, os, pathlib, shlex, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+def _anchor(did, tier):
+    """被测镜像的产物锚点。d6/d7 原先只记镜像 tag，没有 digest 也没有 tar sha256 ——
+    镜像一重建，它们就悄悄锚在旧产物上而**任何门禁都发现不了**（审稿实测过）。
+    从 artifacts/ 的 manifest 里取该档的 tarball sha256 当锚点，供 verify 与 d2 对账。"""
+    import re as _re
+    m = ROOT / "artifacts" / f"{did}-{tier}.manifest"
+    if not m.exists():
+        return None
+    t = m.read_text(errors="replace")
+    g = _re.search(r"# tarball sha256: ([0-9a-f]{64})", t)
+    return g.group(1) if g else None
 OUT = ROOT / "raw" / "d6_installability.json"
 
 # 14 个常见工具。选取标准：运维排查（前 6）、构建（中 6）、语言开发（后 2），
@@ -38,7 +50,8 @@ def main():
             "uos_iso_inventory": None}
     for did, img in IMAGES:
         print(f"  可装性 {img}", file=sys.stderr)
-        rec = {"image": img, "candidates": {}}
+        rec = {"image": img, "candidates": {},
+               "anchor_tar_sha256": _anchor(did, "base")}
         # ⚠️ 判据用 `apt-cache madison`，不能用 `apt-cache policy` 的 Candidate：
         # policy 对**已安装但源里没有**的包同样会报 Candidate（值是已装版本），
         # 于是「已经装了」会被误计成「装得上」。UOS 上这个差别很关键 —— 我们主动切进去的

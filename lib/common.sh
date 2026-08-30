@@ -80,7 +80,15 @@ EOF
     printf 'Dir::Bin::dpkg "/usr/local/bin/dpkg-segv-wrapper";\n' > "$R/etc/apt/apt.conf.d/docker-dpkg-wrapper"
   fi
 
-  [ -n "$SRCLIST" ] && printf '%s\n' "$SRCLIST" > "$R/etc/apt/sources.list"
+  # SRCLIST 为空时要**清空** sources.list，不能放着不管：mmdebstrap 在 bootstrap 期
+  # 写进去的是宿主侧路径（`copy:///w/localrepo/...`、`signed-by=/w/keys/...`），
+  # 出厂镜像里指向构建机上的目录，毫无意义还会误导使用者。micro 档没有 apt，
+  # 正确状态是空文件而不是残留的构建期配置。
+  if [ -n "$SRCLIST" ]; then
+    printf '%s\n' "$SRCLIST" > "$R/etc/apt/sources.list"
+  else
+    : > "$R/etc/apt/sources.list"
+  fi
   # keyring 只拷给**真的要用它验签**的路径。早先这里是无条件拷贝，于是走切片路径、
   # 根本不从在线源拉包的 UOS 也被塞进一把麒麟的 key —— 它的 micro 档里那把还是
   # 目录下唯一的文件。这与「UOS 的信任根是 ISO 本身」以及「多一把没用的 key 就是

@@ -34,8 +34,11 @@ mut "统计量：os_id 撞名 true→false" derived/stats.json 's/"os_id_collisi
 # 而结果看起来是「verify 没抓到」—— 实际是用例自己失效了（踩过）。从凭据里现取。
 _SHA=$(sed -n 's/.*sha256=\([0-9a-f]\{8\}\).*/\1/p' artifacts/repro-evidence.txt | head -1)
 mut "凭据：repro 的一个 sha256"      artifacts/repro-evidence.txt "s/sha256=$_SHA/sha256=deadbeef/"
-mut "正文：抬头的验收断言条数"        report.md 's/验收断言 \*\*365\*\* 条/验收断言 **99999** 条/'
-mut "README：UOS 可装性 0\/14"       README.md 's|\*\*0 / 14\*\*|**9 / 14**|'
+# 同上：不写死会变的值，从 stats 现取
+_VP=$(python3 -c "import json;print(json.load(open('derived/stats.json'))['verify_passed'])")
+mut "正文：抬头的验收断言条数"        report.md "s/验收断言 \*\*${_VP}\*\* 条/验收断言 **99999** 条/"
+_UI=$(python3 -c "import json;s=json.load(open('derived/stats.json'));print(f\"{s['installable_uos25']} / {s['installability_tools']}\")")
+mut "README：UOS 可装性"             README.md "s|\*\*${_UI}\*\*|**9 / 14**|"
 
 echo
 [ "$FAIL" = 0 ] && echo "✅ $PASS 项变异全部被 verify.py 抓到（分析层门禁有效）" \

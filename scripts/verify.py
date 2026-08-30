@@ -221,10 +221,23 @@ if _fps:
 # 仓库层的 keys/ 断言看不到这件事 —— 门禁自己又需要一层门禁。
 ok(S["alien_keyring_images"] == [],
    f"这些 UOS 镜像里出现了麒麟的 keyring：{S['alien_keyring_images']}")
+# 按**档位**判，不只按发行版：micro 档没有 apt，写 sources.list 再塞 keyring 是纯冗余，
+# 所以它应当两者皆空；base/devel 走在线源，需要且只需要麒麟那一把。
 for k, v in S["keyrings_by_image"].items():
-    if k.startswith("kylin"):
+    d, t = k.split(":")
+    if t == "micro":
+        # 只约束**我们注入的**那些。麒麟 V10 的 micro 档带的那把属厂商 kylin-keyring 包，
+        # 是发行版自带内容，删它就越过了「等价环境」的底线 —— 用属主区分，不一刀切。
+        inj = S["injected_keyrings_by_image"].get(k, [])
+        ok(inj == [], f"{k} 是纯运行时档、没有 apt，不该由构建注入 keyring，实际注入 {inj}")
+    elif d.startswith("kylin"):
         ok(v == ["kylin-archive-keyring.gpg"],
            f"{k} 的 keyring 应只有 kylin-archive-keyring.gpg，实际 {v}")
+
+# d6/d7 的被测镜像必须与 d2 的产物同一批，否则那两组结论锚在旧镜像上
+ok(S["anchor_mismatches"] == [],
+   f"d6/d7 的锚点与 d2 的产物不符（锚在旧镜像上）：{S['anchor_mismatches']}")
+ok(S["anchored_records"] >= 12, f"d6/d7 应有锚点的记录数过少：{S['anchored_records']}")
 
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
@@ -265,7 +278,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "165"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "168"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

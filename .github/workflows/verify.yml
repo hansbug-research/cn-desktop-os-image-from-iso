@@ -68,6 +68,28 @@ jobs:
           EOF
           git checkout -- raw/d4_gates.json
 
+      # 与上面的 d4 同构：d3 撑着全文最常引的那组数（648 格 / 398 / 52 / 198、
+      # devel_cxx_ok），而 collect_d3 默认就从 artifacts/caps-*.txt 读、不需要 docker。
+      # 不做这一步，改 caps-*.txt 里任意一格（审稿实测 compile_cxx=N→Y）全链都不会响。
+      - name: Re-derive d3 from the committed probe outputs and fail on drift
+        run: |
+          cp raw/d3_capabilities.json /tmp/d3.before
+          python3 scripts/collect_d3_capabilities.py
+          python3 - <<'EOF'
+          import json, sys
+          a = json.load(open("/tmp/d3.before")); b = json.load(open("raw/d3_capabilities.json"))
+          for d in (a, b):
+              d.pop("collected_at", None); d.pop("source_dir", None)
+              for v in d.get("probes", {}).values():
+                  v.pop("_probe_mtime", None); v.pop("_image_created", None)
+          if a != b:
+              print("::error::raw/d3_capabilities.json 与 artifacts/caps-*.txt 不一致 —— "
+                    "探针输出被改过，或 d3 未随探针重采")
+              sys.exit(1)
+          print("d3 与探针输出一致")
+          EOF
+          git checkout -- raw/d3_capabilities.json
+
       - name: Machine-check every claim in report.md / README.md
         run: python3 scripts/verify.py
 
