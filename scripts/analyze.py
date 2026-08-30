@@ -246,6 +246,14 @@ for r in d2["ours"]:
                  len((r.get("masked_units") or "").split()),
                  len((r.get("setuid_bins") or "").split())])
 csv("t12_hardening_surface.csv", ["distro", "tier", "masked_units", "setuid_bins"], rows)
+# 信任面：每个镜像装了哪些 keyring。麒麟两版走在线源、需要它自己那把；
+# UOS 走切片、不该出现麒麟的 key。
+S["keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
+                          sorted((r.get("keyrings") or "").split())
+                          for r in d2["ours"]}
+S["alien_keyring_images"] = sorted(
+    k for k, v in S["keyrings_by_image"].items()
+    if k.startswith("uos25") and any("kylin" in x for x in v))
 S["masked_units_by_distro"] = {r["distro_id"]: len((r.get("masked_units") or "").split())
                                for r in d2["ours"] if r["tier"] == "base"}
 S["setuid_micro"] = {r["distro_id"]: len((r.get("setuid_bins") or "").split())

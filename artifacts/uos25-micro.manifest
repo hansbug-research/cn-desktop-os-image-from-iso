@@ -1,11 +1,11 @@
 # 产物清单 uos-desktop-v25:micro
-# 生成时间(UTC): 2026-08-30T08:42:45Z
+# 生成时间(UTC): 2026-08-30T09:48:08Z
 # 构建方法: slice
 # 源: n/a n/a n/a
-# tarball sha256: e9adeca1e123fee52d23fb78c32fc67714f1f84371023dc4ffaaedbe08b62a42
+# tarball sha256: 3f6180bee5387ab4ca7789b079c3e454e818397d9b0a6da229f34641dc2143a5
 # tarball bytes: 98099200
 # SOURCE_DATE_EPOCH: 1775779200
-# 镜像 ID: b8cfaeeaa755
+# 镜像 ID: 95364c549c1a
 # 预期基线: glibc=2.38 libstdc++=6.0.30 GLIBCXX=3.4.30
 #
 base-files	23.1-5deepin7

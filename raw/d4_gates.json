@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T08:46:45Z",
+  "collected_at": "2026-08-30T09:54:06Z",
   "gates": {
     "verify": {
       "passed": 365,
@@ -12,7 +12,7 @@
     "digest_chain": {
       "passed": 9,
       "failed": 0,
-      "log_tail": "  ✅ uos25-devel  manifest=tar=镜像  (164b08afb77e… → 164b08afb77eb409d0e3593316904fa41d9\n══ 摘要链: 通过 9 / 失败 0\n✅ 九个镜像的 manifest / tar / 镜像三者一致"
+      "log_tail": "  ✅ uos25-devel  manifest=tar=镜像  (01fd60272a8f… → 01fd60272a8fbcb6153f47b823453131f76\n══ 摘要链: 通过 9 / 失败 0\n✅ 九个镜像的 manifest / tar / 镜像三者一致"
     },
     "sbom": {
       "rows": [
@@ -103,7 +103,7 @@
     "repro": {
       "identical": 6,
       "mismatched": 0,
-      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T08:42:46Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=52aa05ed00484ad70181ad88503b05a83119bb7dfe6f89ce2270224ac3b3140d\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=e9adeca1e123fee52d23fb78c32fc67714f1f84371023dc4ffaaedbe08b62a42\nuos25-base       一致  sha256=077ee76751ec2cef7a7e1ffa70d9150c93da34a5598d01e210ed83afcd5eb661\nuos25-devel      一致  sha256=ba6a7d121e0b372e92bbf90003962479522c52a760b010edce2f409f8f8dd15d\n"
+      "evidence": "# 可复现性实测凭据\n# 生成时间: 2026-08-30T09:51:10Z\n# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256\n# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，\n#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。\n\nkylin11-micro    一致  sha256=52aa05ed00484ad70181ad88503b05a83119bb7dfe6f89ce2270224ac3b3140d\nkylin11-base     一致  sha256=543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac\nkylin11-devel    一致  sha256=ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161\nuos25-micro      一致  sha256=3f6180bee5387ab4ca7789b079c3e454e818397d9b0a6da229f34641dc2143a5\nuos25-base       一致  sha256=749075bcf19e8f8c202f0a639fbd3b690dc237d0fe30459cf885d3c0f1fc02dc\nuos25-devel      一致  sha256=01fd60272a8fbcb6153f47b823453131f76805228dcbcf728c004828b217b4c8\n"
     }
   },
   "manifests": {
@@ -144,19 +144,19 @@
       "package_lines": 71
     },
     "uos25-base": {
-      "tarball_sha256": "077ee76751ec2cef7a7e1ffa70d9150c93da34a5598d01e210ed83afcd5eb661",
+      "tarball_sha256": "749075bcf19e8f8c202f0a639fbd3b690dc237d0fe30459cf885d3c0f1fc02dc",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
       "package_lines": 164
     },
     "uos25-devel": {
-      "tarball_sha256": "ba6a7d121e0b372e92bbf90003962479522c52a760b010edce2f409f8f8dd15d",
+      "tarball_sha256": "01fd60272a8fbcb6153f47b823453131f76805228dcbcf728c004828b217b4c8",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
       "package_lines": 208
     },
     "uos25-micro": {
-      "tarball_sha256": "e9adeca1e123fee52d23fb78c32fc67714f1f84371023dc4ffaaedbe08b62a42",
+      "tarball_sha256": "3f6180bee5387ab4ca7789b079c3e454e818397d9b0a6da229f34641dc2143a5",
       "source_date_epoch": "1775779200",
       "inrelease_sha256": null,
       "package_lines": 67

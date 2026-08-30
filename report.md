@@ -171,7 +171,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 ### 6.3 一个必须讲清的区别：麒麟的"没预装"与 UOS 的"硬缺口"
 
-矩阵里 `cmake`、`autoconf/automake`、`git`、`gdb`、`python3-dev`、`dig`、`strace` 这些项标着不支持，但性质完全不同（`gdb` 在 base 档标的是不适用，见 §3 的档位定位）。我们逐个测了这 14 个工具在各自软件源里的可装性：
+矩阵里 `cmake`、`autoconf/automake`、`git`、`python3-dev`、`gdb`、`dig`、`strace` 这七项在 devel 档标着不支持，但性质完全不同。先说清它们在 base 档的判定：`cmake`、`autoconf/automake`、`git`、`python3-dev`、`gdb` 五项在 base 档按 §3 的档位定位判为**不适用**（它们属工具链或依赖工具链生态），只有 `dig` 与 `strace` 在 base 档**如实记为缺口**——§3 给 base 的定位含「线上排查」，这两个是纯排查工具，不装就是缺口。我们逐个测了这 14 个工具在各自软件源里的可装性：
 
 | | 麒麟 V11 | 麒麟 V10 | UOS V25 |
 |---|---|---|---|
@@ -221,7 +221,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 `selfhost` 路径（麒麟 V10）**不逐位可复现**：它用 `docker export | docker import` 产出镜像，容器层的时间戳与 layer id 每次不同。包集与版本仍然可复现，凭据在九份 manifest 里（`manifests=9`）。九份都记了每个包的精确版本、tarball 的 sha256 与字节数；另外两项按路径而定，不是九份都有：`SOURCE_DATE_EPOCH` 只有 mmdebstrap 与 slice 两条路径有（selfhost 不归一时间戳，那三份记的是 `n/a`），`InRelease` sha256 只有走在线源的两条路径有（slice 路径不从在线源拉包，没有这一项）。
 
-换一台 Linux 机器复现的完整路径写在 [`README.md`](README.md#复现) 里。前提是能访问三个发行版的官方软件源，以及持有 UOS 的 ISO（切片路径需要 squashfs，仓库不含 ISO 与镜像）。
+换一台 Linux 机器复现的完整路径写在 [`README.md`](README.md#5-复现) 里。前提是能访问三个发行版的官方软件源，以及持有 UOS 的 ISO（切片路径需要 squashfs，仓库不含 ISO 与镜像）。
 
 ## 9. 局限与过程记录
 

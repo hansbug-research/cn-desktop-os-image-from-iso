@@ -1,7 +1,7 @@
 capability,kylin11:micro,kylin11:base,kylin11:devel,kylin10:micro,kylin10:base,kylin10:devel,uos25:micro,uos25:base,uos25:devel
 apt,N,Y,Y,N,Y,Y,N,Y,Y
 apt_check,n/a,Y,Y,n/a,Y,Y,n/a,Y,Y
-apt_keyring,Y,Y,Y,Y,Y,Y,Y,Y,Y
+apt_keyring,Y,Y,Y,Y,Y,Y,N,Y,Y
 apt_roundtrip,n/a,Y,Y,n/a,Y,Y,n/a,N,N
 apt_update,n/a,Y,Y,n/a,Y,Y,n/a,Y,Y
 arch,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64

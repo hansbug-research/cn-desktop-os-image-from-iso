@@ -86,8 +86,8 @@ DEFECTS = [
       symptom="base/devel 档启动 systemd 会去拉 display-manager，且零个 masked 单元",
       root_cause="被试是桌面版 ISO，默认目标与真机一致",
       impact="server 用途下会拉起跑不了的单元并刷错误",
-      fix="default.target 改指 multi-user.target，并 mask 掉容器内确证不可用的 7 个单元",
-      where="lib/common.sh", check="default.target 指向 multi-user.target 且 masked 单元 ≥5"),
+      fix="default.target 改指 multi-user.target，并按候选表 mask 掉容器内确证不可用的单元；数量随发行版与档位而变（V11/UOS 的 base/devel 各 7、micro 为 0；V10 三档均 11），见 t12",
+      where="lib/common.sh", check="default.target 指向 multi-user.target；base/devel 档 masked ≥5，micro 档按镜像内有无该单元文件而定"),
 ]
 
 def main():

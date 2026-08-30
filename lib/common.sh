@@ -81,8 +81,14 @@ EOF
   fi
 
   [ -n "$SRCLIST" ] && printf '%s\n' "$SRCLIST" > "$R/etc/apt/sources.list"
-  mkdir -p "$R/usr/share/keyrings"
-  [ -f "$KEYRING" ] && cp "$KEYRING" "$R/usr/share/keyrings/" 2>/dev/null
+  # keyring 只拷给**真的要用它验签**的路径。早先这里是无条件拷贝，于是走切片路径、
+  # 根本不从在线源拉包的 UOS 也被塞进一把麒麟的 key —— 它的 micro 档里那把还是
+  # 目录下唯一的文件。这与「UOS 的信任根是 ISO 本身」以及「多一把没用的 key 就是
+  # 多一份可被滥用的授权」直接冲突。判据用 $SRCLIST：只有写了在线源的路径才需要它。
+  if [ -n "$SRCLIST" ] && [ -f "$KEYRING" ]; then
+    mkdir -p "$R/usr/share/keyrings"
+    cp "$KEYRING" "$R/usr/share/keyrings/" 2>/dev/null || true
+  fi
 
   # 麒麟的一类打包 bug：multiarch 目录里布局正确，同时又在 /usr/lib 塞了冗余真文件，
   # 文件名恰好等于 SONAME 且不是符号链接 -> ldconfig 每次都报 "is not a symbolic link"。

@@ -54,6 +54,11 @@ def facts(img):
         "masked_units": sh("find /etc/systemd/system -maxdepth 1 -lname /dev/null "
                            "-printf '%f\\n' 2>/dev/null | sort | tr '\\n' ' '"),
         "setuid_bins": sh("find / -xdev -perm -4000 -type f 2>/dev/null | sort | tr '\\n' ' '"),
+        # 镜像里到底装了哪些 GPG keyring —— 信任面必须可审计。早先 adapt_container
+        # 无条件把麒麟的 keyring 拷进每个 rootfs，连走切片路径的 UOS 也被塞了一把，
+        # 而落盘证据里查不到这件事，门禁也只看仓库的 keys/ 不看镜像。
+        "keyrings": sh("ls /usr/share/keyrings/*.gpg 2>/dev/null | xargs -r -n1 basename "
+                       "| sort | tr '\\n' ' '"),
     }
 
 def main():

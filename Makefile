@@ -5,7 +5,7 @@ DISTROS := $(patsubst distros/%.conf,%,$(wildcard distros/*.conf))
 TIERS   := micro base devel
 DEXEC   := docker exec -e http_proxy= -e https_proxy= $(BUILDER) bash -c
 
-.PHONY: digest-chain cve repro help all builder builder-image localrepo kylin11 kylin10 uos25 import manifest verify sbom mutation clean-tags distclean
+.PHONY: builder-alive digest-chain cve repro help all builder builder-image localrepo kylin11 kylin10 uos25 import manifest verify sbom mutation clean-tags distclean
 # 这台机器有过资源耗尽历史；并行构建会抢同一个 builder 容器与 out/ 目录
 .NOTPARALLEL:
 
@@ -44,12 +44,19 @@ localrepo: builder
 	@$(DEXEC) 'umask 022; ROOT=/w /w/tools/mk-localrepo.sh kylin11'
 	@$(DEXEC) 'umask 022; ROOT=/w /w/tools/mk-localrepo.sh kylin10'
 
-kylin11: builder
+# builder 存活检查：容器被停掉时 docker exec 会报 "container ... is not running"，
+# 而调用方拿到的只是一个非零退出码，很容易被当成「这轮跳过了」而不是「这轮没建成」。
+# 实际踩过两次：uos25 两轮「重建」其实一次都没跑，产物还是旧的，而 manifest 已经更新。
+builder-alive:
+	@docker exec $(BUILDER) true 2>/dev/null || { \
+	  echo "!! builder 容器 $(BUILDER) 不在运行 —— 先 docker start $(BUILDER)"; exit 1; }
+
+kylin11: builder builder-alive
 	@$(DEXEC) 'umask 022; ROOT=/w /w/build/build.sh kylin11 $(TIERS)'
 uos25-src: builder
 	@$(DEXEC) 'umask 022; ROOT=/w /w/tools/prepare-slice-src.sh uos25'
 
-uos25: builder uos25-src
+uos25: builder builder-alive uos25-src
 	@$(DEXEC) 'umask 022; ROOT=/w /w/build/build.sh uos25 $(TIERS)'
 kylin10: builder
 	@ROOT_HOST=$(ROOT) ./build/build-selfhost.sh $(TIERS)

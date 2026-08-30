@@ -1,11 +1,11 @@
 # 产物清单 uos-desktop-v25:base
-# 生成时间(UTC): 2026-08-30T08:42:45Z
+# 生成时间(UTC): 2026-08-30T09:48:09Z
 # 构建方法: slice
 # 源: n/a n/a n/a
-# tarball sha256: 077ee76751ec2cef7a7e1ffa70d9150c93da34a5598d01e210ed83afcd5eb661
+# tarball sha256: 749075bcf19e8f8c202f0a639fbd3b690dc237d0fe30459cf885d3c0f1fc02dc
 # tarball bytes: 191252480
 # SOURCE_DATE_EPOCH: 1775779200
-# 镜像 ID: 69a7f995ca4e
+# 镜像 ID: a0dc5fde3853
 # 预期基线: glibc=2.38 libstdc++=6.0.30 GLIBCXX=3.4.30
 #
 adduser	3.138

@@ -217,6 +217,15 @@ if _fps:
     _spaced = " ".join(_fps[0][i:i+8] for i in range(0, 40, 8))
     ok(_spaced in REPORT, f"§3.1 记录的指纹应与 keyring 实际指纹逐字符相符（{_spaced}）")
 
+# 镜像层的信任面：UOS 走切片路径、信任根是 ISO，不该出现麒麟的 keyring。
+# 仓库层的 keys/ 断言看不到这件事 —— 门禁自己又需要一层门禁。
+ok(S["alien_keyring_images"] == [],
+   f"这些 UOS 镜像里出现了麒麟的 keyring：{S['alien_keyring_images']}")
+for k, v in S["keyrings_by_image"].items():
+    if k.startswith("kylin"):
+        ok(v == ["kylin-archive-keyring.gpg"],
+           f"{k} 的 keyring 应只有 kylin-archive-keyring.gpg，实际 {v}")
+
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
 # —— 它以为自己在防「图表没人引用」，实际什么也没防（实测 fig06 与 5 张表只在索引里）。
@@ -256,7 +265,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "158"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "165"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

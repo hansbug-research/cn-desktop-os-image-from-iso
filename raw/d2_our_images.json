@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T08:46:22Z",
+  "collected_at": "2026-08-30T09:47:09Z",
   "ours": [
     {
       "distro_id": "kylin11",
@@ -17,6 +17,7 @@
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
       "masked_units": "",
       "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 88419840,
       "tar_sha256": "52aa05ed00484ad70181ad88503b05a83119bb7dfe6f89ce2270224ac3b3140d",
       "tar_source": "本地 tar 实测"
@@ -37,6 +38,7 @@
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 248491520,
       "tar_sha256": "543bb715cfbdfbaf850506497fae3022db209df8a19f247eed554f4b078176ac",
       "tar_source": "本地 tar 实测"
@@ -57,6 +59,7 @@
       "labels": "{\"cn.internal.build-method\":\"mmdebstrap\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.32\",\"cn.internal.suite\":\"11.0\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V11\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 497548800,
       "tar_sha256": "ffc161134d7ae6d0acf9a7682f07080adc96ea5af3aaf043476772b805538161",
       "tar_source": "本地 tar 实测"
@@ -77,6 +80,7 @@
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 213007872,
       "tar_sha256": "67c07aa878d097e0dd33c482f4d846d2dfd4793e8f3cd80a0d03deffeea5acbb",
       "tar_source": "本地 tar 实测"
@@ -97,6 +101,7 @@
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 270419968,
       "tar_sha256": "6b5da0085540aeaa3e2b9514e53108934006ebc4b98a7ef0e0fa7b5748632562",
       "tar_source": "本地 tar 实测"
@@ -117,6 +122,7 @@
       "labels": "{\"cn.internal.build-method\":\"selfhost\",\"cn.internal.expect-glibc\":\"2.31\",\"cn.internal.expect-libstdcpp\":\"6.0.28\",\"cn.internal.suite\":\"10.1\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"银河麒麟桌面 V10 SP1\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service systemd-udev-trigger.service systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service",
       "setuid_bins": "/bin/mount /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/newgrp /usr/bin/passwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/sbin/kysec-wlinit",
+      "keyrings": "kylin-archive-keyring.gpg",
       "tar_bytes": 502579712,
       "tar_sha256": "71fe8f64c435748be2b52de36759efc1d96d8c0213ec8416f1c98b5aa82809e9",
       "tar_source": "本地 tar 实测"
@@ -125,7 +131,7 @@
       "distro_id": "uos25",
       "tier": "micro",
       "image": "uos-desktop-v25:micro",
-      "content_bytes": "37336731",
+      "content_bytes": "37335180",
       "unpacked_human": "142MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
@@ -137,15 +143,16 @@
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"micro\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
       "masked_units": "",
       "setuid_bins": "/usr/bin/newgrp /usr/bin/su",
+      "keyrings": "",
       "tar_bytes": 98099200,
-      "tar_sha256": "e9adeca1e123fee52d23fb78c32fc67714f1f84371023dc4ffaaedbe08b62a42",
+      "tar_sha256": "3f6180bee5387ab4ca7789b079c3e454e818397d9b0a6da229f34641dc2143a5",
       "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "base",
       "image": "uos-desktop-v25:base",
-      "content_bytes": "75757294",
+      "content_bytes": "75756105",
       "unpacked_human": "281MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
@@ -157,15 +164,16 @@
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"base\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "keyrings": "deepin-app-store-home.gpg deepin-archive-camel-keyring.gpg deepin-archive-crimson-keyring.gpg deepin-archive-uranus-keyring.gpg deepin-pools-keyring.gpg uos-archive-snipe-keyring.gpg",
       "tar_bytes": 191252480,
-      "tar_sha256": "077ee76751ec2cef7a7e1ffa70d9150c93da34a5598d01e210ed83afcd5eb661",
+      "tar_sha256": "749075bcf19e8f8c202f0a639fbd3b690dc237d0fe30459cf885d3c0f1fc02dc",
       "tar_source": "本地 tar 实测"
     },
     {
       "distro_id": "uos25",
       "tier": "devel",
       "image": "uos-desktop-v25:devel",
-      "content_bytes": "165047504",
+      "content_bytes": "165046700",
       "unpacked_human": "638MB",
       "os_release": "PRETTY_NAME=\"UOS Desktop 25 Professional\"\nNAME=\"Uos\"\nVERSION_ID=\"25\"\nVERSION=\"25\"\nID=uos\nHOME_URL=\"https://www.chinauos.com/\"\nBUG_REPORT_URL=\"http://bbs.chinauos.com\"\nVERSION_CODENAME=snipe",
       "pkg_format": "dpkg",
@@ -177,8 +185,9 @@
       "labels": "{\"cn.internal.build-method\":\"slice\",\"cn.internal.expect-glibc\":\"2.38\",\"cn.internal.expect-libstdcpp\":\"6.0.30\",\"cn.internal.suite\":\"n/a\",\"cn.internal.tier\":\"devel\",\"org.opencontainers.image.title\":\"统信 UOS 桌面专业版 V25\"}",
       "masked_units": "proc-sys-fs-binfmt_misc.mount sys-fs-fuse-connections.mount sys-kernel-config.mount sys-kernel-debug.mount sys-kernel-tracing.mount systemd-journald-audit.socket systemd-modules-load.service",
       "setuid_bins": "/usr/bin/chfn /usr/bin/chsh /usr/bin/gpasswd /usr/bin/mount /usr/bin/newgrp /usr/bin/passwd /usr/bin/su /usr/bin/umount /usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+      "keyrings": "deepin-app-store-home.gpg deepin-archive-camel-keyring.gpg deepin-archive-crimson-keyring.gpg deepin-archive-uranus-keyring.gpg deepin-pools-keyring.gpg uos-archive-snipe-keyring.gpg",
       "tar_bytes": 448460800,
-      "tar_sha256": "ba6a7d121e0b372e92bbf90003962479522c52a760b010edce2f409f8f8dd15d",
+      "tar_sha256": "01fd60272a8fbcb6153f47b823453131f76805228dcbcf728c004828b217b4c8",
       "tar_source": "本地 tar 实测"
     }
   ],
@@ -196,6 +205,7 @@
     "stopsignal": "",
     "labels": "{\"cn.kylinos.kylin-server-minimal.base_image\":\"\",\"cn.kylinos.kylin-server-minimal.build_id\":\"20260602\"}",
     "masked_units": "",
-    "setuid_bins": ""
+    "setuid_bins": "",
+    "keyrings": ""
   }
 }
