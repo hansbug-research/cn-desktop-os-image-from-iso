@@ -41,6 +41,21 @@ python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.
 - **三态判据只有一份。** 能力矩阵的「支持／不支持／不适用」判据写死在 `analyze.py` 的 `NA_POLICY`，矩阵表与热力图都从它派生。两处各写一份必然漂移。
 - **「不适用」不得用来掩盖缺口。** 只有在档位定位（`report.md` §3）下确实不存在该需求时才能标不适用。
 - **能力一律实测，不按包列表推断。** 装了 gcc 不等于能编出可跑的二进制——麒麟 V11 的 gcc 就会往 stderr 吐错误。
+- **改了构建代码就必须重建再重采，这是一条硬序。** 同一个错误在本项目犯过三次：收窄
+  keyring 后没重建（九份 manifest 与 repro 凭据全锚在已不存在的配置上）、自举路径的
+  stage 缓存指纹漏算 keyring（kylin10 复用旧 stage 仍带已删除的文件）、清空 micro 档
+  sources.list 后先跑了 repro（第一次取旧代码产物、第二次用新代码，报成「哈希漂移」）。
+  正确顺序：改代码 → 重建受影响的档 → 重采 d2/d3（+d6/d7 若镜像变了）→ 重跑门禁与
+  repro → 同步 artifacts/。跳过任何一步，两条证据链就会锚在不同构建上而各自都是绿的。
+- **每一份以镜像为被试的 raw 都要带产物锚点。** d6/d7 曾经只记镜像 tag，镜像一重建
+  它们就悄悄锚在旧产物上，而任何门禁都发现不了。现在每条记录带 anchor_tar_sha256，
+  由 verify 与 d2 交叉对账。
+- **凡是能在 CI 里从已提交输入反向重算的 raw，都必须在 CI 里重算。** 目前 d3（从
+  artifacts/caps-*.txt）与 d4（从 artifacts/f4-*.log）各有一步。不做这一步，那份
+  一手凭据就可以被静默篡改。
+- **改厂商自带的东西要先查属主。** `dpkg -S` 查得到属主的属发行版内容，动它就越过了
+  「等价环境」的底线；查不到的才是我们注入的。麒麟 V10 的 micro 档带的那把 keyring
+  就属 kylin-keyring 包，不能跟注入品一起一刀切。
 - **repro 凭据必须与交付物对账。** `artifacts/repro-evidence.txt` 里的 sha256 要逐条等于对应 manifest 的 `tarball sha256`，`verify.py` 有交叉断言。曾经两条链锚在不同构建上（凭据来自更早一轮双构建，中间重构过产物），六份里五份对不上，而两条链各自都是绿的。
 - **改了镜像就要重跑 repro 并同步 `artifacts/`。** 否则上一条会当场报警——那正是它存在的意义。
 - **判据要选对：可装性用 `apt-cache madison`，不能用 `policy` 的 Candidate。** 后者对已安装但源里没有的包也报候选版本，会把「已经装了」误计成「装得上」。
