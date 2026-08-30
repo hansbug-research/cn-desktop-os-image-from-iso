@@ -104,29 +104,32 @@
     "AOSC OS（安同 OS）",
     "Anolis OS（龙蜥）",
     "Bianbu OS",
+    "FydeOS",
     "Loongnix（龙芯）",
     "OpenCloudOS",
     "RevyOS",
     "Ubuntu Kylin（优麒麟）",
     "deepin（深度）",
     "openEuler",
-    "统信桌面操作系统 V25（UOS）"
-  ],
-  "iso_gated": [
-    "EulerOS（华为）",
+    "openKylin（开放麒麟）",
+    "中标麒麟桌面操作系统（NeoKylin）",
     "凝思安全操作系统",
-    "新支点桌面操作系统（NewStart NSDL）",
-    "方德桌面操作系统 V5.0",
+    "统信桌面操作系统 V25（UOS）",
     "麒麟信安操作系统（KylinSec）"
   ],
+  "iso_gated": [],
+  "iso_netdisk": [
+    "新支点桌面操作系统（NewStart NSDL）"
+  ],
+  "iso_not_found": [
+    "EulerOS（华为）",
+    "方德桌面操作系统 V5.0"
+  ],
   "iso_public_unresolved": [
-    "FydeOS",
-    "openKylin（开放麒麟）",
     "银河麒麟桌面操作系统"
   ],
   "iso_unverified": [
     "一铭桌面操作系统（EmindDesktop）",
-    "中标麒麟桌面操作系统（NeoKylin）",
     "普华桌面操作系统"
   ],
   "keyrings_by_image": {
@@ -219,8 +222,8 @@
   "probe_provenance_recorded": 9,
   "probe_stale_vs_image": [],
   "references_title_from_page": 99,
-  "references_title_manual": 18,
-  "references_total": 117,
+  "references_title_manual": 26,
+  "references_total": 125,
   "repro_identical": 6,
   "sbom_passed": 9,
   "setuid_micro": {

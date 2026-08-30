@@ -177,12 +177,18 @@ if d8:
     # 它既不是「我们 HEAD 到了字节」，也不是「厂商设了门槛」，归进任一类都是失真。
     # 分类是受控取值（见 config 的 s_iso_access），形态差异走 iso_access_qualifier。
     # 早先用自由文本当分类，一个条目被算进两类，合计 23 > 21，断言当场抓到。
-    _ISO_CLS = ("直接下载", "公开列出·直链未解引用", "需申请授权或登录", "未实测或未查到")
+    # 五类受控取值。「网盘分发」与「未查到公开下载」是复核后新增的两类：
+    # 前者既不是 HTTP 直链也不是设了门槛（提取码就明文印在页面上），
+    # 后者与「需授权」的区别在于我们并未看到任何门槛、是根本找不到条目 —— 归并会失真。
+    _ISO_CLS = ("直接下载", "公开列出·直链未解引用", "网盘分发",
+                "需申请授权或登录", "未查到公开下载", "未实测或未查到")
     _by = {k: sorted(e["name"] for e in d8["entries"]
                      if e.get("s_iso_access") == k) for k in _ISO_CLS}
     S["iso_direct"] = _by["直接下载"]
     S["iso_public_unresolved"] = _by["公开列出·直链未解引用"]
+    S["iso_netdisk"] = _by["网盘分发"]
     S["iso_gated"] = _by["需申请授权或登录"]
+    S["iso_not_found"] = _by["未查到公开下载"]
     S["iso_unverified"] = _by["未实测或未查到"]
     S["iso_class_unknown"] = sorted(e["name"] for e in d8["entries"]
                                     if e.get("s_iso_access") not in _ISO_CLS)

@@ -1054,6 +1054,78 @@
    "title_source": "manual",
    "accessed": "2026-08-31",
    "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
+  },
+  {
+   "id": "R118",
+   "publisher": "www.linx-info.com",
+   "title": "凝思 download 目录（Apache autoindex，匿名可列，22 个 ISO 匿名可下）",
+   "url": "https://www.linx-info.com/download/",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R119",
+   "publisher": "mirrorlists.kylinsec.com.cn",
+   "title": "麒麟信安 ISO 镜像列表（匿名 autoindex，9 个版本目录）",
+   "url": "https://mirrorlists.kylinsec.com.cn/iso/",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R120",
+   "publisher": "releases.openkylin.top",
+   "title": "openKylin ISO 规范发布源（ISO 在 openkylin-cdimage/ 而非 apt 仓库 openkylin/）",
+   "url": "https://releases.openkylin.top/3.0/openKylin-Desktop-V3.0-20260827-x86_64.iso",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R121",
+   "publisher": "download.cs2c.com.cn",
+   "title": "中标麒麟 download 开放 autoindex（桌面 6.0 的 x86_64/i386 ISO 匿名可下）",
+   "url": "https://download.cs2c.com.cn/neokylin/desktop/releases/6.0/x86_64/iso/",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R122",
+   "publisher": "download.fydeos.io",
+   "title": "FydeOS 个人版镜像分发（raw disk image，不发 .iso）",
+   "url": "https://download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R123",
+   "publisher": "nsosmirrors.gd-linux.com",
+   "title": "新支点镜像站 CGSL 服务器版 ISO（目录索引 401 但文件 URL 200）",
+   "url": "https://nsosmirrors.gd-linux.com/CGSLV7/7.02.06B7/x86_64/NewStart-CGSL-7.02.06B7-x86_64-dvd.iso",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R124",
+   "publisher": "updates.os.nfschina.com",
+   "title": "方德更新服务器（递归爬完无桌面 ISO；服务器版 ISO 匿名可下）",
+   "url": "https://updates.os.nfschina.com/NFSChina-Server/V4.0-AN/isos/x86_64/NFSCNS-4-0-230108-AN-x86_64-DVD.iso",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+  },
+  {
+   "id": "R125",
+   "publisher": "www.nfschina.com",
+   "title": "方德「镜像下载」栏目（主内容区为空，download_div 计数 0）",
+   "url": "https://www.nfschina.com/index.php?catid=68",
+   "title_source": "manual",
+   "accessed": "2026-08-31",
+   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
   }
  ]
 }

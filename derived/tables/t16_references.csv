@@ -116,3 +116,11 @@ R114,docs.revyos.dev,RevyOS,https://docs.revyos.dev/docs/intro/,page,2026-08-31,
 R115,ruyisdk.org,RuyiSDK · 为 100 万 RISC-V 软件开发人员做好准备 | RuyiSDK,https://ruyisdk.org/,page,2026-08-31,
 R116,repo.huaweicloud.com,"华为镜像站 EulerOS 目录（各版本只有 os/{x86_64,aarch64} 的 RPM 仓库，iso/ 与 ISO/ 实测 404）",https://repo.huaweicloud.com/euler/,manual,2026-08-31,标题为人工标注（该 URL 为目录页/API 端点，无 <title>）
 R117,support.huawei.com,华为企业支持 软件下载端点（对任意 nid 返回 Uniportal 统一认证跳转头）,https://support.huawei.com/dl/download.do?nid=1,manual,2026-08-31,标题为人工标注（该 URL 为目录页/API 端点，无 <title>）
+R118,www.linx-info.com,凝思 download 目录（Apache autoindex，匿名可列，22 个 ISO 匿名可下）,https://www.linx-info.com/download/,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R119,mirrorlists.kylinsec.com.cn,麒麟信安 ISO 镜像列表（匿名 autoindex，9 个版本目录）,https://mirrorlists.kylinsec.com.cn/iso/,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R120,releases.openkylin.top,openKylin ISO 规范发布源（ISO 在 openkylin-cdimage/ 而非 apt 仓库 openkylin/）,https://releases.openkylin.top/3.0/openKylin-Desktop-V3.0-20260827-x86_64.iso,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R121,download.cs2c.com.cn,中标麒麟 download 开放 autoindex（桌面 6.0 的 x86_64/i386 ISO 匿名可下）,https://download.cs2c.com.cn/neokylin/desktop/releases/6.0/x86_64/iso/,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R122,download.fydeos.io,FydeOS 个人版镜像分发（raw disk image，不发 .iso）,https://download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R123,nsosmirrors.gd-linux.com,新支点镜像站 CGSL 服务器版 ISO（目录索引 401 但文件 URL 200）,https://nsosmirrors.gd-linux.com/CGSLV7/7.02.06B7/x86_64/NewStart-CGSL-7.02.06B7-x86_64-dvd.iso,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R124,updates.os.nfschina.com,方德更新服务器（递归爬完无桌面 ISO；服务器版 ISO 匿名可下）,https://updates.os.nfschina.com/NFSChina-Server/V4.0-AN/isos/x86_64/NFSCNS-4-0-230108-AN-x86_64-DVD.iso,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R125,www.nfschina.com,方德「镜像下载」栏目（主内容区为空，download_div 计数 0）,https://www.nfschina.com/index.php?catid=68,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
