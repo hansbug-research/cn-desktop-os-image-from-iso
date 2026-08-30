@@ -430,9 +430,6 @@ in_text("uos-server-base", label="统信基础镜像项目名")
 ok("--noproxy" in REPORT, "代理陷阱那条方法学提醒必须在正文里（决定复现者会不会得出反结论）")
 in_text("000", label="代理下的假不可达", ctx=r"经代理访问时\*\*都返回 000\*\*")
 # 名录里「官方未声明血统」的家数是正文的一个论断，从名录现算而不是手写
-_unstated = sum(1 for e in json.loads((ROOT / "config" / "os_census.json").read_text())["entries"]
-                if "未" in e["lineage"][:12])
-in_text(_unstated, label="血统未声明的家数", ctx=rf"\*\*：{_unstated} 家的血统是「官方未声明」")
 # 剔除项与小型社区两个清单的条数也绑，避免悄悄增删
 _cen = json.loads((ROOT / "config" / "os_census.json").read_text())
 in_text(len(_cen["scope"]["exclusions"]), label="剔除项条数",
@@ -617,16 +614,25 @@ ok(_ddup == [], f"脚注定义不许重复（重复：{_ddup}）")
 # 逐名核对必须限定在**那一句话之内** —— 只查「名字出现在正文任意位置」是永真的
 # （FydeOS、deepin 这些在别处大量出现），上一轮那个 bug 其实是靠写死的黑名单抓到的，
 # 而黑名单只防已经犯过的那一次。
+def _shortname(n):
+    """把名录里的全名压成正文实际用的简称。
+    先前只剥「桌面操作系统」这类后缀，剥不掉版本号尾巴 ——
+    `统信桌面操作系统 V25（UOS）` → `统信 V25`、`方德桌面操作系统 V5.0` → `方德 V5.0`，
+    都不是正文用的写法，于是反向名单对在列的 3 家里有 2 家永不命中（实测）。"""
+    x = n.split("（")[0]
+    for suf in ("桌面操作系统", "安全操作系统", "操作系统"):
+        x = suf and x.replace(suf, "") or x
+    x = re.sub(r"\s*V?\d+(?:\.\d+)*(?:\s*SP\d+)?\s*$", "", x)
+    return x.strip() or n
+
+
 _ent8_names = json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
 _absent_sent = re.search(r"另有 \d+ 家明确不在（[^）]*）", REPORT)
 ok(_absent_sent is not None, "缺席名单那句话必须存在")
 _as = _absent_sent.group(0) if _absent_sent else ""
 for _n in S["aqkk_desktop_absent"]:
     # 名称在正文里会用简称（「麒麟信安操作系统」→「麒麟信安」），去掉这些后缀再比
-    _short = _n.split("（")[0]
-    for _suf in ("桌面操作系统", "安全操作系统", "操作系统"):
-        _short = _short.replace(_suf, "")
-    _short = _short.strip() or _n
+    _short = _shortname(_n)
     ok(_short in _as, f"安可缺席名单里的「{_short}」必须出现在缺席那句话里，实际句子：{_as[:70]}")
 # 反向：那句话里点到的名字都得真的在缺席集里（防止把在列的或无关的塞进去）
 _names = re.findall(r"[\u4e00-\u9fffA-Za-z][\u4e00-\u9fffA-Za-z0-9]{1,12}", _as)
@@ -637,11 +643,8 @@ _absent_short = {n.split("（")[0].replace("桌面操作系统", "").replace("�
 _all_os = {e["name"] for e in _ent8_names}
 _notabsent = set()
 for _n in _all_os - set(S["aqkk_desktop_absent"]):
-    _sh = _n.split("（")[0]
-    for _suf in ("桌面操作系统", "安全操作系统", "操作系统"):
-        _sh = _sh.replace(_suf, "")
-    _sh = _sh.strip()
-    if len(_sh) >= 3:
+    _sh = _shortname(_n)
+    if len(_sh) >= 2:
         _notabsent.add(_sh)
 _listed_but_absent = sorted(n for n in _notabsent if n in _as)
 ok(_listed_but_absent == [],
@@ -848,7 +851,18 @@ _deb = sum(1 for e in _ent if any(k in e.get("s_lineage", "")
 _m = re.search(r"名录里 \d+ 个 OS 里，有 (\d+) 个是 deb 系", REPORT)
 ok(_m is not None and int(_m.group(1)) == _deb,
    f"deb 系家数应为 {_deb}，实际写 {_m.group(1) if _m else '缺'}")
-_unst = sum(1 for e in _ent if "未" in e.get("s_lineage", "")[:16])
+# 口径必须是**读者在表里看到的那份**（s_lineage）；同时要求长文 lineage 同口径 ——
+# 先前门禁读 lineage、表里印 s_lineage，两者一个 6 一个 7，读者数出来的和断言守的不是一个数。
+# 判据用整串里是否出现「未声明/未查到/未书面确认/推断」这组限定词，
+# 不用「前 N 字」—— 那个截断让同口径的两个字段判成不同（银河麒麟的「未声明」
+# 在短版括号里、长版开头，前 16 字这个判据只抓到一边）。
+_UNST = ("未声明", "未查到", "未书面确认", "未给出", "推断")
+_unst_s = {e["name"] for e in _ent if any(k in e.get("s_lineage", "") for k in _UNST)}
+_unst_l = {e["name"] for e in _ent if any(k in e["lineage"] for k in _UNST)}
+ok(_unst_s == _unst_l,
+   f"血统「未声明」的判定在 s_lineage 与 lineage 两个字段上必须一致（差集：{_unst_s ^ _unst_l}）")
+_unst = len(_unst_s)
+in_text(_unst, label="血统未声明的家数", ctx=rf"：{_unst} 家的血统是「官方未声明」")
 _m = re.search(r"那一列显示 (\d+) 家的血统「官方未声明」", REPORT)
 ok(_m is not None and int(_m.group(1)) == _unst,
    f"血统未声明家数应为 {_unst}，实际写 {_m.group(1) if _m else '缺'}")
@@ -861,6 +875,48 @@ _m = re.search(r"DevStation 本身有 (\d+) 个版本", REPORT)
 ok(_m is not None, "DevStation 版本数那句必须存在")
 ok(int(_m.group(1)) == 6,
    f"DevStation 版本数应为 6（SP1/SP2/SP3/24.09/25.03/25.09），实际写 {_m.group(1)}")
+
+# ── README 目录结构树：❌1 能通过 437 条断言的唯一原因是这一段从没被看过 ────
+# 那次事故在正文留下字面量 `\1` 并吞掉了 `distros/` 整行描述。现在把树里出现的
+# 每个路径与真实文件系统对账，并禁止正则替换的残留物进入正文。
+_tree_start = README.index("## 6. 目录结构") if "## 6. 目录结构" in README else README.index("目录结构")
+_tree = README[_tree_start:]
+_tree = _tree[:_tree.index("\n## ")] if "\n## " in _tree else _tree
+# 树是缩进式的：顶层项无缩进，子项缩进两格并相对上一个顶层目录。
+# 先前不跟踪层级，把 `kylin11.conf` 当成仓库根下的路径，全部判成不存在。
+_paths = set(); _cur = ""
+for _l in _tree.split("\n"):
+    # 顶层目录行可能只有目录名、没有描述（如 `test/`），所以描述部分不能是必需的 ——
+    # 先前要求 `\s{2,}\S`，于是 `test/` 没被识别成父项，它底下的文件全对不上。
+    _m = re.match(r"^(\s*)([A-Za-z_][\w./*-]*)(?:\s{2,}\S|\s*$)", _l)
+    if not _m:
+        continue
+    _ind, _nm = len(_m.group(1)), _m.group(2)
+    if _ind == 0:
+        _cur = _nm if _nm.endswith("/") else ""
+        _paths.add(_nm)
+    elif _cur:
+        _paths.add(_cur + _nm)
+_missing = []
+for _pp in sorted(_paths):
+    if "*" in _pp:
+        import glob as _glob
+        if not _glob.glob(str(ROOT / _pp)):
+            _missing.append(_pp)
+    elif not (ROOT / _pp).exists():
+        _missing.append(_pp)
+ok(_missing == [], f"README 目录树里的路径必须都真实存在（不存在：{_missing}）")
+ok(len(_paths) >= 20, f"README 目录树应列出至少 20 个路径，实际 {len(_paths)} —— 太少说明整段被吞了")
+# 真实存在的顶层目录都该在树里出现（防止像 config/ 那样整个漏掉）
+_SKIP = {".git", "out", "logs", "archive", "__pycache__"}
+_topdirs = {d.name + "/" for d in ROOT.iterdir()
+            if d.is_dir() and not d.name.startswith(".") and d.name not in _SKIP}
+_untreed = sorted(d for d in _topdirs if d not in _tree)
+ok(_untreed == [], f"真实存在的顶层目录都必须在 README 目录树里（漏：{_untreed}）")
+# 正则替换的残留物一律不许进正文（`\1` `\2` `\g<1>` 这类）
+for _w, _lbl in ((REPORT, "report"), (README, "README")):
+    _junk = re.findall(r"(?<!`)\\[1-9](?!`)|\\g<\d>", _w)
+    ok(_junk == [], f"{_lbl} 里不许出现正则替换残留（发现：{_junk[:5]}）")
 
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
@@ -876,7 +932,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "437"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "443"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
