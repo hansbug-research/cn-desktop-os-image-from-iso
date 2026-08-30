@@ -1052,7 +1052,7 @@
         ]
       },
       "s_iso_access": "未查到公开下载",
-      "iso_access_note": "官方门户里没有 EulerOS 的 ISO 条目。判据是一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点（`EulerOS for Server`、`CloudBU EulerOS`、`Euler OS for Cloud BU`）的版本数组全为空（`tip` 为 `softwareEos` 与 `actualNoSoft`），排除了匿名 ACL 的可能。该体系的下载端点本身是登录墙（`/dl/download.do` 对任意 nid 返回 `x-login-url: https://uniportal.huawei.com/uniportal1/`），但 EulerOS 在其中无条目。镜像站 `repo.huaweicloud.com/euler/` 有 2.0～2.10 各版本的 RPM 仓库（`2.10/os/x86_64/` 为 200），`iso/` 与 `ISO/` 均 404。约 2022 年前曾可直接下载，承载直链的 OBS 桶现返回 `NoSuchBucket`。",
+      "iso_access_note": "官方门户里没有 EulerOS 的 ISO 条目。判据是一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点（`EulerOS for Server`、`CloudBU EulerOS`、`Euler OS for Cloud BU`）的版本数组全为空（`tip` 为 `softwareEos` 与 `actualNoSoft`），排除了匿名 ACL 的可能。该体系的下载端点本身是登录墙（`/dl/download.do` 对任意 nid 返回 `x-login-url: https://uniportal.huawei.com/uniportal1/`，三个 nid 含一个刻意乱填的 `EDOC1100xxxx`，采集记录见 `artifacts/euleros-loginwall.txt`），但 EulerOS 在其中无条目。镜像站 `repo.huaweicloud.com/euler/` 有 2.0～2.10 各版本的 RPM 仓库（`2.10/os/x86_64/` 为 200），`iso/` 与 `ISO/` 均 404。约 2022 年前曾可直接下载，承载直链的 OBS 桶现返回 `NoSuchBucket`。",
       "s_customers": "**无桌面客群**（服务器/云/存储）",
       "customers_note": "EulerOS 是华为基于 openEuler 的内部商用发行版，官网定位面向企业 IT 基础设施与云计算，应用场景三类全部是服务器侧（TaiShan 服务器、PaaS 容器平台、企业存储），官网自称属华为内部商用系统「并不对外承载开源义务」。未查到官方桌面版产品。⚠️ EulerOS 本身未见于任何一期安可公告；同门在服务器附表的是华为云欧拉 V2.0/V3。桌面附表中华为系只有 HarmonyOS V1.0（2026 年第 1 号，Ⅱ级），且因不满足财库〔2023〕34 号桌面分册第 1 条带星指标「同源兼容多 CPU 平台架构」未通过 2026 年度央采桌面框架协议初审。"
     }

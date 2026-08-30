@@ -13,6 +13,8 @@ PASS=0; FAIL=0
 mutcmd() { # $1=说明 $2=文件 $3=任意 shell 命令（sed 表达不出的变异用它，如「复制一段」）
   local name=$1 file=$2 cmd=$3
   cp "$file" "$file.mutbak"
+  # 中途被信号打断会同时留下 .mutbak 与被改坏的文件 —— trap 保证还原
+  trap '[ -f "$file.mutbak" ] && mv "$file.mutbak" "$file"' INT TERM
   eval "$cmd"
   if python3 scripts/verify.py >/dev/null 2>&1; then
     echo "  ❌ $name — verify 没抓到"; FAIL=$((FAIL+1))
@@ -20,6 +22,7 @@ mutcmd() { # $1=说明 $2=文件 $3=任意 shell 命令（sed 表达不出的变
     echo "  ✅ $name — verify 如期失败"; PASS=$((PASS+1))
   fi
   mv "$file.mutbak" "$file"
+  trap - INT TERM
 }
 
 mut() { # $1=说明 $2=文件 $3=sed 表达式
@@ -75,6 +78,13 @@ import pathlib, re
 p=pathlib.Path("report.md"); s=p.read_text()
 m=re.search(r"^\[\^R\d+\]:.*$", s, re.M)
 s=s[:m.start()]+m.group(0)+"\n"+s[m.start():]
+p.write_text(s)
+PY'
+mutcmd "正文：复制一行表格数据行（不带表头）" report.md 'python3 - <<PY
+import pathlib
+p=pathlib.Path("report.md"); s=p.read_text()
+rows=[l for l in s.split("\n") if l.startswith("| ") and len(l)>=80 and "---|" not in l]
+s=s.replace(rows[0], rows[0]+"\n"+rows[0], 1)
 p.write_text(s)
 PY'
 mutcmd "README：复制一个长段落" README.md 'python3 - <<PY

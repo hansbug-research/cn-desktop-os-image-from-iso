@@ -7,6 +7,7 @@
 ⚠️ 它只覆盖被写成断言的那些数字。未被覆盖的仍需人工核对，
 不要把「verify 全绿」等同于「每个数字都被机器核过」。
 """
+import csv as csv_mod
 import json, os, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -613,15 +614,29 @@ ok(_ddup == [], f"脚注定义不许重复（重复：{_ddup}）")
 
 # 安可缺席的 7 家：先前只断言在列 3 家的名字，缺席那 7 家的点名没人守，
 # 结果正文把 FydeOS 写成了优麒麟（两者都不在列，但名单是错的）。逐名核对。
+# 逐名核对必须限定在**那一句话之内** —— 只查「名字出现在正文任意位置」是永真的
+# （FydeOS、deepin 这些在别处大量出现），上一轮那个 bug 其实是靠写死的黑名单抓到的，
+# 而黑名单只防已经犯过的那一次。
+_absent_sent = re.search(r"另有 \d+ 家明确不在（[^）]*）", REPORT)
+ok(_absent_sent is not None, "缺席名单那句话必须存在")
+_as = _absent_sent.group(0) if _absent_sent else ""
 for _n in S["aqkk_desktop_absent"]:
-    _short = _n.split("（")[0].replace("桌面操作系统", "").replace("安全操作系统", "").strip() or _n
-    ok(_short in REPORT, f"安可缺席名单里的「{_short}」必须在正文点到")
-ok("优麒麟 从未在列" not in REPORT and "一铭、优麒麟从未在列" not in REPORT,
-   "缺席名单不许把优麒麟写进「从未在列」那一串 —— 它确实不在列，但那一串点的是另外几家")
+    # 名称在正文里会用简称（「麒麟信安操作系统」→「麒麟信安」），去掉这些后缀再比
+    _short = _n.split("（")[0]
+    for _suf in ("桌面操作系统", "安全操作系统", "操作系统"):
+        _short = _short.replace(_suf, "")
+    _short = _short.strip() or _n
+    ok(_short in _as, f"安可缺席名单里的「{_short}」必须出现在缺席那句话里，实际句子：{_as[:70]}")
+# 反向：那句话里点到的名字都得真的在缺席集里（防止把在列的或无关的塞进去）
+_names = re.findall(r"[\u4e00-\u9fffA-Za-z][\u4e00-\u9fffA-Za-z0-9]{1,12}", _as)
+_absent_short = {n.split("（")[0].replace("桌面操作系统", "").replace("安全操作系统", "").strip()
+                 for n in S["aqkk_desktop_absent"]}
+_listed_but_absent = [n for n in _names if n in {"优麒麟", "deepin", "openKylin", "openEuler",
+                                                 "Anolis", "OpenCloudOS", "Loongnix", "AOSC"}]
+ok(_listed_but_absent == [],
+   f"缺席那句话里不许出现这些名字（它们不在 aqkk_desktop_absent 集里）：{_listed_but_absent}")
 # 加包代价那四个数：两个起点都有锚点，说成一个是错的
-_t04 = (TAB / "t04_built_images.csv").read_text()
-ok("345MB" in _t04 and "281MB" in _t04,
-   "345 MB 与 281 MB 都应在 t04 的 unpacked_size 列里")
+
 in_text("只有两个起点有现存锚点", label="加包代价四个数的锚点计数")
 
 # sudo 的 61 / 189 / 639 三个数：正文引它们，就必须由矩阵现算并逐个绑住 ——
@@ -655,6 +670,75 @@ ok(_ncases >= 14, f"分析层变异用例应不少于 14 例，实际 {_ncases}"
 in_text(_ncases, label="抬头写明的分析层变异用例数",
         ctx=rf"\+ \*\*{_ncases}\*\*（分析层）")
 
+# ── 抬头计数与附录索引：本轮两个阻塞项的根因是这两处没有门禁 ──────────────
+# 抬头「一手数据集 7 组」错了很久（实际 8），附录 B 表目录停在 t13 缺 4 张，
+# 而 verify.py 自己的注释把「附录 A/B 是完整索引」当成排除附录的前提写着 ——
+# 门禁建立在一个不成立的假设上。现在把这两件事都算出来核。
+_raws = sorted(x.name for x in (ROOT / "raw").glob("d*_*.json"))
+ok(len(_raws) >= 8, f"raw/ 应有至少 8 组一手数据，实际 {len(_raws)}")
+for _w in (REPORT, README):
+    _m = re.search(r"一手数据集 \*\*(\d+)\*\* 组", _w)
+    ok(_m is not None and int(_m.group(1)) == len(_raws),
+       f"抬头的一手数据集组数应为 {len(_raws)}，实际写 {_m.group(1) if _m else '缺'}")
+
+_tables = sorted(x.name for x in (TAB).glob("*.csv"))
+for _w, _lbl in ((REPORT, "report"), (README, "README")):
+    for _m in re.finditer(r"(\d+) 张可复算表", _w):
+        ok(int(_m.group(1)) == len(_tables),
+           f"{_lbl} 里的「N 张可复算表」应为 {len(_tables)}，实际 {_m.group(1)}")
+    _m = re.search(r"可复算表 \*\*(\d+)\*\* 张", _w)
+    ok(_m is not None and int(_m.group(1)) == len(_tables),
+       f"{_lbl} 抬头的表数应为 {len(_tables)}")
+
+# 附录 B 必须是**完整**索引 —— 这是把附录排除在引用检查外的前提
+_appb = REPORT[REPORT.index("## 附录 B"):REPORT.index("## 附录 C")]
+_listed = set(re.findall(r"derived/tables/(\S+?\.csv)", _appb))
+ok(_listed == set(_tables),
+   f"附录 B 表目录必须列全（缺 {sorted(set(_tables) - _listed)}；多 {sorted(_listed - set(_tables))}）")
+_appa = REPORT[REPORT.index("## 附录 A"):REPORT.index("## 附录 B")]
+_figs = sorted(x.name for x in (ROOT / "figures").glob("*.png"))
+_lf = set(re.findall(r"figures/(\S+?\.png)", _appa))
+ok(_lf == set(_figs), f"附录 A 图目录必须列全（缺 {sorted(set(_figs) - _lf)}）")
+
+# 抬头引用条数与图张数
+_m = re.search(r"参考来源 \*\*(\d+)\*\* 条", REPORT)
+ok(_m is not None and int(_m.group(1)) == S["references_total"],
+   f"抬头引用条数应为 {S['references_total']}")
+for _w, _lbl in ((REPORT, "report"), (README, "README")):
+    _m = re.search(r"图 \*\*(\d+)\*\* 张", _w)
+    ok(_m is not None and int(_m.group(1)) == len(_figs),
+       f"{_lbl} 抬头的图张数应为 {len(_figs)}")
+
+# d8 必须出现在 README 的采集清单与目录树里 —— 它是 §2.1 整节的唯一凭据
+for _t in ("d8_os_census.json", "collect_d8_os_census.py"):
+    ok(_t in README, f"README 必须列出 {_t}（§2.1 名录的唯一凭据）")
+
+# ⚠️ maintained 全文曾被短限定覆写过一次（72 字 → 16 字），而 t14b 正是被标为
+# 「完整原文」的表。凡两个字段并存的条目，全文必须长于短限定，否则就是又覆写了。
+_ent8 = json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
+_ovw = [e["name"] for e in _ent8
+        if e.get("s_maintained") and len(e["maintained"]) <= len(e["s_maintained"])]
+ok(_ovw == [], f"maintained 全文不许被 s_maintained 覆写（可疑：{_ovw}）")
+_pairs = sum(1 for e in _ent8 if e.get("s_maintained"))
+ok(_pairs >= 3, f"应有至少 3 条同时带 maintained 与 s_maintained，实际 {_pairs}")
+
+# ⚠️ artifacts/euleros-loginwall.txt 是孤儿凭据：文件在但正文不指向它、门禁不知道它。
+# 「证据消失即断言消失」——凭据必须被引用，否则删掉它没人发现。
+_lw = ROOT / "artifacts" / "euleros-loginwall.txt"
+ok(_lw.exists(), "artifacts/euleros-loginwall.txt 必须存在（「对任意 nid」的一手凭据）")
+_lwt = _lw.read_text() if _lw.exists() else ""
+ok(_lwt.count("x-login-url: https://uniportal.huawei.com/uniportal1/") == 3,
+   "该凭据应含 3 个 nid 的 Uniportal 头（其中一个是刻意乱填的）")
+ok("EDOC1100xxxx" in _lwt, "凭据里必须有那个刻意乱填的 nid —— 它才是「任意 nid」的关键")
+ok("euleros-loginwall.txt" in REPORT,
+   "正文必须指向 artifacts/euleros-loginwall.txt，否则读者从结论走不到凭据")
+
+# ⚠️ t04 锚点那条改为从列现算，不用裸子串
+_t04rows = list(csv_mod.DictReader((TAB / "t04_built_images.csv").open()))
+_anch = {r["unpacked_size"] for r in _t04rows}
+ok("345MB" in _anch and "281MB" in _anch,
+   f"345MB 与 281MB 都应出现在 t04 的 unpacked_size 列，实际该列：{sorted(_anch)}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -669,7 +753,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "345"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "365"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

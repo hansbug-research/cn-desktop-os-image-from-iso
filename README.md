@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 国产桌面 OS 名录 **21** 个（商业 12 / 社区开源 9）｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12**（镜像层）+ **14**（分析层）条 ｜ 机器核对断言 **345** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条（GitHub 脚注，逐格 cite）
+> 基准日 **2026-08-30** ｜ 国产桌面 OS 名录 **21** 个（商业 12 / 社区开源 9）｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12**（镜像层）+ **15**（分析层）条 ｜ 机器核对断言 **365** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条（GitHub 脚注，逐格 cite）
 
 要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把「从桌面版 ISO 自己造分档镜像」这件事做通并留下完整证据：三条构建路径、九个镜像、648 格逐格判定的能力矩阵、五道验收门禁。
 
@@ -109,6 +109,7 @@ python3 scripts/collect_d4_gates.py
 python3 scripts/collect_d5_iso_and_defects.py
 python3 scripts/collect_d6_installability.py    # 需要九个镜像 + builder 容器
 python3 scripts/collect_d7_cve.py               # 需要本地有 aquasec/trivy 镜像
+python3 scripts/collect_d8_os_census.py         # 名录的镜像实测，需要访问各厂商 registry
 ```
 
 六个在容器内跑的脚本（`lib/common.sh`、`build/{build,customize,setup}.sh`、`tools/{mk-localrepo,prepare-slice-src}.sh`）的 `ROOT` 默认是 `/w`（builder 里的挂载点），宿主侧直接单跑会找不到文件；宿主上跑的脚本 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
@@ -155,9 +156,10 @@ raw/                          一手数据，采集脚本的原始输出逐字�
   d5_iso_and_defects.json       三条路径的配置事实 + 12 条厂商缺陷
   d6_installability.json        14 个工具在各自源里的可装性、UOS 源规模与 ISO 包清单
   d7_cve.json                   漏洞扫描器对九个镜像的覆盖判定（有效覆盖／误判／未识别）
+  d8_os_census.json             国产桌面 OS 全名录（21 个）+ 官方镜像存在性实测（42 个引用）
 derived/                      从 raw/ 重算，不手写
   stats.json                    正文引用的全部统计量
-  tables/*.csv                  17 张可复算表（含 t14 国产桌面 OS 名录、t14b 名录完整原文、t15 镜像实测）
+  tables/*.csv                  18 张可复算表（含 t14 国产桌面 OS 名录、t14b 名录完整原文、t15 镜像实测、t16 参考来源）
 figures/*.png                 6 张图
 figures/plotdata.json         每张图实际画进去的数值与文字（机器无关，CI 拿它防「图画着旧数据」）
 artifacts/                    审计凭据：九份 manifest、可复现性凭据、九份探针原始输出、

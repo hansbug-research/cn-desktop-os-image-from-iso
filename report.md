@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **345** 条 ｜ 变异用例 **12**（镜像层）+ **14**（分析层）条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **365** 条 ｜ 变异用例 **12**（镜像层）+ **15**（分析层）条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条
 
 ## 1. 问题
 
@@ -86,7 +86,7 @@
 
 **「ISO 获取」这一列的判据是直连能不能 HEAD 到真实字节，不是厂商说法。** 分类为受控取值，实测分布：**直接下载 15 家**、公开列出但直链未解引用 1 家、网盘分发 1 家、需申请授权或登录 **0 家**、未查到公开下载 2 家、未实测 2 家。字节数逐条记在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)：deepin 的 `deepin-desktop-community-25.2.0-amd64.iso` 6976131072 B、优麒麟的 `ubuntukylin-26.04.1-desktop-amd64.iso` 5694060544 B（托管在 Canonical 自有基础设施）、凝思的 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` 7138705408 B、openKylin 的 `openKylin-Desktop-V3.0-20260827-x86_64.iso` 8068329472 B[^R85]、统信的 `uos-desktop-25-professional-2500-amd64-202604.iso` 7282405376 B[^R84]、麒麟信安的 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 4508876800 B、中标麒麟的 `NeoKylin-Linux-Desktop-6.0-x86_64-B045-20141201.iso` 3482347520 B、Loongnix 25.1 的 KDE livecd 5858738176 B、openEuler 25.09 DevStation 的 dvd 5627537408 B、AOSC 的 desktop tarball 4864387556 B、FydeOS 的 `FydeOS_for_PC_iris_v23.0-com.bin.zip` 2581036906 B。
 
-**「未查到公开下载」与「需申请授权」是两类，不合并。** 前者指没有看到任何门槛、也找不到条目（方德桌面、EulerOS），后者指确实撞上门槛。EulerOS 归入前者靠一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点的版本数组全为空，排除了匿名 ACL 的可能。普华与一铭归入「未实测」而非「不可下载」：普华官网全路径返回 502，属**未能访问而非站点下线**，其名录内容取自 Wayback 2026 年快照；一铭的域名直连与经代理均为 000 且 `emindos.org` 整域 NXDOMAIN。
+**「未查到公开下载」与「需申请授权」是两类，不合并。** 前者指没有看到任何门槛、也找不到条目（方德桌面、EulerOS），后者指确实撞上门槛。EulerOS 归入前者靠一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点的版本数组全为空，排除了匿名 ACL 的可能；该体系的下载端点本身是登录墙，对任意 nid 都返回同一个 Uniportal 跳转头，三个 nid 含一个刻意乱填的，采集记录见 [`artifacts/euleros-loginwall.txt`](artifacts/euleros-loginwall.txt)。普华与一铭归入「未实测」而非「不可下载」：普华官网全路径返回 502，属**未能访问而非站点下线**，其名录内容取自 Wayback 2026 年快照；一铭的域名直连与经代理均为 000 且 `emindos.org` 整域 NXDOMAIN。
 
 **ISO 可得性不是商业与社区的分界线。** 15 家直连可取横跨两类，其中包括看起来最封闭的几家商业发行版。§2.4 第 4 条筛选条件因此要说得更准：真正的限制是**授权**而非下载——本项目用的银河麒麟与统信 ISO 虽然匿名可下，用于交付验证仍需公司持有的正式授权，这与「能不能下到文件」是两件事。这一列的判定过程本身推翻过一整轮，四类误判来源记在 §9.2。
 
@@ -376,7 +376,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 麒麟两版是「没预装」，一条命令就有，不预装是档位设计（保持 server 小镜像）。UOS 是「装不上」：它没有 apt 形式的 OS 软件源，能力面由 ISO 内容封顶。
 
-我们进一步查了 UOS ISO（`uos_iso_packages=1636` 个包，清单落在 `raw/d6_installability.json`）里到底有什么：`ip`、`lsof`、`zstd`、`unzip`、`perl`、`dig`、`curl`、`iputils-ping`、`vim-tiny` 在里面（其中 `iputils-ping` 与 `vim-tiny` 是本轮审稿后才补进 base 的，`ip`/`lsof`/`zstd`/`unzip` 更早一轮已补）；`g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf`、python3 开发头文件**不在里面**（表 [`t11`](derived/tables/t11_tool_installability.csv) 与 `raw/d6_installability.json` 的 ISO 清单）。
+我们进一步查了 UOS ISO（`uos_iso_packages=1636` 个包，清单落在 `raw/d6_installability.json`）里到底有什么：`ip`、`lsof`、`zstd`、`unzip`、`perl`、`dig`、`curl`、`iputils-ping`、`vim-tiny` 在里面（其中 `iputils-ping` 与 `vim-tiny` 是后来补进 base 的，`ip`/`lsof`/`zstd`/`unzip` 更早一轮已补）；`g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf`、python3 开发头文件**不在里面**（表 [`t11`](derived/tables/t11_tool_installability.csv) 与 `raw/d6_installability.json` 的 ISO 清单）。
 
 由此得到一条对使用方直接有影响的结论：**UOS V25 镜像不能作为 C++ 构建环境**——没有 g++ 且装不上。需要在 UOS 上产出 C++ 制品时，只能自行 vendor 工具链，或者用麒麟镜像构建、UOS 镜像只做运行时验证。
 
@@ -508,6 +508,11 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 | [`t11`](derived/tables/t11_tool_installability.csv) | 14 个工具在各自源里的可装性 |
 | [`t12`](derived/tables/t12_hardening_surface.csv) | masked 单元数与 setuid 面（逐档） |
 | [`t13`](derived/tables/t13_cve_coverage.csv) | 漏洞扫描器的覆盖判定 |
+| [`t14`](derived/tables/t14_os_census.csv) | 国产桌面 OS 全名录（21 个，含类型/血统/版本/桌面/ISO 获取/客户与场景） |
+| [`t14b`](derived/tables/t14b_os_census_detail.csv) | 名录各字段的完整原文（紧凑表牺牲的细节在此） |
+| [`t15`](derived/tables/t15_os_image_probes.csv) | 名录的官方镜像存在性实测（42 个引用，判据为退出码） |
+| [`t16`](derived/tables/t16_references.csv) | 参考来源表（含标题来源：抓自页面 / 人工标注） |
+
 ## 附录 C：参考来源
 
 正文与名录里的每处引用都是 GitHub 原生脚注（`[^Rn]`），渲染为上标编号并在页面底部自动生成带回跳链接的 Footnotes 区，所以下面这份定义列表就是参考文献表本身。共 125 条，可复算副本在表 [`t16`](derived/tables/t16_references.csv)，源文件是 [`config/references.json`](config/references.json)。
