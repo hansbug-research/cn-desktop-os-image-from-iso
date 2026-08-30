@@ -10,11 +10,14 @@
 
 失败必须留在数据里：任何一道门禁的失败都是结论的一部分，不许只记成功。
 """
-import json, pathlib, re, subprocess, sys, time
+import json, os, pathlib, re, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
+# 若产物在别处，用 DOSBUILD_OUT 指过去。不要硬编码开发机路径 —— 换台机器就跑不了。
+OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "out"))
 OUT = ROOT / "raw" / "d4_gates.json"
-SRC = ROOT.parent / "dosbuild"
+SRC = OUTDIR.parent
 
 def tail(p, n=400):
     f = pathlib.Path(p)

@@ -5,7 +5,8 @@
 # 覆盖范围说明（别把话说大）：本脚本做的是**同一 builder 内连构两次**。
 # 跨 builder（把 Dockerfile.builder 整个重建后再构）需要单独跑，结论另记。
 set -u
-ROOT=${ROOT:-/data/dosbuild}; BUILDER=${BUILDER:-dosb}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
+BUILDER=${BUILDER:-dosb}
 EV="$ROOT/out/repro-evidence.txt"
 DISTROS=${1:-"kylin11 uos25"}
 {

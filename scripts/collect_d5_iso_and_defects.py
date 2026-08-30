@@ -4,11 +4,14 @@
 缺陷清单的每一条都必须可机器核对或可复现观察，且要写明：现象、根因、影响面、
 本项目的处理方式、以及处理方式落在哪个文件。只写「有个 bug」不算证据。
 """
-import json, pathlib, re, subprocess, time
+import json, os, pathlib, re, subprocess, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
+# 若产物在别处，用 DOSBUILD_OUT 指过去。不要硬编码开发机路径 —— 换台机器就跑不了。
+OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "out"))
 OUT = ROOT / "raw" / "d5_iso_and_defects.json"
-SRC = ROOT.parent / "dosbuild"
+SRC = OUTDIR.parent
 
 def sh(c, timeout=120):
     p = subprocess.run(c, shell=True, capture_output=True, text=True, timeout=timeout)

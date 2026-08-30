@@ -8,7 +8,7 @@ TLS 要真握手、apt 要真装真卸。不看包列表推断 —— 装了 gcc
   --run   现场重跑 test/run-capabilities.sh（需要九个镜像已在本地 docker 里）
   默认    从 --from 指定目录读已落盘的 caps-*.txt（用于在没有镜像的机器上重算）
 """
-import argparse, json, pathlib, subprocess, sys, time
+import argparse, json, os, pathlib, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "raw" / "d3_capabilities.json"
@@ -28,8 +28,9 @@ def parse_caps(text):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", action="store_true", help="现场重跑探针")
-    ap.add_argument("--from", dest="src", default=str(ROOT.parent / "dosbuild" / "out"),
-                    help="已落盘 caps-*.txt 的目录")
+    ap.add_argument("--from", dest="src",
+                    default=os.environ.get("DOSBUILD_OUT") or str(ROOT / "out"),
+                    help="已落盘 caps-*.txt 的目录（默认仓库自身的 out/，可用 DOSBUILD_OUT 覆盖）")
     a = ap.parse_args()
     if a.run:
         subprocess.run([str(ROOT / "test" / "run-capabilities.sh")], check=True,

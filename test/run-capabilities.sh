@@ -1,7 +1,7 @@
 #!/bin/bash
 # 在九个镜像里逐一跑能力探针，结果落 out/caps-<did>-<tier>.txt
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 declare -A IMG=([kylin11]=kylin-desktop-v11 [kylin10]=kylin-desktop-v10 [uos25]=uos-desktop-v25)
 for d in ${DISTROS:-kylin11 kylin10 uos25}; do
   for t in ${TIERS:-micro base devel}; do

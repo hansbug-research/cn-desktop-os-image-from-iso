@@ -90,6 +90,19 @@ make manifest verify digest-chain sbom mutation
 python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.py
 ```
 
+重跑采集（需要九个镜像已在本地 docker 里）。采集脚本默认从仓库自身的 `out/` 读构建产物；产物在别处就用 `DOSBUILD_OUT` 指过去：
+
+```bash
+export DOSBUILD_OUT=/path/to/out          # 存放 *.tar / *.manifest / caps-*.txt 的目录
+python3 scripts/collect_d1_official_images.py   # 需要访问 registry
+python3 scripts/collect_d2_our_images.py
+python3 scripts/collect_d3_capabilities.py      # 加 --run 可现场重跑探针
+python3 scripts/collect_d4_gates.py
+python3 scripts/collect_d5_iso_and_defects.py
+```
+
+所有 shell 脚本的 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
+
 ## 目录结构
 
 ```

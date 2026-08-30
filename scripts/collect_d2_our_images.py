@@ -4,9 +4,12 @@
 采集与判断分离：这里只把事实抓下来，产品线是否「同一条」由 analyze.py 依据
 包格式 / 软件源域名 / glibc / 代号四个字段判定，判据写在 report.md。
 """
-import json, shlex, subprocess, sys, time, pathlib
+import json, os, shlex, subprocess, sys, time, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
+# 若产物在别处，用 DOSBUILD_OUT 指过去。不要硬编码开发机路径 —— 换台机器就跑不了。
+OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "out"))
 OUT = ROOT / "raw" / "d2_our_images.json"
 
 OURS = [(d, t, img) for d, img in
@@ -56,7 +59,7 @@ def main():
         print(f"  采集 {img}", file=sys.stderr)
         rec = {"distro_id": did, "tier": tier, "image": img}
         rec.update(facts(img))
-        tar = ROOT.parent / "dosbuild" / "out" / f"{did}-{tier}.tar"
+        tar = OUTDIR / f"{did}-{tier}.tar"
         if tar.exists():
             rec["tar_bytes"] = tar.stat().st_size
             rec["tar_sha256"] = run(f"sha256sum {tar}").split()[0]

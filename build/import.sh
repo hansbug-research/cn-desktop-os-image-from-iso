@@ -1,7 +1,7 @@
 #!/bin/bash
 # 把 rootfs tarball 导入 docker，按档位设置正确的镜像元数据
 set -eu
-ROOT="${ROOT:-/data/dosbuild}"
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 DID=$1; TIER=$2
 . "$ROOT/distros/$DID.conf"
 TAR="$ROOT/out/$DID-$TIER.tar"

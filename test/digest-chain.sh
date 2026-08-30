@@ -8,7 +8,7 @@
 #
 # 这条链专防一类事故：镜像重建了但 manifest 没更新（审计凭据与实物脱钩）。
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根
 declare -A IMG=([kylin11]=kylin-desktop-v11 [kylin10]=kylin-desktop-v10 [uos25]=uos-desktop-v25)
 PASS=0; FAIL=0
 for d in kylin11 kylin10 uos25; do

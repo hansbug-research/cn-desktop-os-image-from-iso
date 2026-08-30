@@ -11,7 +11,7 @@
 # 因此走两阶段自举：debootstrap --foreign 只解包（不跑脚本）-> 导入容器 ->
 # 用**麒麟自己的 dpkg 1.19.7** 完成 configure。这是发行版工具链代差的标准解法。
 set -eu
-ROOT_HOST=${ROOT_HOST:-/data/dosbuild}
+ROOT_HOST=${ROOT_HOST:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根
 BUILDER=${BUILDER:-dosb}
 DID=kylin10
 . "$ROOT_HOST/distros/$DID.conf"

@@ -11,9 +11,9 @@
   base  = 平台可用（有包管理，能装东西、能跑运维排查，但不预置工具链）
   devel = 构建用（工具链齐备）
 """
-import glob, os, re, sys, collections
+import glob, os, pathlib, re, sys, collections
 
-ROOT = os.environ.get("ROOT", "/data/dosbuild")
+ROOT = os.environ.get("ROOT") or str(pathlib.Path(__file__).resolve().parent.parent)
 DISTROS = [("kylin11", "麒麟V11"), ("kylin10", "麒麟V10"), ("uos25", "UOS25")]
 TIERS = ["micro", "base", "devel"]
 

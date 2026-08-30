@@ -3,7 +3,7 @@
 # 目的是防止"检查永远为真"的假通过——本项目就真踩过一次：
 # /var/lib/dpkg/status 是断链时 `dpkg --audit` 输出 0 行，被当成健康。
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 # 基准换成 base：micro 无 apt 无 systemd，很多检查在它上面不适用
 BASE=${BASE:-kylin-desktop-v11:base}
 CHK="$ROOT/test/inner-checks.sh"

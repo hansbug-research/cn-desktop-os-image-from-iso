@@ -1,7 +1,7 @@
 #!/bin/bash
 # 生成产物清单：精确包版本 + 构建元数据，供审计与"两次构建是否一致"对账
 set -eu
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 DID=$1; TIER=$2
 . "$ROOT/distros/$DID.conf"
 IMG="$IMAGE:$TIER"

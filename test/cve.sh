@@ -17,7 +17,7 @@
 # 要真正跟踪这三个发行版的漏洞，得拿厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，
 # 需要外部数据源，不在本仓库范围内 —— 见 README §11。
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 MAXSEV=${MAXSEV:-0}
 TRIVY=${TRIVY:-aquasec/trivy:0.70.0}
 SOCK=${SOCK:-$(docker context inspect -f '{{.Endpoints.docker.Host}}' 2>/dev/null | sed 's|^unix://||')}

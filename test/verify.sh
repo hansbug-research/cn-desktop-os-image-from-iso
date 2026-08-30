@@ -1,7 +1,7 @@
 #!/bin/bash
 # 全量验收：对每个镜像跑结构/完整性/能力/ABI-gate 检查，并与 distros/*.conf 的预期基线对账
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 GATE_BIN=$ROOT/gate/t_low          # manylinux2014 编的低地板产物（GLIBC_2.14/GLIBCXX_3.4.11）
 GATE_HIGH=$ROOT/gate/t_high        # Debian13 编的高地板产物（GLIBC_2.34）
 PASS=0; FAIL=0; WARN=0

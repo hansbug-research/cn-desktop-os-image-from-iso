@@ -3,7 +3,7 @@
 # 关键坑：扫描器从镜像层 tar 里找 /var/lib/dpkg/status，**不跨归档跟随符号链接**，
 # 所以 UOS 那种把 admindir 搬到 /usr 下的发行版必须把 status 放回标准位置。
 set -u
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 SOCK=$(docker context inspect 2>/dev/null | grep -oE '/run/user/[0-9]+/docker.sock' | head -1)
 SOCK=${SOCK:-/var/run/docker.sock}
 TRIVY=${TRIVY:-aquasec/trivy:0.70.0}
