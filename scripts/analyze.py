@@ -125,20 +125,22 @@ if d8:
                      e.get("s_lineage", e["lineage"]) + _c(e, "s_lineage"),
                      e.get("s_version", e["latest_version"]) + _c(e, "s_version"),
                      e.get("s_desktop", e["desktop"]) + _c(e, "s_desktop"),
+                     e.get("s_iso_access", "") + _c(e, "s_iso_access"),
                      e["maintained"].split("（")[0].split("：")[0],
                      img + _c(e, "image"),
                      _c(e, "general")])
     csv("t14_os_census.csv",
         ["subject", "os", "type", "vendor", "lineage", "latest_version", "desktop",
-         "maintained", "official_image", "other_refs"], rows)
+         "iso_access", "maintained", "official_image", "other_refs"], rows)
 
     rows = []
     for e in d8["entries"]:
         rows.append([e["name"], e["lineage"], e["latest_version"], e["desktop"],
-                     e["maintained"], e.get("official_image_note", "")])
+                     e["maintained"], e.get("iso_access_note", ""),
+                     e.get("official_image_note", "")])
     csv("t14b_os_census_detail.csv",
         ["os", "lineage_full", "version_full", "desktop_full", "maintained_full",
-         "official_image_note"], rows)
+         "iso_access_note", "official_image_note"], rows)
 
     rows = []
     for pr in d8["probes"]:
@@ -165,6 +167,18 @@ if d8:
     # 名录里的引用必须都能在引用表里找到 —— 悬空引用等于假引用
     _cited = {i for e in d8["entries"] for v in e.get("refs", {}).values() for i in v}
     S["census_dangling_refs"] = sorted(_cited - set(REF_BY_ID))
+    # ISO 获取一列：以「直连能否 HEAD 到真实字节」为判据而非厂商说法。
+    # 「未实测」必须单独成类 —— 把它并进「可下载」就是把查不到当成了有。
+    S["iso_direct"] = sorted(e["name"] for e in d8["entries"]
+                             if e.get("s_iso_access", "").startswith("直接下载"))
+    S["iso_gated"] = sorted(e["name"] for e in d8["entries"]
+                            if "授权" in e.get("s_iso_access", "")
+                            or "登录" in e.get("s_iso_access", ""))
+    S["iso_unverified"] = sorted(e["name"] for e in d8["entries"]
+                                 if "未实测" in e.get("s_iso_access", "")
+                                 or "未查到" in e.get("s_iso_access", ""))
+    S["iso_access_missing"] = sorted(e["name"] for e in d8["entries"]
+                                     if not e.get("s_iso_access"))
 
     S["census_os_count"] = len(d8["entries"])
     S["census_commercial"] = sum(1 for e in d8["entries"] if e["type"].startswith("商业"))

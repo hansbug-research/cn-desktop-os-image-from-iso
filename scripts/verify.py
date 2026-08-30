@@ -504,6 +504,29 @@ in_text(S["references_total"], label="正文写明的引用条数",
 in_text(S["census_field_citations"], label="正文写明的字段级引用处数",
         ctx=rf"共 {S['census_field_citations']} 处字段级引用")
 
+# ── ISO 获取列：三分类必须齐全，「未实测」不许被并进「可下载」──────────────
+# 把「查不到」写成「有」正是 §9.2 批判过的错法，这里用断言把它钉住。
+ok(S["iso_access_missing"] == [],
+   f'名录里每个 OS 都必须有 ISO 获取一列（缺：{S["iso_access_missing"]}）')
+ok(len(S["iso_direct"]) + len(S["iso_gated"]) + len(S["iso_unverified"])
+   == S["census_os_count"],
+   "ISO 获取的三分类必须覆盖全部条目，不能有条目落在三类之外")
+ok(len(S["iso_unverified"]) > 0,
+   "「未实测/未查到」这一类不许为空 —— 本轮确有没验证到的，清空它等于粉饰")
+in_text(len(S["iso_direct"]), label="ISO 直接下载家数",
+        ctx=rf"\*\*直接下载 {len(S['iso_direct'])} 个\*\*")
+in_text(len(S["iso_gated"]), label="ISO 需授权家数",
+        ctx=rf"\*\*需申请授权或登录 {len(S['iso_gated'])} 个\*\*")
+in_text(len(S["iso_unverified"]), label="ISO 未实测家数",
+        ctx=rf"\*\*未实测或未查到 {len(S['iso_unverified'])} 个\*\*")
+# 实测到的字节数写在正文里，必须与 t14b 的原文一致（防止正文数字被改而凭据不动）
+_t14b = (TAB / "t14b_os_census_detail.csv").read_text()
+for _b in ("6976131072", "5694060544", "5858738176", "5627537408"):
+    ok(_b in _t14b, f"正文引用的 ISO 字节数 {_b} 必须在 t14b 的原文里")
+    in_text(_b, label=f"ISO 字节数 {_b}")
+ok("公司持有的正式授权" in REPORT,
+   "拿到商业 ISO 靠的是授权这件事必须写明，不许暗示这两家比别家开放")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -518,7 +541,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "269"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "284"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

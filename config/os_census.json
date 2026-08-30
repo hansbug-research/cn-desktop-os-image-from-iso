@@ -45,8 +45,13 @@
         "image": [
           "R7",
           "R8"
+        ],
+        "s_iso_access": [
+          "R64"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权",
+      "iso_access_note": "⚠️ 官网未提供公开 ISO 直链；桌面版走商务/授权渠道获取。本轮未在官网找到匿名可下的桌面 ISO"
     },
     {
       "name": "统信桌面操作系统 V25（UOS）",
@@ -87,8 +92,13 @@
           "R80",
           "R46",
           "R47"
+        ],
+        "s_iso_access": [
+          "R84"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权 / 注册后下载",
+      "iso_access_note": "⚠️ 官网设有下载资源页（实测 HTTP 200 可达），但桌面专业版按授权分发；本项目所用 ISO 由公司持有的正式授权取得。本轮未取到匿名可下的桌面专业版直链"
     },
     {
       "name": "openKylin（开放麒麟）",
@@ -133,8 +143,13 @@
           "R74",
           "R16",
           "R30"
+        ],
+        "s_iso_access": [
+          "R85"
         ]
-      }
+      },
+      "s_iso_access": "公开下载页（直链未实测）",
+      "iso_access_note": "⚠️ 官网设公开下载页，但下载分发走站内 API，本轮**未取到可直接 HEAD 的静态直链**（南大镜像站只有 `dists/`、`pool/`、`project/`，无 ISO 目录）。下载页含「登录/申请」字样，但那可能属站点导航，不足以判定下载需注册 —— 故如实记为「直链未实测」，不含糊成「可下载」"
     },
     {
       "name": "deepin（深度）",
@@ -182,8 +197,13 @@
         ],
         "general": [
           "R14"
+        ],
+        "s_iso_access": [
+          "R4"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`cdimage.deepin.com` 直连可取：`deepin-desktop-community-25.2.0-amd64.iso` 实测 **6976131072 B（6.98 GB）**"
     },
     {
       "name": "openEuler",
@@ -231,8 +251,13 @@
           "R32",
           "R17",
           "R48"
+        ],
+        "s_iso_access": [
+          "R49"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`repo.openeuler.org` 直连可取：SP4 的 `-x86_64-dvd.iso` 实测 **4833935360 B（4.83 GB）**、25.09 DevStation 的 dvd 实测 **5627537408 B（5.63 GB）**，均 HTTP 200 + `application/octet-stream`，无需注册"
     },
     {
       "name": "麒麟信安操作系统（KylinSec）",
@@ -264,8 +289,13 @@
         ],
         "s_desktop": [
           "R66"
+        ],
+        "s_iso_access": [
+          "R72"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权",
+      "iso_access_note": "⚠️ 未查到公开 ISO 直链；列于 openEuler 官方商业发行版页"
     },
     {
       "name": "方德桌面操作系统 V5.0",
@@ -297,8 +327,13 @@
         ],
         "s_desktop": [
           "R50"
+        ],
+        "s_iso_access": [
+          "R70"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权",
+      "iso_access_note": "⚠️ 官网「镜像下载」栏提供的是 ISO 页面入口，本轮未取到匿名可下的直链"
     },
     {
       "name": "Ubuntu Kylin（优麒麟）",
@@ -333,8 +368,13 @@
         ],
         "s_desktop": [
           "R78"
+        ],
+        "s_iso_access": [
+          "R6"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "托管在 Canonical 的 `cdimage.ubuntu.com`：`ubuntukylin-26.04.1-desktop-amd64.iso` 实测 **5694060544 B（5.69 GB）**"
     },
     {
       "name": "Loongnix（龙芯）",
@@ -374,8 +414,13 @@
         ],
         "image": [
           "R9"
+        ],
+        "s_iso_access": [
+          "R69"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`pkg.loongnix.cn` 直连可取：`Loongnix-25.1.livecd.kde-loong64.hybrid.iso` 实测 **5858738176 B（5.86 GB）**"
     },
     {
       "name": "凝思安全操作系统",
@@ -408,8 +453,13 @@
         ],
         "general": [
           "R68"
+        ],
+        "s_iso_access": [
+          "R67"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权（文档公开）",
+      "iso_access_note": "⚠️ 官网 download 目录公开的是发布说明、用户手册、安装手册与安全升级预案 PDF（本报告的血统证据即取自这些 PDF），未见 ISO 直链"
     },
     {
       "name": "Anolis OS（龙蜥）",
@@ -453,8 +503,13 @@
         "image": [
           "R18",
           "R33"
+        ],
+        "s_iso_access": [
+          "R41"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`mirrors.openanolis.cn` 直连可取：`AnolisOS-23.5-x86_64-boot.iso` 实测 **1320222720 B（1.32 GB）**（无桌面版 ISO，见桌面环境一列）"
     },
     {
       "name": "OpenCloudOS",
@@ -501,8 +556,13 @@
         ],
         "image": [
           "R34"
+        ],
+        "s_iso_access": [
+          "R43"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`mirrors.opencloudos.tech` 直连可取：`OpenCloudOS-9.6-20260713.0-x86_64-boot.iso` 实测 **1076627456 B（1.08 GB）**（无桌面版 ISO）"
     },
     {
       "name": "新支点桌面操作系统（NewStart NSDL）",
@@ -534,8 +594,13 @@
         ],
         "s_lineage": [
           "R83"
+        ],
+        "s_iso_access": [
+          "R59"
         ]
-      }
+      },
+      "s_iso_access": "网盘分发 / 镜像站需登录",
+      "iso_access_note": "⚠️ 官网下载中心的 V4.5.2 标注「全面免费正版授权」，但经百度云盘/腾讯云盘分发（非 HTTP 直链）；镜像站 `nsosmirrors.gd-linux.com` 实测返回 **403 需登录**"
     },
     {
       "name": "AOSC OS（安同 OS）",
@@ -572,8 +637,13 @@
         "image": [
           "R35",
           "R20"
+        ],
+        "s_iso_access": [
+          "R1"
         ]
-      }
+      },
+      "s_iso_access": "直接下载",
+      "iso_access_note": "`releases.aosc.io` 直连可取：`aosc-os_desktop_20260621_amd64.tar.xz` 实测 **4864387556 B（4.86 GB）**（AOSC 交付 tarball 而非 ISO）"
     },
     {
       "name": "RevyOS",
@@ -608,8 +678,13 @@
         ],
         "s_desktop": [
           "R82"
+        ],
+        "s_iso_access": [
+          "R39"
         ]
-      }
+      },
+      "s_iso_access": "直接下载（刷机镜像，非 ISO）",
+      "iso_access_note": "`mirror.iscas.ac.cn` 直连可取，交付物是开发板刷机镜像：`boot-lpi4a-20260504_080619.ext4.zst` 实测 **62695800 B**；本轮未见 ISO 形态"
     },
     {
       "name": "Bianbu OS",
@@ -640,8 +715,13 @@
         ],
         "s_desktop": [
           "R2"
+        ],
+        "s_iso_access": [
+          "R86"
         ]
-      }
+      },
+      "s_iso_access": "直接下载（开发板镜像）",
+      "iso_access_note": "`archive.spacemit.com` 的版本目录直连可达（HTTP 200），交付物为 K1/K3 开发板镜像"
     },
     {
       "name": "FydeOS",
@@ -675,8 +755,13 @@
         ],
         "s_desktop": [
           "R45"
+        ],
+        "s_iso_access": [
+          "R45"
         ]
-      }
+      },
+      "s_iso_access": "公开下载（免费版）/ 商业版按授权",
+      "iso_access_note": "⚠️ 官网下载页从本机经代理实测返回 **403**（可能是地域或 UA 策略），未能确认直链；开源版 openFyde 的构建产物在 GitHub 公开"
     },
     {
       "name": "普华桌面操作系统",
@@ -708,8 +793,13 @@
         ],
         "s_desktop": [
           "R61"
+        ],
+        "s_iso_access": [
+          "R61"
         ]
-      }
+      },
+      "s_iso_access": "未查到公开下载",
+      "iso_access_note": "⚠️ 官网产品页在架但未见下载入口"
     },
     {
       "name": "中标麒麟桌面操作系统（NeoKylin）",
@@ -752,8 +842,13 @@
         "image": [
           "R36",
           "R37"
+        ],
+        "s_iso_access": [
+          "R10"
         ]
-      }
+      },
+      "s_iso_access": "未查到公开下载",
+      "iso_access_note": "⚠️ 品牌事实停用，未查到桌面版公开下载"
     },
     {
       "name": "一铭桌面操作系统（EmindDesktop）",
@@ -783,8 +878,13 @@
         ],
         "s_desktop": [
           "R58"
+        ],
+        "s_iso_access": [
+          "R55"
         ]
-      }
+      },
+      "s_iso_access": "未查到公开下载",
+      "iso_access_note": "⚠️ 官网最后可用快照为 2023-04-01，桌面版最后公开版本停在 2016 年"
     },
     {
       "name": "EulerOS（华为）",
@@ -815,8 +915,13 @@
         ],
         "s_desktop": [
           "R72"
+        ],
+        "s_iso_access": [
+          "R72"
         ]
-      }
+      },
+      "s_iso_access": "需申请授权",
+      "iso_access_note": "⚠️ 面向服务器与华为云 B2B，未见公开桌面 ISO"
     }
   ],
   "scope": {
