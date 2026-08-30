@@ -369,6 +369,13 @@ ok(len(S["uos_iso_missing"]) == 6, "UOS ISO 缺的构建工具应为 6 个")
 for _t in S["uos_iso_missing"]:
     in_text(_t, label=f"UOS ISO 缺失工具 {_t} 应在正文列出")
 
+# 同一个区间在 report 与 README 各写一份，实测已经漂过一次
+# （report 改成 37.9%–46.9% 之后 README 还留着抹平的 38%–47%）。两份都绑。
+in_text(S["unpack_overhead_pct_min"], where="readme", label="README 解包开销下界",
+        ctx=r"实测 %s%%–" % S["unpack_overhead_pct_min"])
+in_text(S["unpack_overhead_pct_max"], where="readme", label="README 解包开销上界",
+        ctx=r"–%s%%）" % S["unpack_overhead_pct_max"])
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -383,7 +390,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "215"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "217"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
