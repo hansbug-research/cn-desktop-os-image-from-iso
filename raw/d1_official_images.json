@@ -1,0 +1,290 @@
+{
+  "collected_at": "2026-08-30T05:47:23Z",
+  "vantage_note": "采集主机出口在中国大陆，境外站点经本地代理；探测失败需区分网络位置与策略拒绝",
+  "hub_namespaces": {
+    "openkylin": {
+      "ok": true,
+      "count": 52,
+      "repos": [
+        "alertmanager",
+        "atomcode",
+        "claude-code",
+        "codewhale",
+        "codex",
+        "conda",
+        "containerd",
+        "copilot-cli",
+        "cubefs",
+        "distroless-base",
+        "distroless-base-noroot",
+        "distroless-static",
+        "dotnet-sdk",
+        "druid",
+        "etcd",
+        "executorch",
+        "fastdfs",
+        "filebeat",
+        "flannel",
+        "flink",
+        "gemini-cli",
+        "go",
+        "go-runner",
+        "hbase",
+        "hermes-agent",
+        "hive",
+        "kafka",
+        "kserve-agent",
+        "kserve-controller",
+        "kserve-router",
+        "kserve-storage-initializer",
+        "kube-cross",
+        "lammps",
+        "libvirt",
+        "mariadb",
+        "mmx-cli",
+        "nemo",
+        "nginx",
+        "node",
+        "onnx",
+        "onnxruntime",
+        "openkylin",
+        "picoclaw",
+        "postgres",
+        "python",
+        "pytorch",
+        "qemu",
+        "qwen-code",
+        "redis",
+        "ros",
+        "spark",
+        "vllm-cpu"
+      ]
+    },
+    "deepin": {
+      "ok": true,
+      "count": 1,
+      "repos": [
+        "deepin-core"
+      ]
+    },
+    "uniontech": {
+      "ok": true,
+      "count": 0,
+      "repos": []
+    },
+    "kylin": {
+      "ok": true,
+      "count": 8,
+      "repos": [
+        "aarch64-addon-letsencrypt",
+        "amd64-addon-letsencrypt",
+        "armhf-addon-letsencrypt",
+        "armv7-addon-letsencrypt",
+        "hass-addon-broadlink-bridge",
+        "i386-addon-letsencrypt",
+        "portainer-ce-zh",
+        "repository"
+      ]
+    },
+    "linuxdeepin": {
+      "ok": true,
+      "count": 3,
+      "repos": [
+        "apricot",
+        "beige",
+        "deepin"
+      ]
+    },
+    "nfschina": {
+      "ok": true,
+      "count": 0,
+      "repos": []
+    },
+    "iSoftStone": {
+      "ok": false,
+      "error": "HTTPError: HTTP Error 400: Bad Request"
+    }
+  },
+  "images": [
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1",
+      "pull": {
+        "rc": 0,
+        "stdout": "v10sp1: Pulling from kylin/kylin-server-minimal\nDigest: sha256:905a2ad4e37bc87c76dcb84af38e4db439276fc9318547d9ef776f56d3d58f49\nStatus: Image is up to date for cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1\ncr.kylinos.cn/kylin/kylin-server-minimal:v10sp1",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "cr.kylinos.cn/kylin/kylin-server-minimal@sha256:905a2ad4e37bc87c76dcb84af38e4db439276fc9318547d9ef776f56d3d58f49",
+      "size_bytes": "63227315",
+      "os_release": "NAME=\"Kylin Linux Advanced Server\"\nVERSION=\"V10 (Tercel)\"\nID=\"kylin\"\nVERSION_ID=\"V10\"\nPRETTY_NAME=\"Kylin Linux Advanced Server V10 (Tercel)\"\nANSI_COLOR=\"0;31\"",
+      "pkg_format": "rpm",
+      "pkg_count": "217\n0",
+      "glibc": "ldd (GNU libc) 2.28",
+      "repos": "baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/base/$basearch/\nbaseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/updates/$basearch/\nbaseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/addons/$basearch/",
+      "vendor": "麒麟软件",
+      "product": "银河麒麟高级服务器操作系统 V10 SP1"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-server:v10",
+      "pull": {
+        "rc": 1,
+        "stdout": "",
+        "stderr": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-server:v10\": cr.kylinos.cn/kylin/kylin-server:v10: not found"
+      },
+      "available": false,
+      "vendor": "麒麟软件",
+      "product": "银河麒麟高级服务器操作系统 V10"
+    },
+    {
+      "ref": "docker.io/openkylin/openkylin:2.0",
+      "pull": {
+        "rc": 0,
+        "stdout": "2.0: Pulling from openkylin/openkylin\nDigest: sha256:ead96f8876f756fdd71e89887fd16a4cd468c9dfb8bc4bf61a72c5fd9b90e766\nStatus: Image is up to date for openkylin/openkylin:2.0\ndocker.io/openkylin/openkylin:2.0",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "openkylin/openkylin@sha256:ead96f8876f756fdd71e89887fd16a4cd468c9dfb8bc4bf61a72c5fd9b90e766",
+      "size_bytes": "44208084",
+      "os_release": "NAME=\"openKylin\"\nFULL_NAME=\"openKylin\"\nVERSION=\"2.0 SP2 (nile)\"\nVERSION_US=\"2.0 SP2 (nile)\"\nID=openkylin\nPRETTY_NAME=\"openKylin 2.0 SP2\"\nVERSION_ID=\"2.0\"\nHOME_URL=\"https://www.openkylin.top/\"\nVERSION_CODENAME=nile\nPRODUCT_FEATURES=3",
+      "pkg_format": "dpkg",
+      "pkg_count": "0\n95",
+      "glibc": "ldd (Ubuntu GLIBC 2.38-1ok6.16) 2.38",
+      "repos": "deb http://archive.build.openkylin.top/openkylin/ nile main cross pty\ndeb http://archive.build.openkylin.top/openkylin/ nile-security main cross pty\ndeb http://archive.build.openkylin.top/openkylin/ nile-updates main cross pty\ndeb http://archive.build.openkylin.top/openkylin/ nile-proposed main cross pty\ndeb http://archive.build.openkylin.top/openkylin/ nile.bedrock main cross pty\ndeb http://archive.build.openkylin.top/openkylin/ nile.bedrock-proposed main cross pty",
+      "vendor": "openKylin 社区",
+      "product": "openKylin 2.0"
+    },
+    {
+      "ref": "docker.io/openkylin/openkylin:latest",
+      "pull": {
+        "rc": 0,
+        "stdout": "latest: Pulling from openkylin/openkylin\nDigest: sha256:bfc0bdcba371598fa80fb8e500f54cd0f3b0af9ef2d6fbc231a93c9ea8ca3b9e\nStatus: Image is up to date for openkylin/openkylin:latest\ndocker.io/openkylin/openkylin:latest",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "openkylin/openkylin@sha256:bfc0bdcba371598fa80fb8e500f54cd0f3b0af9ef2d6fbc231a93c9ea8ca3b9e",
+      "size_bytes": "35726196",
+      "os_release": "NAME=\"openKylin\"\nFULL_NAME=\"openKylin\"\nVERSION=\"3.0 (huanghe)\"\nVERSION_US=\"3.0 (huanghe)\"\nID=openkylin\nPRETTY_NAME=\"openKylin 3.0\"\nVERSION_ID=\"3.0\"\nHOME_URL=\"https://www.openkylin.top/\"\nVERSION_CODENAME=huanghe\nPRODUCT_FEATURES=3",
+      "pkg_format": "dpkg",
+      "pkg_count": "0\n108",
+      "glibc": "ldd (Ubuntu GLIBC 2.43-ok2) 2.43",
+      "repos": "deb http://archive.build.openkylin.top/openkylin huanghe main\ndeb http://archive.build.openkylin.top/openkylin huanghe-proposed main\ndeb http://ppa.build.openkylin.top/kylinsoft/anything3.0/openkylin/ huanghe main",
+      "vendor": "openKylin 社区",
+      "product": "openKylin latest"
+    },
+    {
+      "ref": "docker.io/deepin/deepin-core:latest",
+      "pull": {
+        "rc": 0,
+        "stdout": "latest: Pulling from deepin/deepin-core\nDigest: sha256:6bc93d870a071c0937b89fff13757b8fdcc34c4841372945253ee1f034e45754\nStatus: Image is up to date for deepin/deepin-core:latest\ndocker.io/deepin/deepin-core:latest",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "deepin/deepin-core@sha256:6bc93d870a071c0937b89fff13757b8fdcc34c4841372945253ee1f034e45754",
+      "size_bytes": "112494707",
+      "os_release": "PRETTY_NAME=\"Deepin GNU/Linux (Server 15)\"\nNAME=\"Deepin GNU/Linux\"\nVERSION_ID=\"15\"\nVERSION=\"15 (server)\"\nID=deepin\nHOME_URL=\"http://www.deepin.com/\"\nSUPPORT_URL=\"http://www.deepin.com/support/\"\nBUG_REPORT_URL=\"http://mantis.linuxdeepin.com/\"",
+      "pkg_format": "dpkg",
+      "pkg_count": "0\n163",
+      "glibc": "ldd (Debian GLIBC 2.19-18+deb8u4) 2.19",
+      "repos": "deb http://packages.deepin.com/deepin-server/ kui main non-free contrib\ndeb http://packages.deepin.com/deepin-server/ kui-security main non-free contrib",
+      "vendor": "deepin 社区",
+      "product": "deepin-core"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/beige:latest",
+      "pull": {
+        "rc": 0,
+        "stdout": "latest: Pulling from linuxdeepin/beige\nDigest: sha256:db2dedb4926898486f39ca5bbc03739fc0ca765a519f91994ec9cff861a1b699\nStatus: Image is up to date for linuxdeepin/beige:latest\ndocker.io/linuxdeepin/beige:latest",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "linuxdeepin/beige@sha256:db2dedb4926898486f39ca5bbc03739fc0ca765a519f91994ec9cff861a1b699",
+      "size_bytes": "65872869",
+      "os_release": "PRETTY_NAME=\"Deepin 23\"\nNAME=\"Deepin\"\nVERSION_ID=\"23\"\nVERSION=\"23\"\nID=Deepin\nHOME_URL=\"https://www.deepin.org/\"\nBUG_REPORT_URL=\"https://bbs.deepin.org\"\nVERSION_CODENAME=beige",
+      "pkg_format": "dpkg",
+      "pkg_count": "0\n118",
+      "glibc": "ldd (Debian GLIBC 2.35-1) 2.35",
+      "repos": "deb https://community-packages.deepin.com/beige/ beige main community commercial",
+      "vendor": "deepin 社区",
+      "product": "deepin beige (23)"
+    },
+    {
+      "ref": "docker.io/linuxdeepin/apricot:latest",
+      "pull": {
+        "rc": 0,
+        "stdout": "latest: Pulling from linuxdeepin/apricot\nDigest: sha256:9264b0496e8d2ef85abc97c4b326de65bfe3120b385ca556e6fddee65c8bf2c8\nStatus: Image is up to date for linuxdeepin/apricot:latest\ndocker.io/linuxdeepin/apricot:latest",
+        "stderr": ""
+      },
+      "available": true,
+      "digest": "linuxdeepin/apricot@sha256:9264b0496e8d2ef85abc97c4b326de65bfe3120b385ca556e6fddee65c8bf2c8",
+      "size_bytes": "62132699",
+      "os_release": "PRETTY_NAME=\"Deepin 20.8\"\nNAME=\"Deepin\"\nVERSION_ID=\"20.8\"\nVERSION=\"20.8\"\nVERSION_CODENAME=\"apricot\"\nID=Deepin\nHOME_URL=\"https://www.deepin.org/\"\nBUG_REPORT_URL=\"https://bbs.deepin.org/\"",
+      "pkg_format": "dpkg",
+      "pkg_count": "0\n114",
+      "glibc": "ldd (Debian GLIBC 2.28.21-1+deepin-1) 2.28",
+      "repos": "deb https://community-packages.deepin.com/deepin/ apricot main contrib non-free\ndeb https://com-store-packages.uniontech.com/appstore deepin appstore",
+      "vendor": "deepin 社区",
+      "product": "deepin apricot (20)"
+    },
+    {
+      "ref": "docker.io/uniontech/uos:latest",
+      "pull": {
+        "rc": 1,
+        "stdout": "",
+        "stderr": "Error response from daemon: pull access denied for uniontech/uos, repository does not exist or may require 'docker login'"
+      },
+      "available": false,
+      "vendor": "统信软件",
+      "product": "UOS（探测是否存在官方镜像）"
+    }
+  ],
+  "existence_probes": [
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1",
+      "exists": true,
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-server-minimal:v11",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-server-minimal:v11\": cr.kylinos.cn/kylin/kylin-server-minimal:v11: not found"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-desktop:v10",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-desktop:v10\": cr.kylinos.cn/kylin/kylin-desktop:v10: not found"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-desktop:v11",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-desktop:v11\": cr.kylinos.cn/kylin/kylin-desktop:v11: not found"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-desktop:latest",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-desktop:latest\": cr.kylinos.cn/kylin/kylin-desktop:latest: not found"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-linux-desktop:v10",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: failed to resolve reference \"cr.kylinos.cn/kylin/kylin-linux-desktop:v10\": cr.kylinos.cn/kylin/kylin-linux-desktop:v10: not found"
+    },
+    {
+      "ref": "docker.io/uniontech/uos:latest",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: pull access denied for uniontech/uos, repository does not exist or may require 'docker login'"
+    },
+    {
+      "ref": "docker.io/uniontech/uos-desktop:latest",
+      "exists": false,
+      "rc": 1,
+      "stderr_tail": "Error response from daemon: pull access denied for uniontech/uos-desktop, repository does not exist or may require 'docker login'"
+    }
+  ]
+}

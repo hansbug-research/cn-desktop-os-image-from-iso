@@ -1,0 +1,9 @@
+ref,result,evidence
+cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1,存在,
+cr.kylinos.cn/kylin/kylin-server-minimal:v11,不存在,"Error response from daemon: failed to resolve reference ""cr.kylinos.cn/kylin/kylin-server-minimal:v11"": cr.kylinos.cn/ky"
+cr.kylinos.cn/kylin/kylin-desktop:v10,不存在,"Error response from daemon: failed to resolve reference ""cr.kylinos.cn/kylin/kylin-desktop:v10"": cr.kylinos.cn/kylin/kyl"
+cr.kylinos.cn/kylin/kylin-desktop:v11,不存在,"Error response from daemon: failed to resolve reference ""cr.kylinos.cn/kylin/kylin-desktop:v11"": cr.kylinos.cn/kylin/kyl"
+cr.kylinos.cn/kylin/kylin-desktop:latest,不存在,"Error response from daemon: failed to resolve reference ""cr.kylinos.cn/kylin/kylin-desktop:latest"": cr.kylinos.cn/kylin/"
+cr.kylinos.cn/kylin/kylin-linux-desktop:v10,不存在,"Error response from daemon: failed to resolve reference ""cr.kylinos.cn/kylin/kylin-linux-desktop:v10"": cr.kylinos.cn/kyl"
+docker.io/uniontech/uos:latest,不存在,"Error response from daemon: pull access denied for uniontech/uos, repository does not exist or may require 'docker login"
+docker.io/uniontech/uos-desktop:latest,不存在,"Error response from daemon: pull access denied for uniontech/uos-desktop, repository does not exist or may require 'dock"

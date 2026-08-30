@@ -1,0 +1,9 @@
+vendor,product,ref,status,os_name,os_id,version_id,pkg_format,pkg_count,glibc
+麒麟软件,银河麒麟高级服务器操作系统 V10 SP1,cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1,可拉取,Kylin Linux Advanced Server,kylin,V10,rpm,217,2.28
+麒麟软件,银河麒麟高级服务器操作系统 V10,cr.kylinos.cn/kylin/kylin-server:v10,拉取失败,,,,,0,
+openKylin 社区,openKylin 2.0,docker.io/openkylin/openkylin:2.0,可拉取,openKylin,openkylin,2.0,dpkg,95,2.38
+openKylin 社区,openKylin latest,docker.io/openkylin/openkylin:latest,可拉取,openKylin,openkylin,3.0,dpkg,108,2.43
+deepin 社区,deepin-core,docker.io/deepin/deepin-core:latest,可拉取,Deepin GNU/Linux,deepin,15,dpkg,163,2.19
+deepin 社区,deepin beige (23),docker.io/linuxdeepin/beige:latest,可拉取,Deepin,Deepin,23,dpkg,118,2.35
+deepin 社区,deepin apricot (20),docker.io/linuxdeepin/apricot:latest,可拉取,Deepin,Deepin,20.8,dpkg,114,2.28
+统信软件,UOS（探测是否存在官方镜像）,docker.io/uniontech/uos:latest,拉取失败,,,,,0,

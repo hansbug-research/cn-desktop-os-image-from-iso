@@ -1,0 +1,10 @@
+distro,tier,image,rootfs_tar_mb,unpacked_size,packages,version_id,glibc,stopsignal,tar_sha256_16
+kylin11,micro,kylin-desktop-v11:micro,88,125MB,71,v11,2.38-1ok6.9k0.5,—,967426f09bc60549
+kylin11,base,kylin-desktop-v11:base,248,345MB,206,v11,2.38-1ok6.9k0.5,SIGRTMIN+3,aadad84ac7c44808
+kylin11,devel,kylin-desktop-v11:devel,498,686MB,255,v11,2.38-1ok6.9k0.5,SIGRTMIN+3,ba3da0e4b80e4240
+kylin10,micro,kylin-desktop-v10:micro,213,308MB,154,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,b9c6621f94870683
+kylin10,base,kylin-desktop-v10:base,270,394MB,221,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,6d3c9f7ec56bfded
+kylin10,devel,kylin-desktop-v10:devel,503,710MB,263,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,2c2b3677fd47e1ea
+uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,61e03d26e3ceaf67
+uos25,base,uos-desktop-v25:base,187,274MB,161,25,2.38-6deepin19,SIGRTMIN+3,b740c3685f1197f4
+uos25,devel,uos-desktop-v25:devel,444,631MB,205,25,2.38-6deepin19,SIGRTMIN+3,044af9b3b51b1b53

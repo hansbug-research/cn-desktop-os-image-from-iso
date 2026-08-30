@@ -1,0 +1,12 @@
+# 仓库不含镜像与 ISO：体积原因，也因为分发厂商制品有版权问题
+*.tar
+*.iso
+*.squashfs
+out/
+work/
+logs/
+build/*/
+localrepo/
+__pycache__/
+*.pyc
+.venv/

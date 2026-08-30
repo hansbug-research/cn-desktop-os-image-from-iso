@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""只读 raw/、只写 derived/。不联网、不调 docker。
+
+这条分界线的意义：重跑分析不需要重跑实验。正文里的每个统计量都必须出自
+derived/stats.json，不许在 Markdown 里手写。
+"""
+import json, pathlib, re, collections
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+RAW, DER = ROOT / "raw", ROOT / "derived"
+TAB = DER / "tables"; TAB.mkdir(parents=True, exist_ok=True)
+
+def load(n): return json.loads((RAW / n).read_text())
+def osrel(text):
+    d = {}
+    for l in (text or "").splitlines():
+        if "=" in l:
+            k, v = l.split("=", 1); d[k.strip()] = v.strip().strip('"')
+    return d
+def csv(name, header, rows):
+    out = [",".join(header)]
+    for r in rows:
+        out.append(",".join('"' + str(x).replace('"', '""') + '"' if any(c in str(x) for c in ',"\n')
+                            else str(x) for x in r))
+    (TAB / name).write_text("\n".join(out) + "\n")
+
+d1, d2, d3, d4, d5 = (load(f"d{i}_{n}.json") for i, n in
+    [(1, "official_images"), (2, "our_images"), (3, "capabilities"), (4, "gates"), (5, "iso_and_defects")])
+S = {}
+
+# ── T01 官方容器镜像可获得性 ────────────────────────────────────────────────
+rows = []
+for im in d1["images"]:
+    o = osrel(im.get("os_release", ""))
+    counts = (im.get("pkg_count") or "").split("\n")
+    n = next((c for c in counts if c.strip() and c.strip() != "0"), "0")
+    rows.append([im["vendor"], im["product"], im["ref"], "可拉取" if im["available"] else "拉取失败",
+                 o.get("NAME", ""), o.get("ID", ""), o.get("VERSION_ID", ""),
+                 im.get("pkg_format", ""), n.strip(),
+                 re.sub(r".*\)\s*", "", im.get("glibc", "")) or im.get("glibc", "")])
+csv("t01_official_image_availability.csv",
+    ["vendor", "product", "ref", "status", "os_name", "os_id", "version_id", "pkg_format", "pkg_count", "glibc"], rows)
+S["official_probed"] = len(d1["images"])
+S["official_available"] = sum(1 for i in d1["images"] if i["available"])
+
+# ── T02 存在性探测（桌面镜像到底有没有）────────────────────────────────────
+rows = [[p["ref"], "存在" if p["exists"] else "不存在", p.get("stderr_tail", "")[:120]]
+        for p in d1.get("existence_probes", [])]
+csv("t02_registry_existence_probes.csv", ["ref", "result", "evidence"], rows)
+S["existence_probes"] = len(rows)
+S["existence_found"] = sum(1 for p in d1.get("existence_probes", []) if p["exists"])
+S["kylin_desktop_official_images"] = sum(
+    1 for p in d1.get("existence_probes", []) if p["exists"] and "desktop" in p["ref"])
+S["uos_official_images"] = sum(
+    1 for p in d1.get("existence_probes", []) if p["exists"] and "uniontech" in p["ref"])
+
+# ── T03 产品线对照：官方 server 镜像 vs 我们从桌面 ISO 造的 ────────────────
+off = d2["official_reference"]; oo = osrel(off["os_release"])
+def line(tag, img, o, rec):
+    return [tag, img, o.get("NAME", ""), o.get("ID", ""), o.get("VERSION_ID", ""),
+            rec["pkg_format"], rec.get("glibc_pkg", ""),
+            (rec.get("repo_urls", "").splitlines() or [""])[0][:80]]
+rows = [line("厂商官方", off["image"], oo, off)]
+for r in d2["ours"]:
+    if r["tier"] == "base":
+        rows.append(line("本项目自建", r["image"], osrel(r["os_release"]), r))
+csv("t03_product_line_comparison.csv",
+    ["kind", "image", "os_name", "os_id", "version_id", "pkg_format", "glibc", "repo_url_sample"], rows)
+S["official_pkg_format"] = off["pkg_format"]
+S["ours_pkg_formats"] = sorted({r["pkg_format"] for r in d2["ours"]})
+S["os_id_collision"] = (oo.get("ID") == osrel(
+    next(r for r in d2["ours"] if r["distro_id"] == "kylin10")["os_release"]).get("ID"))
+
+# ── T04 九个镜像的构建产物事实 ──────────────────────────────────────────────
+rows = []
+for r in d2["ours"]:
+    o = osrel(r["os_release"])
+    n = [c for c in (r.get("pkg_count") or "").split("\n") if c.strip() and c.strip() != "0"]
+    rows.append([r["distro_id"], r["tier"], r["image"],
+                 round(r["tar_bytes"] / 1e6) if r.get("tar_bytes") else "",
+                 r.get("unpacked_human", ""),
+                 (n[0].strip() if n else ""), o.get("VERSION_ID", ""), r.get("glibc_pkg", ""),
+                 r.get("stopsignal", "") or "—", r.get("tar_sha256", "")[:16]])
+csv("t04_built_images.csv",
+    ["distro", "tier", "image", "rootfs_tar_mb", "unpacked_size", "packages", "version_id",
+     "glibc", "stopsignal", "tar_sha256_16"], rows)
+S["images_built"] = len(d2["ours"])
+S["tiers"] = sorted({r["tier"] for r in d2["ours"]})
+S["distros"] = sorted({r["distro_id"] for r in d2["ours"]})
+
+# ── T05 能力矩阵（三态）──────────────────────────────────────────────────────
+# 三态语义：Y=支持（实测通过）／N=不支持（该档位确有此需求却不满足，是缺口）／
+# NA=不适用（该档位定位下这一需求不存在）。
+#
+# 「不适用」只在有明确定位依据时才用，不拿它掩盖缺口。档位定位：
+#   micro = 纯运行时（应用在别处构建好再拷进来，不装包、不编译、不做运维排查）
+#   base  = 平台可用（有包管理、能装东西、能排查，但不预置工具链）
+#   devel = 构建用（工具链齐备）
+# 这份策略是矩阵表与热力图的**唯一真源** —— 两处各写一份必然漂移。
+NA_POLICY = {
+    "micro": {"apt", "apt_update", "apt_roundtrip", "apt_check", "sources_list", "apt_keyring",
+              "cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
+              "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
+              "autotools", "cc_clean_stderr", "python3_dev", "python3", "python3_run",
+              "python3_ssl", "perl", "git", "zstd", "unzip", "ps", "top", "sock_tools",
+              "ip_tools", "ping", "dnsutil", "file", "pager", "editor", "lsof", "strace", "gdb",
+              "useradd", "useradd_works", "su_to_user", "sudo", "systemd", "default_target",
+              "masked_units", "policy_rcd"},
+    "base":  {"cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
+              "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
+              "autotools", "cc_clean_stderr", "python3_dev", "git", "strace", "gdb", "sudo"},
+    "devel": {"sudo"},
+}
+probes = d3["probes"]
+keys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
+order = [f"{d}:{t}" for d in ["kylin11", "kylin10", "uos25"] for t in ["micro", "base", "devel"]]
+
+def tri(col, key):
+    tier = col.split(":")[1]
+    if key in NA_POLICY.get(tier, set()):
+        return "NA"
+    v = probes[col].get(key, "")
+    if v in ("n/a", ""):
+        return "NA"
+    return "Y" if v == "Y" else "N"
+
+csv("t05_capability_matrix.csv", ["capability"] + order,
+    [[k] + [tri(c, k) for c in order] for k in keys])
+csv("t05b_capability_raw.csv", ["capability"] + order,
+    [[k] + [probes[c].get(k, "") for c in order] for k in keys])
+S["capability_items"] = len(keys)
+S["capability_cells"] = len(keys) * len(order)
+S["probe_complete_all"] = all(v.get("_probe_complete") == "Y" for v in probes.values())
+_tri = [tri(c, k) for k in keys for c in order]
+S["cells_supported"] = _tri.count("Y")
+S["cells_gap"] = _tri.count("N")
+S["cells_na"] = _tri.count("NA")
+
+# ── T06 编译能力（本研究的首要用途）────────────────────────────────────────
+CC = ["compile_c", "static_link", "compile_cxx", "cxx17", "cxx20", "make_build",
+      "cc_clean_stderr", "cmake", "autotools", "pkgconfig", "python3_dev"]
+csv("t06_build_capability.csv", ["capability"] + order,
+    [[k] + [probes[c].get(k, "") for c in order] for k in CC])
+S["devel_c_ok"] = sum(1 for c in order if c.endswith(":devel") and probes[c].get("compile_c") == "Y")
+S["devel_cxx_ok"] = sum(1 for c in order if c.endswith(":devel") and probes[c].get("compile_cxx") == "Y")
+S["devel_count"] = sum(1 for c in order if c.endswith(":devel"))
+
+# ── T07 门禁结果 ────────────────────────────────────────────────────────────
+g = d4["gates"]
+csv("t07_gates.csv", ["gate", "result", "detail"], [
+    ["verify", f"{g['verify']['passed']} 通过 / {g['verify']['failed']} 失败",
+     f"基线 {g['verify']['baseline']}"],
+    ["digest-chain", f"{g['digest_chain']['passed']} 通过 / {g['digest_chain']['failed']} 失败",
+     "manifest = tar = 镜像"],
+    ["sbom", "全部可生成" if g["sbom"]["all_ok"] else "有失败", f"{len(g['sbom']['rows'])} 行"],
+    ["mutation", f"{g['mutation']['caught']} 抓到 / {g['mutation']['missed']} 漏",
+     f"{g['mutation']['skipped']} 跳过"],
+    ["repro", f"{g.get('repro',{}).get('identical',0)} 逐位一致", "同 builder 连构两次"],
+])
+S["verify_passed"] = g["verify"]["passed"]; S["verify_failed"] = g["verify"]["failed"]
+S["verify_baseline"] = g["verify"]["baseline"]
+S["digest_chain_passed"] = g["digest_chain"]["passed"]
+S["mutation_caught"] = g["mutation"]["caught"]; S["mutation_missed"] = g["mutation"]["missed"]
+S["repro_identical"] = g.get("repro", {}).get("identical", 0)
+S["manifests"] = len(d4["manifests"])
+
+# ── T08 厂商缺陷清单 ────────────────────────────────────────────────────────
+csv("t08_vendor_defects.csv", ["id", "distro", "title", "symptom", "root_cause", "impact", "fix", "where"],
+    [[x["id"], x["distro"], x["title"], x["symptom"], x["root_cause"], x["impact"], x["fix"], x["where"]]
+     for x in d5["defects"]])
+S["defects"] = len(d5["defects"])
+S["defects_by_distro"] = dict(collections.Counter(x["distro"] for x in d5["defects"]))
+
+# ── T09 三条构建路径 ────────────────────────────────────────────────────────
+csv("t09_build_paths.csv",
+    ["distro", "method", "suite", "expect_glibc", "expect_glibcxx", "usrmerge", "immutable"],
+    [[i["distro_id"], i["method"], i["suite"], i["expect_glibc"], i["expect_glibcxx"],
+      i["usrmerge"] or "", i["immutable"] or ""] for i in d5["isos"]])
+S["build_methods"] = sorted({i["method"] for i in d5["isos"]})
+
+(DER / "stats.json").write_text(json.dumps(S, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+print(f"derived/：{len(list(TAB.glob('*.csv')))} 张表，stats.json {len(S)} 个统计量")

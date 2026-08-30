@@ -1,0 +1,13 @@
+id,distro,title,symptom,root_cause,impact,fix,where
+D01,kylin11,base-files 不提供 usr-merge 符号链接,chroot 里无 /bin/sh，所有 #!/bin/sh 的 preinst 直接 ENOENT,V11 的 base-files 把 ./bin ./lib ./sbin 作为真实目录发出，而包内容已 usr-merge,mmdebstrap 路径完全无法起步（S0 阻断）,mmdebstrap --hook-dir=.../merged-usr,build/build.sh
+D02,kylin11,kysec2-package-plugins 让容器内 dpkg 必段错误,apt install 带 maintainer script 的包后永久卡在 half-configured，dpkg --configure -a 反复 SIGSEGV,该包往 /var/lib/dpkg/plugins/ 装 ksaf_label.so 与 spro.so，麒麟给 dpkg 打了补丁去 dlopen 它们；这两个插件依赖内核态 KYSEC LSM，容器里没有,一次 apt install 就让包数据库永久报废,PIN_NEVER 不装该包（其全部内容就是那两个 .so，且无任何包依赖它）,distros/kylin11.conf
+D03,kylin11,libboundscheck 把编译器写成运行时依赖,装一个运行时库要拖进整个 gcc/g++,"Depends 里写了 g++, gcc（应为 Build-Depends）",每档白背约 200MB,重打包去掉该依赖，版本加 +nogccdep1 后缀便于审计,tools/mk-localrepo.sh
+D04,kylin11,deb-host-gnu-type-secure 的 preinst 缺 Pre-Depends,devel 档构建失败,preinst 调 dpkg-architecture 却未 Pre-Depends: dpkg-dev,devel 档无法构建,该包内容只有 /usr/share/doc，用 container-stub 提供 + apt pin 到 -1,distros/kylin11.conf
+D05,kylin11,gcc/g++ 包装脚本污染 stderr,每次编译往 stderr 吐 grep: /CurrentlyBuilding: No such file or directory,厂商包装脚本无条件 grep 一个不存在的文件,编译本身成功，但会坑用 stderr 非空判错的 CI,不动厂商脚本（属等价环境底线内），仅记录：判错请用退出码,report.md
+D06,kylin10,bash 的 preinst 是 ELF 二进制,解包顺序里 libc 未就位则 ENOENT,厂商把 preinst 编译成了 ELF 而非脚本,mmdebstrap 路径不可用,debootstrap --foreign 两阶段，第二阶段在目标容器内用麒麟自己的 dpkg 完成,build/build-selfhost.sh
+D07,kylin10,宿主 dpkg 1.22 写的状态标记，目标 dpkg 1.19.7 读不懂,后续所有 dpkg 操作失败,宿主 Debian 13 的 dpkg 往 status 写 Conffiles: ... newconffile 标记,发行版工具链代差导致 mmdebstrap 路径不可用,同 D06，用目标自带 dpkg 完成 configure,build/build-selfhost.sh
+D08,uos25,OS 分发不走 apt，且两个授权源未授权返回 401,apt-get update 整体退出非零，哪怕 appstore 源本身是通的,sources.list.d 里 professional-security.chinauos.com 与 pro-driver-packages.uniontech.com 需订阅授权,镜像自带一个必然失败的源清单,默认注释掉并留重新启用说明（凭据写 /etc/apt/auth.conf.d/）,lib/common.sh
+D09,uos25,dpkg admindir 被搬到 /usr/lib/dpkg/var,SBOM 扫描器扫出来只有 2 个包,trivy 从镜像层 tar 里找 /var/lib/dpkg/status，且不跨归档跟随符号链接,SBOM 静默失效（看起来成功，内容是空的）,把 admindir 归位到 /var/lib/dpkg，原路径做符号链接指回,build/build.sh
+D10,uos25,info/format 漏拷导致 Multi-Arch 包集体报错,对一大片包报 missing the list control file,info/format（内容为 1）决定 Multi-Arch: same 的包用 pkg:arch.list 命名，漏拷则 dpkg 去找不带 arch 的名字,切片出的 dpkg 数据库不自洽,切片时一并拷 info/format 及 admindir 顶层元文件,tools/slice.py
+D11,共通,iproute2 的 tc ATM 插件缺库,ldd 报 libatm.so.1 => not found,libatm1t64（V10 上是 libatm1）只是 Recommends，--no-install-recommends 构建就缺,tc 的 ATM 队列不可用（容器场景无实际影响），但属真实悬空依赖,显式装入该库（约 50KB）,"distros/kylin11.conf, distros/kylin10.conf"
+D12,共通,桌面 ISO 出身的 systemd 默认目标是 graphical.target,base/devel 档启动 systemd 会去拉 display-manager，且零个 masked 单元,被试是桌面版 ISO，默认目标与真机一致,server 用途下会拉起跑不了的单元并刷错误,default.target 改指 multi-user.target，并 mask 掉容器内确证不可用的 7 个单元,lib/common.sh

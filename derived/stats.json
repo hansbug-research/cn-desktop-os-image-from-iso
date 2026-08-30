@@ -1,0 +1,53 @@
+{
+  "build_methods": [
+    "mmdebstrap",
+    "selfhost",
+    "slice"
+  ],
+  "capability_cells": 711,
+  "capability_items": 79,
+  "cells_gap": 102,
+  "cells_na": 209,
+  "cells_supported": 400,
+  "defects": 12,
+  "defects_by_distro": {
+    "kylin10": 2,
+    "kylin11": 5,
+    "uos25": 3,
+    "共通": 2
+  },
+  "devel_c_ok": 3,
+  "devel_count": 3,
+  "devel_cxx_ok": 2,
+  "digest_chain_passed": 9,
+  "distros": [
+    "kylin10",
+    "kylin11",
+    "uos25"
+  ],
+  "existence_found": 1,
+  "existence_probes": 8,
+  "images_built": 9,
+  "kylin_desktop_official_images": 0,
+  "manifests": 9,
+  "mutation_caught": 12,
+  "mutation_missed": 0,
+  "official_available": 6,
+  "official_pkg_format": "rpm",
+  "official_probed": 8,
+  "os_id_collision": true,
+  "ours_pkg_formats": [
+    "dpkg"
+  ],
+  "probe_complete_all": true,
+  "repro_identical": 6,
+  "tiers": [
+    "base",
+    "devel",
+    "micro"
+  ],
+  "uos_official_images": 0,
+  "verify_baseline": 360,
+  "verify_failed": 0,
+  "verify_passed": 365
+}

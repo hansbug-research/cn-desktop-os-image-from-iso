@@ -1,0 +1,6 @@
+gate,result,detail
+verify,365 通过 / 0 失败,基线 360
+digest-chain,9 通过 / 0 失败,manifest = tar = 镜像
+sbom,全部可生成,10 行
+mutation,12 抓到 / 0 漏,1 跳过
+repro,6 逐位一致,同 builder 连构两次
