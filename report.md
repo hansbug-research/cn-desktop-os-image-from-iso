@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **14** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 机器核对断言 **215** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **14** 张
 
 ## 1. 问题
 
@@ -60,7 +60,7 @@
 
 档位定位直接决定了能力矩阵里"不适用"格的判据（见 §6）。这一点必须先说定，否则"micro 档没有 gcc"到底算缺口还是算设计，会变成一笔糊涂账。
 
-九个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（实测 38%–47%，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
+九个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%，按 tar 原始字节而非四舍五入后的 MB 计，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
 
 ![三档镜像的体积与包数](figures/fig04_tier_size.png)
 
@@ -175,7 +175,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 **麒麟 V11 的 gcc 会污染 stderr。** 每次编译往 stderr 吐 `grep: /CurrentlyBuilding: No such file or directory`，编译本身成功。这是厂商包装脚本的缺陷（D05），我们没改——改厂商脚本就越过了"等价环境"的底线。影响是：在这个镜像里判断编译是否失败，必须用退出码，不能用 stderr 非空。
 
-**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源只提供 2496 个包，全部来自应用商店，连 `nano` 都没有，OS 分发走 OSTree 加玲珑。
+**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源索引只有 2496 个条目、全部来自应用商店仓库，其中不含任何 OS 基础包——连 `nano` 这样的基础编辑器在整个 apt 源里都查不到候选（`apt-cache policy nano` 返回 `Candidate: (none)`；同一次探测里对照组 `1000-notepad` 能查到 5.14.0，证明探测本身有效，见 `raw/d6_installability.json` 的 `uos_apt_scale`），OS 分发走 OSTree 加玲珑。
 
 这个数字的口径要说清楚：2496 是**源索引里的条目数**（用 `apt-helper cat-file` 解开压缩的 `Packages` 索引数出来的）。不要用 `apt-cache stats` 的 `Total package names`——那个数（4758）把本机已装的 OS 包和只在依赖里被引用过的名字也算了进去，不是「源里有多少包」。另外采集时带了一条**阳性对照**：从源索引里取一个真实存在的包名，确认 `apt-cache madison` 查得到它。没有这条对照，「14 个工具全都装不上」就区分不了「源里没有」与「源根本没通」。
 
@@ -243,6 +243,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 - **不覆盖内核态。** 容器共享宿主内核，厂商的 KYSEC、IMA/EVM 完整性度量、驱动都不在一致性范围内。麒麟的 `kysec2-package-plugins` 我们是直接不装的（见 D02）。
 - **UOS 的 `security.*` 扩展属性未保留。** rootless docker 无 `CAP_SYS_ADMIN`，`unsquashfs -xattrs` 会 FATAL。其中 IMA/EVM 那部分丢了没有实际影响（容器不加载相关 LSM），但 `security.capability`（file capabilities）在容器里是真会用的——如果业务二进制依赖 file capability 才能跑，在 UOS 三档里会表现成权限不足。
 - **漏洞跟踪没有做，因为通用扫描器对这三个发行版没有有效覆盖。** 这一条有一手数据（表 [`t13`](derived/tables/t13_cve_coverage.csv)，原始输出 `raw/d7_cve.json`）：用 trivy 0.70.0 扫九个镜像，**有效覆盖 0 个**——未识别的 3 个是麒麟 V11 三档（trivy 判为 `none`，压根没扫），误判成 Debian 的 6 个是麒麟 V10 与 UOS 各三档，九个镜像报出的 HIGH/CRITICAL 合计为 0。误判那六个最危险：拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0，而一个一百多个包的 bookworm 代镜像报 0 是不可信的——那是"比不出来"，不是"没有漏洞"。`make cve` 因此强制区分这两种情况，把无有效覆盖的镜像明确标出、不计入通过。真实的漏洞跟踪需要接厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，不在本仓库范围内。
+- **审计闭环防的是"改了没同步"，防不住"全员串通"。** 本仓库的证据链是自洽性校验：manifest ↔ tar ↔ 镜像 ID ↔ 探针输出 ↔ 正文数字互相对账，任何一处单独被改都会被 `make verify` 抓到（分析层 10 例变异全部报警，见 §7）。但如果有人同时改掉 `raw/` 里的原始输出、`derived/` 的复算结果、正文数字与 manifest 锚点，这套校验在结构上无法分辨——它验的是内部一致，不是"这些数真的来自那次执行"。要挡这一类需要外部信任根（构建产物签名、独立 CI 出具的证明），本仓库没有做。第三方复核的正确做法是拿脚本在自己机器上从 ISO 重跑一遍，而不是核对我们提交的数字彼此是否吻合。
 - **"官方"一词受限使用。** 只有能给出 registry 域名归属证据的才称官方。Docker Hub 上的 `kylin` 命名空间是无关第三方（内容是 Home Assistant 插件），不是厂商。
 
 ### 9.2 被推翻的判断与踩过的坑

@@ -160,6 +160,9 @@
     "devel",
     "micro"
   ],
+  "unpack_overhead_n": 9,
+  "unpack_overhead_pct_max": 46.9,
+  "unpack_overhead_pct_min": 37.9,
   "uos_apt_normal_packages": 2710,
   "uos_apt_positive_control": true,
   "uos_apt_repo_packages": 2496,
@@ -174,6 +177,7 @@
     "strace"
   ],
   "uos_iso_packages": 1636,
+  "uos_nano_candidate_none": true,
   "uos_official_images": 0,
   "verify_baseline": 360,
   "verify_failed": 0,

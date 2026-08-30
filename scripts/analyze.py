@@ -283,9 +283,37 @@ csv("t12_hardening_surface.csv", ["distro", "tier", "masked_units", "setuid_bins
 # 「采集之后又重建」这一类，mtime 守卫抓不到（它比的是采集时刻记下的两个时间，
 # 镜像在采集之后重建时那一对永远自洽）。用镜像 ID 与 manifest 记录的 ID 对账才行。
 S["image_id_mismatches"] = sorted(
-    f'{r["distro_id"]}:{r["tier"]}' for r in d2["ours"]
-    if r.get("image_id") and d4["manifests"].get(f'{r["distro_id"]}-{r["tier"]}', {}).get("image_id")
+    f'{r["distro_id"]}:{r["tier"]}' for r in d2["ours"]    if r.get("image_id") and d4["manifests"].get(f'{r["distro_id"]}-{r["tier"]}', {}).get("image_id")
     and r["image_id"] != d4["manifests"][f'{r["distro_id"]}-{r["tier"]}']["image_id"])
+
+
+# 「解包后比 tar 大四成上下」这句原先是手写进正文的、没有任何统计量兜底的数，
+# 且下界 37.8% 被我抹成了 38%（有一档真的低于 38%，属于把下界往上报）。
+# 一律从 t04 现算，正文只允许引用这里的数。
+def _mb(v):
+    m = re.match(r"([\d.]+)\s*([KMG]?)B?", str(v).strip(), re.I)
+    if not m:
+        return None
+    x, u = float(m.group(1)), m.group(2).upper()
+    return x / 1024 if u == "K" else x * 1024 if u == "G" else x
+
+_ovh = []
+for _r in d2["ours"]:
+    _t = _r["tar_bytes"] / 1e6 if _r.get("tar_bytes") else None
+    _u = _mb(_r.get("unpacked_human", ""))
+    if _t and _u:
+        _ovh.append(round((_u - _t) / _t * 100, 1))
+# 九个镜像一个都不能少，否则「区间」是在子集上算的
+assert len(_ovh) == len(d2["ours"]), f"解包开销只算到 {len(_ovh)}/{len(d2['ours'])} 个镜像"
+S["unpack_overhead_pct_min"] = min(_ovh)
+S["unpack_overhead_pct_max"] = max(_ovh)
+S["unpack_overhead_n"] = len(_ovh)
+
+# UOS「连 nano 都没有」这句的证据绑定：既要 nano 无候选，也要对照组能查到——
+# 少了对照组，「查不到」和「探测坏了」无法区分。
+_scale = d6.get("uos_apt_scale", "")
+_nano = _scale.split("---nano---")[-1] if "---nano---" in _scale else ""
+S["uos_nano_candidate_none"] = "Candidate: (none)" in _nano
 S["keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
                           sorted((r.get("keyrings") or "").split())
                           for r in d2["ours"]}

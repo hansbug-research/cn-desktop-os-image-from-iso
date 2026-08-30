@@ -146,7 +146,7 @@ ok(S["installable_uos25"] == 0, "UOS 应 0/14 —— 这是「硬缺口」论断
 in_text(S["uos_iso_packages"], label="UOS ISO 包数")
 ok(S["uos_iso_has_gxx"] is False, "UOS ISO 里不应有 g++（C++ 构建环境论断的依据）")
 in_text(S["uos_apt_repo_packages"], label="UOS 源提供的包数",
-        ctx=rf"源只提供 {S['uos_apt_repo_packages']} 个包")
+        ctx=rf"源索引只有 {S['uos_apt_repo_packages']} 个条目")
 ok(S["uos_apt_positive_control"] is True,
    "UOS 源规模采集必须带阳性对照 —— 否则「工具都装不上」区分不了「源里没有」与「源没通」")
 ok(S["sbom_passed"] == 9, "sbom 应 9 个镜像全通过")
@@ -345,10 +345,45 @@ if m:
 mr = re.search(r"机器核对断言 \*\*(\d+)\*\* 条", README)
 ok(mr is not None, "README 抬头应声明机器核对断言条数")
 
+# ── 归因绑定：小整数在正文里出现上百处，裸 in_text 等于没查 ──────────────
+# 每个数必须绑到它所论断的那一句上，否则改坏了也能在别处蒙到同样的数字。
+ok(S["existence_probes"] == 8, "存在性探测应为 8 条")
+in_text(S["existence_probes"], label="存在性探测条数",
+        ctx=rf"另一组 {S['existence_probes']} 条是针对桌面 tag 的存在性探测")
+ok(S["existence_found"] == 1, "8 条探测里应只有 1 条拉得到")
+in_text("kylin/kylin-server-minimal:v10sp1", label="唯一拉得到的那条要写明是哪条",
+        ctx=r"唯一拉得到的是 `kylin/kylin-server-minimal:v10sp1`")
+ok(S["official_pkg_format"] == "rpm", "麒麟官方镜像应为 rpm 系")
+in_text(S["official_pkg_format"], label="官方镜像包格式",
+        ctx=rf"\*\*{S['official_pkg_format']}\*\*（\d+ 个包）")
+ok(S["os_id_collision"] is True, "两条产品线的 os-release ID 应确实撞名（这是全文最易被质疑处）")
+ok(S["kylin_desktop_official_images"] == 0, "麒麟桌面线官方镜像应为 0 个")
+ok(S["uos_official_images"] == 0, "UOS 官方桌面镜像应为 0 个")
+ok(S["cve_unrecognized"] == 3, "trivy 未识别应为 3 个")
+in_text(S["cve_unrecognized"], label="CVE 未识别数",
+        ctx=rf"未识别的 {S['cve_unrecognized']} 个是麒麟 V11 三档")
+ok(S["cve_misidentified"] == 6, "trivy 误判为 Debian 应为 6 个")
+in_text(S["cve_misidentified"], label="CVE 误判数",
+        ctx=rf"误判成 Debian 的 {S['cve_misidentified']} 个")
+ok(len(S["uos_iso_missing"]) == 6, "UOS ISO 缺的构建工具应为 6 个")
+for _t in S["uos_iso_missing"]:
+    in_text(_t, label=f"UOS ISO 缺失工具 {_t} 应在正文列出")
+
+# §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
+# 否则「源里没有」与「探测本身坏了」在证据上不可区分。
+ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
+in_text("Candidate: (none)", label="正文引用的是实际执行的 apt-cache policy 输出",
+        ctx=r"apt-cache policy nano` 返回 `Candidate: \(none\)")
+in_text("1000-notepad", label="正文写明对照组")
+in_text(S["unpack_overhead_pct_min"], label="解包开销下界",
+        ctx=r"实测 %s%%–" % S["unpack_overhead_pct_min"])
+in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
+        ctx=r"–%s%%，按 tar 原始字节" % S["unpack_overhead_pct_max"])
+
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "190"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "215"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
