@@ -593,6 +593,24 @@ ok("能不能纯 HTTP 复现" in REPORT,
 ok("TaiShan 节点匿名可取到 98 个版本" in REPORT,
    "EulerOS 判定所依赖的正对照必须写在正文 —— 没有它，「门户里没条目」与「藏在登录墙后」无法区分")
 
+# ── 段落重复检测：本轮真正的伤害来源 ────────────────────────────────────
+# 一次「删除」实际把待删块换成了前一段的副本，留下 26 行陈旧重复，
+# 并由此在正文里留下三处自相矛盾（同一现象既是两次又是三次、
+# 同一结论既「无法区分」又「已定案」）。322 条断言当时全过 —— 它们
+# 逐字锚定数字，却没有一条在看「同一段是不是出现了两次」。
+_paras = [x.strip() for x in REPORT.split("\n\n") if len(x.strip()) >= 80]
+_dupes = sorted({x[:60] for x in _paras if _paras.count(x) > 1})
+ok(_dupes == [],
+   f"正文不许有重复段落（重复 {len(_dupes)} 处，首处：{_dupes[:1]}）")
+# 表格也查：整张表被复制一份时，表头会出现两次
+for _hdr in ("| 公告期号 | 桌面操作系统入围 |", "| | OS | 类型 | 厂商/主导方 |"):
+    ok(REPORT.count(_hdr) == 1,
+       f"表头「{_hdr[:24]}…」应只出现 1 次，实际 {REPORT.count(_hdr)} 次")
+# 脚注定义不许重复：GitHub 只取首个，重复定义会让附录 C 的完整版被中段的覆盖
+_defs = re.findall(r"^\[\^(R\d+)\]:", REPORT, re.M)
+_ddup = sorted({d for d in _defs if _defs.count(d) > 1})
+ok(_ddup == [], f"脚注定义不许重复（重复：{_ddup}）")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -607,7 +625,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "322"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "326"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

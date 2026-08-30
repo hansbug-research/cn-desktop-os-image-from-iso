@@ -130,7 +130,10 @@ if d8:
                          if e.get("iso_access_qualifier") else "")
                       + _c(e, "s_iso_access")),
                      e.get("s_customers", "") + _c(e, "s_customers"),
-                     e["maintained"].split("（")[0].split("：")[0],
+                     # 维护状态：优先用显式的短限定 s_maintained；没有就取首段。
+                     # 不能一律截到「（」——那会把「品牌活跃（桌面线最近更新未查到）」
+                     # 削成无条件的「品牌活跃」。
+                     e.get("s_maintained") or e["maintained"].split("（")[0].split("：")[0],
                      img + _c(e, "image"),
                      _c(e, "general")])
     csv("t14_os_census.csv",
