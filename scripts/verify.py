@@ -797,6 +797,71 @@ in_text(len(S["aqkk_desktop_listed"]), label="安可在列家数",
 in_text(len(S["aqkk_desktop_absent"]), label="安可缺席家数",
         ctx=rf"另有 {len(S['aqkk_desktop_absent'])} 家明确不在")
 
+# ── 按「量」批量核对，而不是逐句绑 ────────────────────────────────────────
+# 前四轮 10 个 ❌ 里有 6 个是同一模式：某个量在一处更新了、另一处没跟上，
+# 而门禁只绑了其中一处。系统扫描发现两份 md 里 142 处数字有 84 处无门禁、
+# 其中 53 处能从派生数据现算。逐句加 in_text 治不了这个类别 —— 换成按量核：
+# 每个量配一组「量词模式」，凡文中以该模式出现的地方，数值必须等于派生值。
+_QTY = [
+    (S["census_os_count"],        [r"名录里 (\d+) 个 OS", r"扩到 (\d+) 个 OS",
+                                   r"全部 (\d+) 个 OS", r"(\d+) 个 OS 逐个直连",
+                                   r"全名录（(\d+) 个", r"名录 \*\*(\d+)\*\* 个"], "名录 OS 数"),
+    (S["census_probes"],          [r"(\d+) 个候选引用实测", r"实测（(\d+) 个引用",
+                                   r"存在性实测（(\d+) 个引用"], "名录实测引用数"),
+    (S["references_total"],       [r"共 (\d+) 条，定义见附录", r"共 (\d+) 条，可复算副本",
+                                   r"全局引用表（(\d+) 条", r"参考来源 \*\*(\d+)\*\* 条"], "引用条数"),
+    (S["references_title_from_page"], [r"(\d+) 条的标题由脚本抓自"], "抓自页面的标题数"),
+    (S["references_title_manual"],[r"另 (\d+) 条的页面不返回"], "人工标注的标题数"),
+    (len(S["iso_direct"]),        [r"\*\*直接下载 (\d+) 家\*\*", r"(\d+) 家直连可取"], "ISO 直接下载家数"),
+    (S["existence_probes"],       [r"(\d+) 个候选引用 \d+ 个可匿名拉取",
+                                   r"上面那 (\d+) 个候选引用", r"在这 (\d+) 条里",
+                                   r"对 (\d+) 条探测的观察"], "d1 候选引用数"),
+    (S["official_available"],     [r"\d+ 个候选引用 (\d+) 个可匿名拉取"], "可匿名拉取数"),
+    (S["installability_tools"] if isinstance(S.get("installability_tools"), int)
+     else len(S.get("installability_tools", [])),
+                                  [r"(\d+) 个工具在各自源里", r"这 (\d+) 个工具在各自软件源",
+                                   r"「(\d+) 个工具全都装不上」", r"(\d+) 个常见工具的源内可装性",
+                                   r"(\d+) 个工具是 `ipr"], "可装性工具数"),
+    (S["uos_iso_packages"],       [r"（(\d+) 个包的 ISO 清单", r"（(\d+) 个包的清单可查"], "UOS ISO 包数"),
+    (S["defects"],                [r"\+ (\d+) 条厂商缺陷"], "厂商缺陷数"),
+    (S["mutation_caught"],        [r"(\d+) 个用例覆盖删", r"上面那 (\d+) 例打的是镜像内",
+                                   r"镜像层 (\d+) 例）"], "镜像层变异用例数"),
+    (S["uos_apt_repo_packages"],  [r"源索引只有 (\d+) 个条目"], "UOS 源索引条目数"),
+    (S["census_probes_exist"],    [r"个候选引用实测 (\d+) 个存在"], "名录实测存在数"),
+    (S["images_built"],           [r"× (\d+) 个镜像 = 648"], "镜像数"),
+
+]
+for _val, _pats, _lbl in _QTY:
+    _hits = 0
+    for _pat in _pats:
+        for _w in (REPORT, README):
+            for _m in re.finditer(_pat, _w):
+                _hits += 1
+                ok(int(_m.group(1)) == _val,
+                   f"{_lbl}应为 {_val}，但有一处写 {_m.group(1)}（模式 {_pat}）")
+    ok(_hits > 0, f"{_lbl}的量词模式在文中一处都没匹配到 —— 模式过时了，这条断言在空转")
+
+# 这几个量不在 stats 里，但同样能从名录或表格现算，正文引了就该绑。
+_ent = json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
+_deb = sum(1 for e in _ent if any(k in e.get("s_lineage", "")
+                                  for k in ("Debian", "deb 系", "Ubuntu")))
+_m = re.search(r"名录里 \d+ 个 OS 里，有 (\d+) 个是 deb 系", REPORT)
+ok(_m is not None and int(_m.group(1)) == _deb,
+   f"deb 系家数应为 {_deb}，实际写 {_m.group(1) if _m else '缺'}")
+_unst = sum(1 for e in _ent if "未" in e.get("s_lineage", "")[:16])
+_m = re.search(r"那一列显示 (\d+) 家的血统「官方未声明」", REPORT)
+ok(_m is not None and int(_m.group(1)) == _unst,
+   f"血统未声明家数应为 {_unst}，实际写 {_m.group(1) if _m else '缺'}")
+# DevStation 版本数：正文那张表里 DevStation/ 为 200 的行数
+_dev = REPORT[REPORT.index("| 版本 | `DevStation/`"):]
+_dev = _dev[:_dev.index("\n\n")]
+_dev200 = sum(1 for l in _dev.split("\n")
+              if l.startswith("| ") and re.search(r"\| 200 \|", l))
+_m = re.search(r"DevStation 本身有 (\d+) 个版本", REPORT)
+ok(_m is not None, "DevStation 版本数那句必须存在")
+ok(int(_m.group(1)) == 6,
+   f"DevStation 版本数应为 6（SP1/SP2/SP3/24.09/25.03/25.09），实际写 {_m.group(1)}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -811,7 +876,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "376"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "437"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
