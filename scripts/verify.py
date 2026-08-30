@@ -553,6 +553,25 @@ in_text("Ⅱ级", label="HarmonyOS 的 Ⅱ 级必须写明（唯一非 Ⅰ 级�
 ok("未能访问" in REPORT,
    "「未能访问」与「站点下线」的区分必须在正文出现（普华官网 502 那处）")
 
+# 名录与构建脚本的对账：凡 distros/*.conf 里有公开 ISO_URL 的发行版，
+# 名录的 ISO 获取列不得标为「需授权」—— 这个矛盾本轮真的发生过（统信那条），
+# 而当时没有任何断言在看，全靠用户指出。
+_iso_urls = {}
+for _cf in sorted((ROOT / "distros").glob("*.conf")):
+    for _l in _cf.read_text().splitlines():
+        if _l.startswith("ISO_URL="):
+            _iso_urls[_cf.stem] = _l.split("=", 1)[1].strip().strip('"')
+_DID2NAME = {"uos25": "统信桌面操作系统 V25（UOS）",
+             "kylin11": "银河麒麟桌面操作系统", "kylin10": "银河麒麟桌面操作系统"}
+_contra = []
+_ent = {e["name"]: e for e in json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]}
+for _did, _u in _iso_urls.items():
+    _nm = _DID2NAME.get(_did)
+    if _nm and _nm in _ent and "授权" in _ent[_nm].get("s_iso_access", ""):
+        _contra.append(f"{_did}（conf 里有公开 ISO_URL {_u[:48]}…）↔ 名录标为需授权")
+ok(_contra == [], "名录不得与构建脚本矛盾：" + "；".join(_contra))
+ok(len(_iso_urls) >= 1, f"至少应有一个发行版在 conf 里记了 ISO_URL，实际 {len(_iso_urls)}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -567,7 +586,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "301"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "303"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
