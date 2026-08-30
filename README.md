@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 国产桌面 OS 名录 **21** 个（商业 12 / 社区开源 9）｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12**（镜像层）+ **15**（分析层）条 ｜ 机器核对断言 **365** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条（GitHub 脚注，逐格 cite）
+> 基准日 **2026-08-30** ｜ 国产桌面 OS 名录 **21** 个（商业 12 / 社区开源 9）｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格逐格判定 ｜ 验收断言 **365** 条 ｜ 变异用例 **12**（镜像层）+ **15**（分析层）条 ｜ 机器核对断言 **376** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张（含机器无关的数据侧车 `figures/plotdata.json`）｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条（GitHub 脚注，逐格 cite）
 
 要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把「从桌面版 ISO 自己造分档镜像」这件事做通并留下完整证据：三条构建路径、九个镜像、648 格逐格判定的能力矩阵、五道验收门禁。
 
@@ -14,8 +14,8 @@
 
 | # | 结论 | 证据 |
 |---|---|---|
-| 1 | **麒麟「有官方容器镜像」是个误读。** `cr.kylinos.cn` 上匿名可拉的唯一镜像是 `kylin-server-minimal:v10sp1`，它是 **rpm** 包格式、glibc `2.28-36.1.p24.ky10`、软件源在 `update.cs2c.com.cn`；而桌面 V10/V11 是 **dpkg**、glibc `2.31-0kylin9.1k20.3` / `2.38-1ok6.9k0.5`、源在 `archive.kylinos.cn`。包格式、glibc、软件源三样全不同 | [§2.1](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`fig02`、[`t03`](derived/tables/t03_product_line_comparison.csv) |
-| 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
+| 1 | **麒麟「有官方容器镜像」是个误读。** `cr.kylinos.cn` 上匿名可拉的唯一镜像是 `kylin-server-minimal:v10sp1`，它是 **rpm** 包格式、glibc `2.28-36.1.p24.ky10`、软件源在 `update.cs2c.com.cn`；而桌面 V10/V11 是 **dpkg**、glibc `2.31-0kylin9.1k20.3` / `2.38-1ok6.9k0.5`、源在 `archive.kylinos.cn`。包格式、glibc、软件源三样全不同 | [§2.3](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`fig02`、[`t03`](derived/tables/t03_product_line_comparison.csv) |
+| 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.3](report.md#23-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
 | 3 | **国产桌面 OS 里没有一个有桌面版官方容器镜像。** 名录 21 个 OS（商业 12 / 社区开源 9）、42 个候选引用实测 18 个存在，但带 `desktop`/`ukui`/`dde` 字样的 **13 条跨 5 家 registry 一条都不存在**。更强的一格：直接枚举厂商自己的 registry——`cr.kylinos.cn` 的 `kylin` 项目 27 个仓库全列出、含 desktop 或 ukui 的 **0 个**；`registry.uniontech.com` **18 个公开项目、0 个桌面相关**，基础镜像项目名就叫 `uos-server-base`。唯一例外是 openEuler DevStation 的 1.92 GiB rootfs，而它不在任何 registry、只有一个版本 | [§2](report.md#2-国产桌面-os-的分布与官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
 | 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源索引只有 2496 个条目、全来自应用商店，连 `nano` 都查不到候选），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
@@ -119,8 +119,9 @@ python3 scripts/collect_d8_os_census.py         # 名录的镜像实测，需要
 ```
 report.md                     学术正文（问题 → 官方镜像现状 → 分档 → 三条构建路径 →
                               精简与改造 → 能力矩阵 → 验收 → 可复现性 → 局限与过程记录）
-distros/                      三个发行版的构建参数：源、套件、期望 ABI 基线、档位包集、
-  kylin11.conf                  以及每个厂商缺陷的绕法与理由
+config/os_census.json         国产桌面 OS 名录（人工维护的文献部分，每条带 sources）
+config/references.json        全局引用表（125 条，report 里每处 [^Rn] 指向它）
+\1  kylin11.conf                  以及每个厂商缺陷的绕法与理由
   kylin10.conf
   uos25.conf
 build/                        构建入口
@@ -170,7 +171,7 @@ scripts/                      collect_d*.py 只采集不判断；analyze.py 只�
 
 ## 7. 相关工作
 
-同 org 的 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study) 研究的是「用哪个基座编、能落到哪些国产桌面上」的 ABI 选型，被试是既有镜像；本仓库研究的是「目标环境本身怎么造出来」。两者结论互补：前者结论 7 指出厂商 server 镜像可作为对应桌面版的 **ABI 预检代理**，本仓库 §2.1 指出它**不是**桌面版的等价环境——符号地板的单向预检与用户态环境的一致复现是两个不同强度的需求。
+同 org 的 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study) 研究的是「用哪个基座编、能落到哪些国产桌面上」的 ABI 选型，被试是既有镜像；本仓库研究的是「目标环境本身怎么造出来」。两者结论互补：前者结论 7 指出厂商 server 镜像可作为对应桌面版的 **ABI 预检代理**，本仓库 §2.3 指出它**不是**桌面版的等价环境——符号地板的单向预检与用户态环境的一致复现是两个不同强度的需求。
 
 ## 8. 许可
 

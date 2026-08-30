@@ -617,6 +617,7 @@ ok(_ddup == [], f"脚注定义不许重复（重复：{_ddup}）")
 # 逐名核对必须限定在**那一句话之内** —— 只查「名字出现在正文任意位置」是永真的
 # （FydeOS、deepin 这些在别处大量出现），上一轮那个 bug 其实是靠写死的黑名单抓到的，
 # 而黑名单只防已经犯过的那一次。
+_ent8_names = json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
 _absent_sent = re.search(r"另有 \d+ 家明确不在（[^）]*）", REPORT)
 ok(_absent_sent is not None, "缺席名单那句话必须存在")
 _as = _absent_sent.group(0) if _absent_sent else ""
@@ -631,8 +632,18 @@ for _n in S["aqkk_desktop_absent"]:
 _names = re.findall(r"[\u4e00-\u9fffA-Za-z][\u4e00-\u9fffA-Za-z0-9]{1,12}", _as)
 _absent_short = {n.split("（")[0].replace("桌面操作系统", "").replace("安全操作系统", "").strip()
                  for n in S["aqkk_desktop_absent"]}
-_listed_but_absent = [n for n in _names if n in {"优麒麟", "deepin", "openKylin", "openEuler",
-                                                 "Anolis", "OpenCloudOS", "Loongnix", "AOSC"}]
+# 反向名单从数据现算：凡不在 aqkk_desktop_absent 里的 OS 名（含在列那 3 家）
+# 都不该出现在这句话里。先前写死黑名单，恰好漏掉在列的 3 家（实测塞「统信UOS」不报）。
+_all_os = {e["name"] for e in _ent8_names}
+_notabsent = set()
+for _n in _all_os - set(S["aqkk_desktop_absent"]):
+    _sh = _n.split("（")[0]
+    for _suf in ("桌面操作系统", "安全操作系统", "操作系统"):
+        _sh = _sh.replace(_suf, "")
+    _sh = _sh.strip()
+    if len(_sh) >= 3:
+        _notabsent.add(_sh)
+_listed_but_absent = sorted(n for n in _notabsent if n in _as)
 ok(_listed_but_absent == [],
    f"缺席那句话里不许出现这些名字（它们不在 aqkk_desktop_absent 集里）：{_listed_but_absent}")
 # 加包代价那四个数：两个起点都有锚点，说成一个是错的
@@ -739,6 +750,53 @@ _anch = {r["unpacked_size"] for r in _t04rows}
 ok("345MB" in _anch and "281MB" in _anch,
    f"345MB 与 281MB 都应出现在 t04 的 unpacked_size 列，实际该列：{sorted(_anch)}")
 
+# ── 章节编号漂移与正文内的陈旧例数：第四轮两个 ❌ 的整类根因 ──────────────
+# ① 「§x.y」标签与它 anchor 指向的标题编号必须一致 —— 插入名录那次把
+#    「麒麟是另一条产品线」从 §2.1 挤到 §2.3，anchor slug 改了、可见的标签没改。
+_heads = {}
+for _m in re.finditer(r"^#{2,4}\s+((\d+(?:\.\d+)?)[\s.、]\s*.+)$", REPORT, re.M):
+    _heads[_gh_anchor(_m.group(1))] = _m.group(2)
+_mismatch = []
+for _m in re.finditer(r"\[§(\d+(?:\.\d+)?)\]\(report\.md#([^\)]+)\)", README):
+    _lbl, _anc = _m.group(1), _m.group(2)
+    _real = _heads.get(_anc)
+    if _real and _real != _lbl:
+        _mismatch.append(f"标签 §{_lbl} → anchor 实为 §{_real}")
+ok(_mismatch == [], f"README 里「§x.y」标签必须与 anchor 指向的标题编号一致（不符：{_mismatch}）")
+
+# ② 正文里写的「分析层 N 例」必须等于 mutation-docs.sh 的实际用例数。
+#    先前只绑抬头那一处，正文 §9.1 的两处漂了三个版本没人发现。
+_nc = len(re.findall(r"^(?:mut|mutcmd) ", (ROOT / "test" / "mutation-docs.sh").read_text(), re.M))
+for _m in re.finditer(r"分析层 (\d+) 例", REPORT):
+    ok(int(_m.group(1)) == _nc,
+       f"正文的「分析层 N 例」应为 {_nc}，实际写 {_m.group(1)}")
+ok(len(re.findall(r"分析层 \d+ 例", REPORT)) >= 2,
+   "正文应至少两处提到分析层例数（§9.1 的两处），否则这条断言等于空转")
+
+# ③ report 的门禁结果表五个数也要绑 —— 先前只绑 README 那张，两份可以互相矛盾。
+for _v, _ctx, _lbl in [
+    (S["verify_passed"], rf"\*\*{S['verify_passed']} 通过 / 0 失败\*\*", "report 门禁表 verify"),
+    (S["digest_chain_passed"], rf"\*\*{S['digest_chain_passed']} / 9\*\*", "report 门禁表 digest/sbom"),
+    (S["mutation_caught"], rf"\*\*{S['mutation_caught']} 抓到 / 0 漏", "report 门禁表 mutation"),
+    (S["repro_identical"], rf"\*\*{S['repro_identical']} / 6 逐位一致\*\*", "report 门禁表 repro"),
+]:
+    in_text(_v, label=_lbl, ctx=_ctx)
+
+# ④ config/ 与 raw/ 的名录必须一致 —— report 说 config 是「可核对的源文件」，
+#    而门禁读的是 raw；只改 config 那一边先前两个方向都不报警。
+_cfg = json.loads((ROOT / "config" / "os_census.json").read_text())["entries"]
+_raw8 = json.loads((ROOT / "raw" / "d8_os_census.json").read_text())["entries"]
+ok(_cfg == _raw8,
+   "config/os_census.json 与 raw/d8_os_census.json 的 entries 必须逐字段相等"
+   "（前者是报告声明的可核对源文件，后者是门禁实际读的）")
+
+
+# ⑥ 缺席那句话里的两个可现算数字
+in_text(len(S["aqkk_desktop_listed"]), label="安可在列家数",
+        ctx=rf"在列的是 \*\*{len(S['aqkk_desktop_listed'])} 家")
+in_text(len(S["aqkk_desktop_absent"]), label="安可缺席家数",
+        ctx=rf"另有 {len(S['aqkk_desktop_absent'])} 家明确不在")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -753,7 +811,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "365"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "376"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
@@ -762,6 +820,12 @@ if N < BASELINE:
 # ⚠️ 这条检查**不走 ok()**：它自己若计入 N，抬头数就永远比实跑少 1，形成自指。
 if mr and int(mr.group(1)) != N:
     BAD.append(f"README 抬头写的机器核对断言 {mr.group(1)} 条 ≠ 实际执行 {N} 条")
+# report 抬头那份先前无人比对，改错全绿。与 README 同判据，同样不走 ok()。
+_mrep = re.search(r"机器核对断言 \*\*(\d+)\*\* 条", REPORT)
+if _mrep and int(_mrep.group(1)) != N:
+    BAD.append(f"report 抬头写的机器核对断言 {_mrep.group(1)} 条 ≠ 实际执行 {N} 条")
+if not _mrep:
+    BAD.append("report 抬头缺「机器核对断言 N 条」")
 print(f"执行断言 {N} 条（基线 {BASELINE}）")
 if BAD:
     print(f"❌ {len(BAD)} 条未过：")

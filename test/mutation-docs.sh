@@ -28,6 +28,9 @@ mutcmd() { # $1=说明 $2=文件 $3=任意 shell 命令（sed 表达不出的变
 mut() { # $1=说明 $2=文件 $3=sed 表达式
   local name=$1 file=$2 expr=$3
   cp "$file" "$file.mutbak"
+  # 15 个用例里 10 个走这里 —— trap 与 mutcmd 一致，否则被打断会同时留下
+  # .mutbak 与被改坏的文件（实测复现过）
+  trap '[ -f "$file.mutbak" ] && mv "$file.mutbak" "$file"' INT TERM
   sed -i "$expr" "$file"
   if python3 scripts/verify.py >/dev/null 2>&1; then
     echo "  ❌ $name — verify 没抓到"; FAIL=$((FAIL+1))
@@ -35,6 +38,7 @@ mut() { # $1=说明 $2=文件 $3=sed 表达式
     echo "  ✅ $name — verify 如期失败"; PASS=$((PASS+1))
   fi
   mv "$file.mutbak" "$file"
+  trap - INT TERM
 }
 
 echo "分析层变异测试（改坏后 verify.py 必须非零退出）"
