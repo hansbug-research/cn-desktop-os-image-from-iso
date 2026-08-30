@@ -32,7 +32,13 @@ docker exec "$BUILDER" bash -c "unset http_proxy https_proxy; ROOT=/w . /w/lib/c
 # ── 阶段 1：--foreign 纯解包
 # .foreign-done 里存输入指纹（源+suite+components+STAGE_INCLUDE）。只有指纹一致才复用 stage，
 # 否则改了 distros/*.conf 的包清单会静默拿旧 stage 继续构建。
-STAGE_FP=$(printf '%s|%s|%s|%s' "$MIRROR" "$SUITE" "$COMPONENTS" "${STAGE_INCLUDE:-}" | sha256sum | cut -c1-16)
+# ⚠️ 指纹必须包含 keyring 的**内容哈希**：debootstrap 会把 --keyring 指向的文件
+# 拷进 rootfs，并把它的文件名写进 sources.list 的 signed-by=。换了信任根却不换指纹，
+# 旧 stage 会被复用，于是产物里留着一个仓库里已不存在的 keyring —— 实际踩过：
+# 把信任集从 kylin-combined.gpg 收窄到 kylin-archive-keyring.gpg 之后，
+# kylin10 三档仍然带着旧文件，而 manifest 的哈希锚点已经跟着新代码更新了。
+KEYRING_FP=$(sha256sum "$ROOT_HOST/keys/$(basename "${KEYRING:-keys/kylin-archive-keyring.gpg}")" 2>/dev/null | cut -c1-16)
+STAGE_FP=$(printf '%s|%s|%s|%s|%s' "$MIRROR" "$SUITE" "$COMPONENTS" "${STAGE_INCLUDE:-}" "$KEYRING_FP" | sha256sum | cut -c1-16)
 if [ "$(cat "$ROOT_HOST/build/$DID-stage/.foreign-done" 2>/dev/null)" != "$STAGE_FP" ]; then
   log "[$DID] 阶段1: debootstrap --foreign（只解包，不跑 maintainer script）"
   docker exec "$BUILDER" bash -c "

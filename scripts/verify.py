@@ -186,12 +186,36 @@ ok(_off[5] in README, f"官方镜像包格式 {_off[5]} 应在 README 出现")
 
 # ── 漏洞扫描覆盖（十条主要结论里唯一涉及安全判断的一条，必须有凭据）──────────
 ok(S["cve_effective_coverage"] == 0, "三个发行版应无一有效的漏洞库覆盖")
+# 「有效覆盖 0」是十条结论里唯一涉及安全判断的数字，必须在两份文档里都被逐字校验
+in_text(S["cve_effective_coverage"], label="report 有效覆盖数",
+        ctx=rf"\*\*有效覆盖 {S['cve_effective_coverage']} 个\*\*")
+in_text(S["cve_effective_coverage"], where="readme", label="README 有效覆盖数",
+        ctx=rf"9 个镜像有效覆盖 {S['cve_effective_coverage']} 个")
+# 结论标题的极性也要钉住，避免整句被反转
+ok("没有有效覆盖" in README and "没有有效覆盖" in REPORT,
+   "「通用扫描器没有有效覆盖」这句判断应在两份文档里原样存在")
 ok(S["cve_unrecognized"] + S["cve_misidentified"] == 9, "九个镜像应全部落在未识别或误判")
 in_text(S["cve_misidentified"], label="被误判的镜像数", ctx=rf"误判成 Debian 的 {S['cve_misidentified']} 个")
 in_text(S["cve_unrecognized"], label="未识别的镜像数", ctx=rf"未识别的 {S['cve_unrecognized']} 个")
 # 「报 0 个 HIGH/CRITICAL」这句必须是实测而非推断
 ok(S["cve_high_critical_total"] == 0,
    "正文称扫描报 0 个 HIGH/CRITICAL，实测总数应为 0")
+
+# ── 信任根（本轮把「最小信任集」当成了结论，就必须有断言守住）────────────────
+_keys = sorted(p.name for p in (ROOT / "keys").glob("*.gpg"))
+ok(_keys == ["kylin-archive-keyring.gpg"],
+   f"keys/ 应只含最小信任集的单一 keyring，实际 {_keys}")
+import subprocess as _sp
+_fp = _sp.run(f"gpg --show-keys --with-colons {ROOT}/keys/kylin-archive-keyring.gpg",
+              shell=True, capture_output=True, text=True).stdout
+# ⚠️ 数 key 要数 pub: 行。--with-colons 的 fpr: 行**把子密钥也算进去**，
+# 用它计数会把「一把带子密钥的 key」误报成两把（本断言首版就这么误报过）。
+_pubs = [l for l in _fp.splitlines() if l.startswith("pub:")]
+_fps = [l.split(":")[9] for l in _fp.splitlines() if l.startswith("fpr:")]
+ok(len(_pubs) == 1, f"keyring 里应只有一把主密钥，实际 {len(_pubs)} 把 —— 多一把就是多一份授权")
+if _fps:
+    _spaced = " ".join(_fps[0][i:i+8] for i in range(0, 40, 8))
+    ok(_spaced in REPORT, f"§3.1 记录的指纹应与 keyring 实际指纹逐字符相符（{_spaced}）")
 
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
@@ -232,7 +256,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "152"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "158"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **152** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **14** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **158** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **14** 张
 
 要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把"从桌面版 ISO 自己造分档镜像"这件事做通并留下完整证据：三条构建路径、九个镜像、648 格实测能力矩阵、五道验收门禁。
 
@@ -102,6 +102,8 @@ python3 scripts/collect_d2_our_images.py
 python3 scripts/collect_d3_capabilities.py      # 加 --run 可现场重跑探针
 python3 scripts/collect_d4_gates.py
 python3 scripts/collect_d5_iso_and_defects.py
+python3 scripts/collect_d6_installability.py    # 需要九个镜像 + builder 容器
+python3 scripts/collect_d7_cve.py               # 需要本地有 aquasec/trivy 镜像
 ```
 
 所有 shell 脚本的 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
@@ -132,7 +134,7 @@ tools/
 test/
   verify.sh                     全量验收（365 项，含检查总数基线断言）
   inner-checks.sh               在被测镜像内运行的检查集，结尾有完成哨兵
-  capabilities.sh               能力探针：79 项全部真跑（其中 71 项进三态矩阵，6 项是环境指纹、1 项是完成哨兵、1 项（sudo）因九档全不适用而移出）
+  capabilities.sh               能力探针：79 项全部真跑（其中 72 项进三态矩阵，6 项是环境指纹、1 项是完成哨兵）
   run-capabilities.sh           把探针跑遍九个镜像
   mutation.sh                   变异测试（镜像层）：故意破坏镜像，确认检查集真的会失败
   mutation-docs.sh              变异测试（分析层）：改坏 stats/正文/凭据，确认 verify.py 真的会失败
@@ -150,7 +152,7 @@ raw/                          一手数据，采集脚本的原始输出逐字�
   d7_cve.json                   漏洞扫描器对九个镜像的覆盖判定（有效覆盖／误判／未识别）
 derived/                      从 raw/ 重算，不手写
   stats.json                    正文引用的全部统计量
-  tables/*.csv                  13 张可复算表
+  tables/*.csv                  14 张可复算表
 figures/*.png                 6 张图
 artifacts/                    审计凭据：九份 manifest、可复现性凭据、九份探针原始输出、
                               四份门禁日志（f4-verify/digest/sbom/mutation.log，一手输出可核对）

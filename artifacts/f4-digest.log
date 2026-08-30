@@ -1,9 +1,9 @@
-  ✅ kylin11-micro  manifest=tar=镜像  (967426f09bc6… → 967426f09bc605497444b1bb19b373002
-  ✅ kylin11-base  manifest=tar=镜像  (aadad84ac7c4… → aadad84ac7c44808270c32841fb99db1b9
-  ✅ kylin11-devel  manifest=tar=镜像  (ba3da0e4b80e… → ba3da0e4b80e424048a8dd2f2d4c4d177
-  ✅ kylin10-micro  manifest=tar=镜像  (b9c6621f9487… → b9c6621f9487068361e986791af9fefa6
-  ✅ kylin10-base  manifest=tar=镜像  (6d3c9f7ec56b… → 6d3c9f7ec56bfded4d57cd53e1dd0229b9
-  ✅ kylin10-devel  manifest=tar=镜像  (2c2b3677fd47… → 2c2b3677fd47e1eae1acb0f53e2f8f295
+  ✅ kylin11-micro  manifest=tar=镜像  (52aa05ed0048… → 52aa05ed00484ad70181ad88503b05a83
+  ✅ kylin11-base  manifest=tar=镜像  (543bb715cfbd… → 543bb715cfbdfbaf850506497fae3022db
+  ✅ kylin11-devel  manifest=tar=镜像  (ffc161134d7a… → ffc161134d7ae6d0acf9a7682f07080ad
+  ✅ kylin10-micro  manifest=tar=镜像  (67c07aa878d0… → 67c07aa878d097e0dd33c482f4d846d2d
+  ✅ kylin10-base  manifest=tar=镜像  (6b5da0085540… → 6b5da0085540aeaa3e2b9514e531089340
+  ✅ kylin10-devel  manifest=tar=镜像  (71fe8f64c435… → 71fe8f64c435748be2b52de36759efc1d
   ✅ uos25-micro  manifest=tar=镜像  (61e03d26e3ce… → 61e03d26e3ceaf67afae895294d56725fce
   ✅ uos25-base  manifest=tar=镜像  (6d9a057d07bd… → 6d9a057d07bdea7d8e90fa5c33db816b2bef
   ✅ uos25-devel  manifest=tar=镜像  (164b08afb77e… → 164b08afb77eb409d0e3593316904fa41d9

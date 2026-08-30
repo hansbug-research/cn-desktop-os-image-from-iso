@@ -30,7 +30,10 @@ mut "统计量：门禁失败数 0→2"        derived/stats.json 's/"verify_fai
 mut "统计量：摘要链 9→8"            derived/stats.json 's/"digest_chain_passed": 9/"digest_chain_passed": 8/'
 mut "统计量：产品线包格式 rpm→dpkg" derived/stats.json 's/"official_pkg_format": "rpm"/"official_pkg_format": "dpkg"/'
 mut "统计量：os_id 撞名 true→false" derived/stats.json 's/"os_id_collision": true/"os_id_collision": false/'
-mut "凭据：repro 的一个 sha256"      artifacts/repro-evidence.txt 's/sha256=61e03d26/sha256=deadbeef/'
+# ⚠️ 不能写死 sha256 前缀：镜像一重建它就变了，变异 sed 匹配不上等于没做变异，
+# 而结果看起来是「verify 没抓到」—— 实际是用例自己失效了（踩过）。从凭据里现取。
+_SHA=$(sed -n 's/.*sha256=\([0-9a-f]\{8\}\).*/\1/p' artifacts/repro-evidence.txt | head -1)
+mut "凭据：repro 的一个 sha256"      artifacts/repro-evidence.txt "s/sha256=$_SHA/sha256=deadbeef/"
 mut "正文：抬头的验收断言条数"        report.md 's/验收断言 \*\*365\*\* 条/验收断言 **99999** 条/'
 mut "README：UOS 可装性 0\/14"       README.md 's|\*\*0 / 14\*\*|**9 / 14**|'
 

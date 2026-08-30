@@ -1,5 +1,5 @@
 kind,image,os_name,os_id,version_id,pkg_format,glibc,repo_url_sample
 厂商官方,cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1,Kylin Linux Advanced Server,kylin,V10,rpm,2.28-36.1.p24.ky10,baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1.1/os/adv/lic/base/$basear
-本项目自建,kylin-desktop-v11:base,Kylin,kylin,v11,dpkg,2.38-1ok6.9k0.5,deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn
-本项目自建,kylin-desktop-v10:base,Kylin,kylin,v10,dpkg,2.31-0kylin9.1k20.3,deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] http://archive.kylinos.cn
+本项目自建,kylin-desktop-v11:base,Kylin,kylin,v11,dpkg,2.38-1ok6.9k0.5,deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] http://archive.kyl
+本项目自建,kylin-desktop-v10:base,Kylin,kylin,v10,dpkg,2.31-0kylin9.1k20.3,deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] http://archive.kyl
 本项目自建,uos-desktop-v25:base,Uos,uos,25,dpkg,2.38-6deepin19,deb https://pro-store-packages.uniontech.com/appstore-V25 snipe appstore

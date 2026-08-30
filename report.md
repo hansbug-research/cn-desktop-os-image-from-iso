@@ -143,6 +143,12 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 - **不支持**：该档位确实存在这一需求却不满足，是缺口
 - **不适用**：该档位定位下这一需求不存在（依据 §3 的档位定位，不拿它掩盖缺口）
 
+79 项探针输出里，进三态矩阵的是 72 项，另外 7 项的去向必须交代清楚：6 项是环境指纹（架构、glibc 版本、`os-release` ID、setuid 数量、file capabilities 数量、`default.target`），值是版本号或计数而非布尔，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；1 项是探针完成哨兵 `probe_complete`，用于判断探针有没有跑完，本身不是能力。
+
+72 项里有一项要特别说明：**`sudo` 在九档全部判为「不适用」，而探针实测九档全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。这里写明是因为它曾经被处理错过：早先版本把 `sudo` 整项从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」，与数据相反，效果是把缺口数从 61 压到 52。现在改回按档位定位归入 NA 集，不再做删除。
+
+同理，198 格「不适用」里绝大多数是探针实测为 `N`、再按档位定位改判的，只有少数是探针本身输出 `n/a`（micro 档无 apt 时的 `apt_update` 等）。读者若只看「缺口 52」会低估实际未满足面，完整原始值在 `t05b`。
+
 648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)

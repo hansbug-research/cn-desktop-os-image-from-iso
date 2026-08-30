@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T07:05:08Z",
+  "collected_at": "2026-08-30T08:47:30Z",
   "source_dir": "/data/dosbuild/out",
   "probes": {
     "kylin11:micro": {
@@ -82,8 +82,8 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:03:47.099044+00:00",
-      "_image_created": "2026-08-30T11:21:33.086486+08:00",
+      "_probe_mtime": "2026-08-30T08:46:57.627580+00:00",
+      "_image_created": "2026-08-30T16:10:53.132741+08:00",
       "_probe_complete": "Y"
     },
     "kylin11:base": {
@@ -166,8 +166,8 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:03:53.694993+00:00",
-      "_image_created": "2026-08-30T11:54:23.621413+08:00",
+      "_probe_mtime": "2026-08-30T08:47:03.977533+00:00",
+      "_image_created": "2026-08-30T16:10:59.895210+08:00",
       "_probe_complete": "Y"
     },
     "kylin11:devel": {
@@ -250,8 +250,8 @@
       "glibc": "2.38-1ok6.9k",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:03.260920+00:00",
-      "_image_created": "2026-08-30T11:54:36.608726+08:00",
+      "_probe_mtime": "2026-08-30T08:47:11.246478+00:00",
+      "_image_created": "2026-08-30T16:11:13.577065+08:00",
       "_probe_complete": "Y"
     },
     "kylin10:micro": {
@@ -334,8 +334,8 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:04.228912+00:00",
-      "_image_created": "2026-08-30T11:31:44.167520+08:00",
+      "_probe_mtime": "2026-08-30T08:47:12.187471+00:00",
+      "_image_created": "2026-08-30T16:25:46.943317+08:00",
       "_probe_complete": "Y"
     },
     "kylin10:base": {
@@ -418,8 +418,8 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:11.696855+00:00",
-      "_image_created": "2026-08-30T11:54:43.344654+08:00",
+      "_probe_mtime": "2026-08-30T08:47:18.027427+00:00",
+      "_image_created": "2026-08-30T16:25:53.622980+08:00",
       "_probe_complete": "Y"
     },
     "kylin10:devel": {
@@ -502,8 +502,8 @@
       "glibc": "2.31-0kylin9",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:18.535802+00:00",
-      "_image_created": "2026-08-30T11:54:55.800717+08:00",
+      "_probe_mtime": "2026-08-30T08:47:24.599377+00:00",
+      "_image_created": "2026-08-30T16:26:06.087220+08:00",
       "_probe_complete": "Y"
     },
     "uos25:micro": {
@@ -586,8 +586,8 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:19.199797+00:00",
-      "_image_created": "2026-08-30T11:21:57.243991+08:00",
+      "_probe_mtime": "2026-08-30T08:47:25.249372+00:00",
+      "_image_created": "2026-08-30T16:42:11.776657+08:00",
       "_probe_complete": "Y"
     },
     "uos25:base": {
@@ -670,8 +670,8 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:22.095775+00:00",
-      "_image_created": "2026-08-30T14:21:49.105028+08:00",
+      "_probe_mtime": "2026-08-30T08:47:28.040352+00:00",
+      "_image_created": "2026-08-30T16:42:17.513207+08:00",
       "_probe_complete": "Y"
     },
     "uos25:devel": {
@@ -754,8 +754,8 @@
       "glibc": "2.38-6deepin",
       "arch": "amd64",
       "probe_complete": "Y",
-      "_probe_mtime": "2026-08-30T07:04:24.211759+00:00",
-      "_image_created": "2026-08-30T14:22:01.221837+08:00",
+      "_probe_mtime": "2026-08-30T08:47:30.178335+00:00",
+      "_image_created": "2026-08-30T16:42:29.851195+08:00",
       "_probe_complete": "Y"
     }
   }
