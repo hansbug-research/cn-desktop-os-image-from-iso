@@ -16,12 +16,12 @@
 |---|---|---|
 | 1 | **麒麟「有官方容器镜像」是个误读。** `cr.kylinos.cn` 上匿名可拉的唯一镜像是 `kylin-server-minimal:v10sp1`，它是 **rpm** 包格式、glibc `2.28-36.1.p24.ky10`、软件源在 `update.cs2c.com.cn`；而桌面 V10/V11 是 **dpkg**、glibc `2.31-0kylin9.1k20.3` / `2.38-1ok6.9k0.5`、源在 `archive.kylinos.cn`。包格式、glibc、软件源三样全不同 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`fig02`、[`t03`](derived/tables/t03_product_line_comparison.csv) |
 | 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
-| 3 | **商业桌面线的官方容器镜像一个都没有。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot） | [§2](report.md#2-国产桌面-os-的官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
+| 3 | **麒麟与统信的桌面线官方容器镜像匿名拉不到。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot）。⚠️ 证明的是「从单一网络位置匿名不可获得」，不能证明厂商内部或授权渠道没有；也只探了这两家，不外推到整个品类 | [§2](report.md#2-国产桌面-os-的官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
-| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源只提供 2496 个包且全来自应用商店，连 `nano` 都没有），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
+| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源索引只有 2496 个条目、全来自应用商店，连 `nano` 都查不到候选），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 6 | **麒麟的「没预装」与 UOS 的「硬缺口」性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14 / 14**、麒麟 V10 **14 / 14**、UOS V25 **0 / 14**（判据用 `apt-cache madison` 而非 `policy` 的 Candidate，后者会把「已经装了」误计成「装得上」） | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 7 | **dpkg 段错误的真根因是厂商的安全插件，不是 IO 选项。** 麒麟 V11 的 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们。此前三次归因全错，其中一次是受控实验里的状态污染 | [§9.2](report.md#92-被推翻的判断与踩过的坑)、缺陷 D02 |
-| 8 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从 274 MB 涨到 420 MB。两项都已回退。⚠️ 这四个数是回退前的一次性观察、用 `docker images` 解包口径，与本仓库其余处的 rootfs tar 口径不同且无落盘凭据 | [§5.1](report.md#51-加包要看真实代价) |
+| 8 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从约 281 MB 涨到 420 MB。两项都已回退。⚠️ 这四个数用 `docker images` 解包口径，与本仓库其余处的 rootfs tar 口径不同；只有起点 345 MB 有现存锚点，其余是回退前的一次性观察 | [§5.1](report.md#51-加包要看真实代价) |
 | 9 | **检查框架自己会假通过，所以门禁本身也要被门禁。** 本项目实测到三类：helper 函数未定义导致两条分支都是「命令未找到」、检查脚本挂死导致输出截断而缺失 key 被读成空值、负向断言不核对失败原因等于永真 | [§9.2](report.md#92-被推翻的判断与踩过的坑) |
 | 10 | **通用漏洞扫描器对这三个发行版没有有效覆盖：实测 9 个镜像有效覆盖 0 个。** 麒麟 V11 三档被 trivy 判为 `none` 根本没扫，麒麟 V10 与 UOS 六档被**误判成 Debian**——拿厂商改过的版本号比 Debian 公告区间，比不出来就报 0（九镜像 HIGH/CRITICAL 合计为 0）。那是「没有数据」，不是「没有漏洞」 | [§9.1](report.md#91-局限)、[`t13`](derived/tables/t13_cve_coverage.csv) |
 
@@ -33,7 +33,7 @@
 | 银河麒麟桌面 V10 SP1 | `selfhost` 两阶段自举 | 213 MB / 154 包 | 270 MB / 221 包 | 503 MB / 263 包 |
 | 统信 UOS V25 | `slice` squashfs 切片 | 98 MB / 67 包 | 191 MB / 164 包 | 448 MB / 208 包 |
 
-尺寸为 rootfs tar 的字节流（构建的直接产物，被 manifest 的 sha256 锚定）。`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%），两个口径不能混用。
+尺寸为 rootfs tar 的字节流（构建的直接产物，被 manifest 的 sha256 锚定）。`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%，分母用 tar 精确字节、分子取 `docker images` 报的 MB），两个口径不能混用。
 
 档位定位：`micro` 纯运行时（把别处编好的产物拷进来跑）、`base` 平台可用（有包管理、能排查）、`devel` 构建用（工具链齐备）。
 
@@ -108,7 +108,7 @@ python3 scripts/collect_d6_installability.py    # 需要九个镜像 + builder �
 python3 scripts/collect_d7_cve.py               # 需要本地有 aquasec/trivy 镜像
 ```
 
-所有 shell 脚本的 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
+六个在容器内跑的脚本（`lib/common.sh`、`build/{build,customize,setup}.sh`、`tools/{mk-localrepo,prepare-slice-src}.sh`）的 `ROOT` 默认是 `/w`（builder 里的挂载点），宿主侧直接单跑会找不到文件；宿主上跑的脚本 `ROOT` 默认取仓库根（由脚本自身位置推出），不需要按开发机路径改动。
 
 ## 6. 目录结构
 
@@ -147,7 +147,7 @@ keys/                         麒麟 archive GPG keyring（来源与指纹见 re
 raw/                          一手数据，采集脚本的原始输出逐字保存
   d1_official_images.json       官方镜像可获得性与存在性探测
   d2_our_images.json            九个自建镜像的事实 + 官方镜像产品线对照
-  d3_capabilities.json          能力探针原始输出（79 项 × 9 镜像；三态矩阵取其中 72 项 = 648 格）
+  d3_capabilities.json          能力探针原始输出（每镜像 82 个 key = 79 项探针 + 3 项采集侧 provenance；三态矩阵取 72 项 = 648 格）
   d4_gates.json                 五道门禁结果与九份 manifest 的审计锚点
   d5_iso_and_defects.json       三条路径的配置事实 + 12 条厂商缺陷
   d6_installability.json        14 个工具在各自源里的可装性、UOS 源规模与 ISO 包清单

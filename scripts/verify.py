@@ -374,7 +374,7 @@ for _t in S["uos_iso_missing"]:
 in_text(S["unpack_overhead_pct_min"], where="readme", label="README 解包开销下界",
         ctx=r"实测 %s%%–" % S["unpack_overhead_pct_min"])
 in_text(S["unpack_overhead_pct_max"], where="readme", label="README 解包开销上界",
-        ctx=r"–%s%%）" % S["unpack_overhead_pct_max"])
+        ctx=r"–%s%%，分母用 tar 精确字节" % S["unpack_overhead_pct_max"])
 
 # README 里指向 report.md 的章节锚点：改标题会无声断链，发布页上直接点不动。
 # 按 GitHub 的规则本地生成 anchor（小写、去标点、空格转连字符）再比对。
@@ -399,7 +399,7 @@ in_text("1000-notepad", label="正文写明对照组")
 in_text(S["unpack_overhead_pct_min"], label="解包开销下界",
         ctx=r"实测 %s%%–" % S["unpack_overhead_pct_min"])
 in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
-        ctx=r"–%s%%，按 tar 原始字节" % S["unpack_overhead_pct_max"])
+        ctx=r"–%s%%，分母用 tar 的精确字节" % S["unpack_overhead_pct_max"])
 
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。

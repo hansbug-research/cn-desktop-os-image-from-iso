@@ -6,7 +6,9 @@
 
 一份编译好的软件要交付到客户的国产桌面系统上，交付前得先验证它在那个环境里跑不跑得起来。理想做法是拿一台装着目标系统的机器实跑，但机器数量和版本组合很快就不够用；退而求其次的做法是把目标系统做成容器镜像，让验证跑在 CI 里。
 
-问题在于，能直接拿来用的镜像并不存在。厂商发布的是 ISO 安装介质，容器镜像要么没有，要么不是同一个东西。本项目要回答的是：能不能从桌面版 ISO 出发，自己构建出与真机高度一致的分档镜像，让它同时承担三类用途——验证编译产物能否运行、为需要现场编译的场景提供工具链、以及作为一个包管理可用的平台基座。
+问题在于，能直接拿来用的镜像并不存在。厂商发布的是 ISO 安装介质，容器镜像要么没有，要么不是同一个东西。本项目要回答的是：能不能从厂商的桌面版发行物出发，自己构建出与真机高度一致的分档镜像，让它同时承担三类用途——验证编译产物能否运行、为需要现场编译的场景提供工具链、以及作为一个包管理可用的平台基座。
+
+仓库名与标题里的「从 ISO」需要一处校正，否则会误导复核者：**三个被试的内容来源并不相同**。统信 UOS V25 确实是从 ISO 出发——它的 rootfs 逐文件切自 ISO 内的 squashfs。银河麒麟 V10 SP1 与 V11 的内容取自厂商**在线 apt 源**（`archive.kylinos.cn`），ISO 在这两条路上只用来取 ABI 期望基线（见 `distros/kylin11.conf` 的顶部注释），并不提供 rootfs 内容。所以一个手里只有 ISO、没有源访问的复核者，能复现的是 UOS 那一条，麒麟两条跑不动；反之只有源访问、没有 UOS ISO 的人，能复现麒麟两条。§4 每条路径的第一句都写明了它实际从哪里取内容。
 
 这里的「一致」有明确边界。容器共享宿主内核，所以内核态的东西（LSM、驱动、initramfs）一律不在一致性范围内；我们要的一致是用户态的一致：同一套 libc 与 libstdc++ 版本、同一套厂商补丁过的系统库、同一套软件源与包数据库、同一套 locale 与证书。这个边界决定了后面所有取舍。
 
@@ -60,7 +62,7 @@
 
 档位定位直接决定了能力矩阵里「不适用」格的判据（见 §6）。这一点必须先说定，否则「micro 档没有 gcc」到底算缺口还是算设计，会变成一笔糊涂账。
 
-九个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%，按 tar 原始字节而非四舍五入后的 MB 计，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
+九个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%，分母用 tar 的精确字节、分子取 `docker images` 报的 MB，故上下界本身带 ±0.5 MB 的舍入，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
 
 ![三档镜像的体积与包数](figures/fig04_tier_size.png)
 
@@ -94,7 +96,7 @@ UOS 走切片路径，不从在线源拉包，改为核对 squashfs 的 sha256�
 
 ## 4. 三条构建路径
 
-从 ISO 到镜像，教科书做法是 `mmdebstrap` 或 `debootstrap` 拉起一个 chroot。三个被试里只有一个能这么走，另外两个各自撞上不同的墙，最后形成三条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。
+造 rootfs 的教科书做法是 `mmdebstrap` 或 `debootstrap` 从软件源拉起一个 chroot。三个被试里只有一个能这么走，另外两个各自撞上不同的墙，最后形成三条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。
 
 ### 4.1 mmdebstrap：银河麒麟桌面 V11
 
@@ -108,6 +110,8 @@ V10 上 `mmdebstrap` 不可用，两道墙叠在一起：apt 解析 essential �
 
 ### 4.3 slice 切片：统信 UOS V25
 
+被试制品必须具名，否则「UOS V25 不能作为 C++ 构建环境」这类结论无从复核：切片源是 `uos-desktop-25-professional-2500-amd64-202604.iso`，取自 `cdimage-download.chinauos.com` 的 **beta 通道**（`desktop-professional/2500u1/beta/`，完整 URL 在 `distros/uos25.conf` 的 `ISO_URL`），squashfs 的 sha256 为 `e1e2f905…dfe8a728`（`SQUASHFS_SHA256`，构建前强制核对）。本文所有以「UOS V25」为主语的结论——包括 1636 个包的 ISO 清单与 C++ 构建环境那一条——都只在这一个 beta 制品上实测过，正式通道的制品内容可能不同。同理，麒麟被试是 V11 构建号 2603 与 V10 SP1（`distros/*.conf` 顶部各有记录）。
+
 UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl` 接管，在线源也不承担 OS 分发。这条路径不做 bootstrap，而是直接从 ISO 的 squashfs 里按包依赖闭包切片：以一组种子包为起点解析依赖，把闭包内的文件、`dpkg` 元数据、`update-alternatives` 记录一并搬出来。
 
 切片路径踩的坑最深，两条值得单列：`info/format`（内容为 `1`）决定了 `Multi-Arch: same` 的包用 `pkg:arch.list` 命名，漏拷这一个文件会让 dpkg 对一大片包报 "missing the list control file"（缺陷 D10）；`dpkg` 的 admindir 在 UOS 上被搬到了 `/usr/lib/dpkg/var`，而 SBOM 扫描器从镜像层 tar 里找 `/var/lib/dpkg/status` 且**不跨归档跟随符号链接**，放符号链接会让扫描结果静默变成空的（缺陷 D09）。
@@ -118,7 +122,7 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 一类是标准的容器精简：`policy-rc.d` 返回 101 阻止装包时起服务、apt 配置去掉缓存与翻译文件、`/usr/share/doc` 按 `path-exclude` + `path-include copyright` 只保留版权声明（GPL 要求）、清空 `machine-id`、删除 ssh host key 与 `resolv.conf`、去掉内核与固件。
 
-另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个——不是「没有单元目录」（`/lib/systemd/system` 里其实还有个别包丢进去的几个单元），而是**没有 `multi-user.target`**：改造的守卫先判 `multi-user.target` 是否存在，判空就整段不进；而那 13 条候选单元在 micro 档里一条都不在，本来也无从 mask。`default.target` 也因此为空（缺陷 D12）。
+另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个——不是「没有单元目录」（`/lib/systemd/system` 里其实还有个别包丢进去的几个单元），而是**没有 `multi-user.target`**：改造的守卫先判 `multi-user.target` 是否存在，判空就整段不进；而那 14 条候选单元在 micro 档里一条都不在，本来也无从 mask。`default.target` 也因此为空（缺陷 D12）。
 
 还有一类是补齐，理由是「缺了会让语义不自洽」。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是「今天」，否则可复现性当场报废。
 
@@ -131,11 +135,11 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 | 加什么 | 体积变化（`docker images` 解包占用口径） | 真因 |
 |---|---|---|
 | `bind9-dnsutils`（`dig`） | 麒麟 V11 base 345 MB → 407 MB | 拖 `bind9-libs` → **`libicu74`（36 MB）** |
-| UOS base 的 `perl` | UOS base 274 MB → 420 MB | `libperl5.36`（29 MB）+ `perl-modules-5.36`（18 MB）+ `libicu74`（36 MB） |
+| UOS base 的 `perl` | UOS base 约 281 MB → 420 MB | `libperl5.36`（29 MB）+ `perl-modules-5.36`（18 MB）+ `libicu74`（36 MB） |
 
-⚠️ 这张表是回退前后的一次性对照，用的是 `docker images` 解包占用口径（因为当时就是这么读的），与本文其余处的 rootfs tar 口径不同；回退后的构型已经覆盖了那次实验的产物，所以 407 MB 与 420 MB 这两个终点值**没有落盘凭据**，只是当时的观察记录。正文其余所有尺寸一律为 tar 口径。
+⚠️ 这张表是回退前后的一次性对照，用的是 `docker images` 解包占用口径（因为当时就是这么读的），与本文其余处的 rootfs tar 口径不同。回退后的构型已经覆盖了那次实验的产物，所以**四个数里只有起点 345 MB 有现存锚点**（表 [`t04`](derived/tables/t04_built_images.csv) 的 kylin11:base），两个终点值 407 MB 与 420 MB 是当时的观察记录、没有落盘凭据；UOS base 的起点早先写作 274 MB 也是错的，当前实测是 281 MB（274 恰好是 `kylin-server-minimal:v10sp1` 的解包体积，抄串了）。正文其余所有尺寸一律为 tar 口径。
 
-一个 `dig` 要 40 到 60 MB，与「小镜像」的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里九个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有，UOS 装不上（原因见 §6.2）。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，合计约 13 MB。这六个在 UOS 的 ISO 里都有，补齐后三家齐平（`ping` 与 `vi` 是最后补上的两个，此前矩阵里它们在 UOS 侧还是缺口）；`wget` 则三家都没装——`curl` 已覆盖同类需求，不重复占体积。
+唯一的实测点是麒麟 V11 base 的 345 MB → 407 MB，即一个 `dig` 要 **62 MB**（早先这里写「40 到 60 MB」，区间反而把自己唯一的数据点排除在外，且下界 40 在本仓库没有任何数据支撑）。这与「小镜像」的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里九个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有；UOS 是 `apt` 装不上（原因见 §6.2），但 `bind9-dnsutils` 本身在它的 ISO 里，要就得改切片种子重切——这里说的是「装不上」，不是「没有」。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，六个包自身的 `Installed-Size` 合计约 7.2 MiB（`apt-cache show` 实测：2981 + 121 + 474 + 1746 + 362 + 1719 KB，不含依赖；早先这里写的「约 13 MB」没有任何测量支撑）。这六个在 UOS 的 ISO 里都有，补齐后三家齐平（`ping` 与 `vi` 是最后补上的两个，此前矩阵里它们在 UOS 侧还是缺口）；`wget` 则三家都没装——`curl` 已覆盖同类需求，不重复占体积。
 
 ## 6. 能力矩阵：测什么、怎么测、测出什么
 
@@ -225,7 +229,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 ## 8. 可复现性
 
-`mmdebstrap` 与 `slice` 两条路径逐位可复现：同一 builder 内连构两次，六个产物 sha256 完全一致（`repro_identical=6`，凭据在 [`artifacts/repro-evidence.txt`](artifacts/repro-evidence.txt)）。做到这一点靠三件事：`SOURCE_DATE_EPOCH` 取自仓库 `Release` 的 `Date` 且由 `lib/common.sh::derive_epoch` 在构建与本地源两处共用（两边各算一次会让哈希漂，实际踩过）；`tar --sort=name --mtime=@epoch --numeric-owner`；以及把 SONAME 修复的候选限定为真实文件而非符号链接，避免选取顺序依赖目录遍历。
+`mmdebstrap` 与 `slice` 两条路径逐位可复现：同一 builder 内连构两次，六个产物 sha256 完全一致（`repro_identical=6`，凭据在 [`artifacts/repro-evidence.txt`](artifacts/repro-evidence.txt)）。做到这一点靠三件事：`SOURCE_DATE_EPOCH` 由 `lib/common.sh::derive_epoch` 在构建与本地源两处共用（两边各算一次会让哈希漂，实际踩过），取值按路径而定——mmdebstrap 路径取自仓库 `Release` 的 `Date`，slice 路径没有在线源可取，由 `distros/uos25.conf` 钉死为 `1775779200`（squashfs 的 mkfs 时间）；`tar --sort=name --mtime=@epoch --numeric-owner`；以及把 SONAME 修复的候选限定为真实文件而非符号链接，避免选取顺序依赖目录遍历。
 
 这份凭据与交付物是对得上的：`artifacts/repro-evidence.txt` 里六个 sha256 与对应 manifest 的 `tarball sha256` 逐条相等，`scripts/verify.py` 对此有一条交叉断言。早先版本不是这样——凭据来自一轮更早的双构建，中间又改过配置重构了产物，于是六份里五份对不上；那种情况下 `digest-chain`（manifest = tar = 镜像）与 `repro`（连构两次一致）两条链锚在不同构建上，看着都绿其实接不起来。
 
@@ -241,12 +245,18 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 - **不覆盖内核态。** 容器共享宿主内核，厂商的 KYSEC、IMA/EVM 完整性度量、驱动都不在一致性范围内。麒麟的 `kysec2-package-plugins` 我们是直接不装的（见 D02）。
 - **UOS 的 `security.*` 扩展属性未保留。** rootless docker 无 `CAP_SYS_ADMIN`，`unsquashfs -xattrs` 会 FATAL。其中 IMA/EVM 那部分丢了没有实际影响（容器不加载相关 LSM），但 `security.capability`（file capabilities）在容器里是真会用的——如果业务二进制依赖 file capability 才能跑，在 UOS 三档里会表现成权限不足。
 - **漏洞跟踪没有做，因为通用扫描器对这三个发行版没有有效覆盖。** 这一条有一手数据（表 [`t13`](derived/tables/t13_cve_coverage.csv)，原始输出 `raw/d7_cve.json`）：用 trivy 0.70.0 扫九个镜像，**有效覆盖 0 个**——未识别的 3 个是麒麟 V11 三档（trivy 判为 `none`，根本没扫），误判成 Debian 的 6 个是麒麟 V10 与 UOS 各三档，九个镜像报出的 HIGH/CRITICAL 合计为 0。误判那六个最危险：拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0，而一个一百多个包的 bookworm 代镜像报 0 是不可信的——那是「比不出来」，不是「没有漏洞」。`make cve` 因此强制区分这两种情况，把无有效覆盖的镜像明确标出、不计入通过。真实的漏洞跟踪需要接厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，不在本仓库范围内。
-- **审计闭环防的是「改了没同步」，防不住「全员串通」。** 本仓库的证据链是自洽性校验：manifest ↔ tar ↔ 镜像 ID ↔ 探针输出 ↔ 正文数字互相对账，任何一处单独被改都会被 `make verify` 抓到（分析层 10 例变异全部报警，见 §7）。但如果有人同时改掉 `raw/` 里的原始输出、`derived/` 的复算结果、正文数字与 manifest 锚点，这套校验在结构上无法分辨——它验的是内部一致，不是「这些数真的来自那次执行」。要挡这一类需要外部信任根（构建产物签名、独立 CI 出具的证明），本仓库没有做。第三方复核的正确做法是拿脚本在自己机器上从 ISO 重跑一遍，而不是核对我们提交的数字彼此是否吻合。
+- **九个镜像里有三个不逐位可复现。** `repro` 门禁只覆盖 6/9：麒麟 V10 SP1 三档走 selfhost 路径，用 `docker export | docker import` 产出镜像，容器层时间戳与 layer id 每次不同（详见 §8）。这一条写在可复现性一节，但它本身就是一条局限，故在此列明。
+- **麒麟 V11 的 `SOURCE_DATE_EPOCH` 没有钉死。** UOS 那条在 `distros/uos25.conf` 里写死为 `1775779200`，麒麟 V11 却是构建时在线拉 `dists/11.0/Release` 的 `Date` 现算（`lib/common.sh::derive_epoch`）。厂商任何一次重发 `Release` 都会让 V11 三档的 tar 时间戳变化，`digest-chain` 与 `artifacts/repro-evidence.txt` 里那三个哈希随之失效，而不会有任何东西提示「是 epoch 漂了」。当前记录值 `1756113384` 与厂商现值一致，但这是当下的巧合而非锚定。另外 `derive_epoch` 在 curl 失败时静默回落到硬编码值，离线复现者会拿到一个看起来正常的 epoch 与全不一致的产物。
+- **d3 探针输出没有内容锚点。** d6/d7 的每条记录都带 `anchor_tar_sha256`，d3 没有——它只有 mtime 与镜像 `Created` 的先后关系，而 git 不保留 mtime（§6.1 已详述）。这是本仓库已知的一处可审计性缺口。
+- **`test/capabilities.sh` 自己没有被变异测试打过。** 变异测试覆盖的是 `inner-checks.sh`（镜像层 12 例）与 `verify.py`（分析层 10 例），而全文最常引用的 648 格恰恰出自 `capabilities.sh`，且 §9.2 记载这一族探针出过两次恒真错误。做了变异测试不等于覆盖了所有层。
+- **官方镜像的探测只在单一网络位置做过。** `raw/d1_official_images.json` 的 `vantage_note` 记着：采集主机出口在中国大陆、境外站点经本地代理，探测失败需区分「网络位置」与「策略拒绝」。§2 的核心结论建立在这批探测上，所以「拉不到」严格说是「从这个网络位置匿名拉不到」。UOS 那两条探测的 stderr 原文也带着 `or may require 'docker login'`。
+- **「商业桌面线没有官方镜像」只探了两家。** 麒麟与统信之外，中科方德、普华、凝思、红旗等均未探测，这条结论不应外推到整个品类。
+- **审计闭环防的是「改了没同步」，防不住「全员串通」。** 本仓库的证据链是自洽性校验：manifest ↔ tar ↔ 镜像 ID ↔ 探针输出 ↔ 正文数字互相对账，任何一处单独被改都会被 `make verify` 抓到（分析层 10 例变异全部报警，见 §9.2 末条）。但如果有人同时改掉 `raw/` 里的原始输出、`derived/` 的复算结果、正文数字与 manifest 锚点，这套校验在结构上无法分辨——它验的是内部一致，不是「这些数真的来自那次执行」。要挡这一类需要外部信任根（构建产物签名、独立 CI 出具的证明），本仓库没有做。第三方复核的正确做法是拿脚本在自己机器上重跑一遍（麒麟两条路需要访问 `archive.kylinos.cn`，UOS 那条需要它的 ISO，见 §1），而不是核对我们提交的数字彼此是否吻合。
 - **「官方」一词受限使用。** 只有能给出 registry 域名归属证据的才称官方。Docker Hub 上的 `kylin` 命名空间是无关第三方（内容是 Home Assistant 插件），不是厂商。
 
 ### 9.2 被推翻的判断与踩过的坑
 
-**dpkg 段错误的三次误判。** 麒麟 V11 上 `apt install` 带 maintainer script 的包会让 dpkg 段错误，包数据库永久报废。我先后归因于 `libchkuid` 的 ldconfig 警告、`force-unsafe-io`、以及 `libdb5.3` 的 t64 迁移窗口，三次都错。其中第二次尤其值得记：我做了一个 A/B 对照并「确认」了结论，但对照组的包已经被实验组解包过——**受控实验里的状态污染**。真根因是 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装了两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们（D02）。不装那个包就干净根治，base 档还小了 36 MB。
+**dpkg 段错误的三次误判。** 麒麟 V11 上 `apt install` 带 maintainer script 的包会让 dpkg 段错误，包数据库永久报废。我先后归因于 `libchkuid` 的 ldconfig 警告、`force-unsafe-io`、以及 `libdb5.3` 的 t64 迁移窗口，三次都错。其中第二次尤其值得记：我做了一个 A/B 对照并「确认」了结论，但对照组的包已经被实验组解包过——**受控实验里的状态污染**。真根因是 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装了两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们（D02）。不装那个包就干净根治。（早先这里写着「base 档还小了 36 MB」，是错的：`apt-cache show kysec2-package-plugins` 实测 `Installed-Size: 46`，即 46 KB，那个 36 MB 是从下面 §5.1 的 `libicu74（36 MB）` 串过来的。这个包的价值在于去掉一个真故障，不在体积。）
 
 **检查框架自己会假通过。** 三处：其一，我在 `verify.sh` 里用了未定义的 `pass`/`fail` 函数，`[ 条件 ] && pass ... || fail ...` 的**两条分支都返回「命令未找到」**，四项新检查全程空转而汇总照样全绿；补上函数定义的当次运行就抓出一个本来会发出去的真缺陷（麒麟 V10 三档的 `default.target` 是悬空软链——V10 不做 usr-merge，单元在 `/lib/systemd/system`，而我的守卫两处都判了却把软链目标写死成 `/usr/lib/...`）。其二，检查脚本会在坏镜像上挂死，外层只拿到截断输出，而缺失的 key 被读成空值而不是失败；现在凡是碰 dpkg/apt 的地方一律套超时，并在最后一行输出 `checks_complete` 哨兵由 verify 硬断言。其三，`gate_high` 的负向断言原先只判「输出不等于 `ok 14`」，可二进制不存在、exec 格式错、缺任意别的库都满足这条，等于永真；现在必须核对失败原因确实是 `GLIBC_2.34 not found`。
 
