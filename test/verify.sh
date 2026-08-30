@@ -108,7 +108,7 @@ for DID in $DISTROS; do
       base)  check has_apt Y "$(g has_apt)"; check has_python3 Y "$(g has_python3)"; check tls Y "$(g tls)"
              if [ "${IMMUTABLE:-no}" = yes ]; then
                # UOS V25 的 OS 分发走 OSTree + 玲珑，apt 源里只有应用商店的 GUI 应用
-               # （实测 4731 个包名，不含 nano 这类 OS 包）。所以：
+               # （实测源只提供 2496 个包，不含 nano 这类 OS 包）。所以：
                #   · apt update 必须成功（两个需授权的 401 源已默认注释掉，见 lib/common.sh）
                #   · 但装 OS 包必然失败，往返结果是 N(...not-installed) —— 这是产品设计，不是缺陷
                # 断言写成"必须是这个失败形态"，而不是笼统放过：若哪天 update 又坏了，

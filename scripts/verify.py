@@ -7,7 +7,7 @@
 ⚠️ 它只覆盖被写成断言的那些数字。未被覆盖的仍需人工核对，
 不要把「verify 全绿」等同于「每个数字都被机器核过」。
 """
-import json, pathlib, re, sys
+import json, os, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 S = json.loads((ROOT / "derived" / "stats.json").read_text())
@@ -95,7 +95,10 @@ ok(S["installable_kylin10"] == S["installability_tools"], "麒麟 V10 应 14/14 
 ok(S["installable_uos25"] == 0, "UOS 应 0/14 —— 这是「硬缺口」论断的定量依据")
 in_text(S["uos_iso_packages"], label="UOS ISO 包数")
 ok(S["uos_iso_has_gxx"] is False, "UOS ISO 里不应有 g++（C++ 构建环境论断的依据）")
-in_text(S["uos_apt_package_names"], label="UOS apt 源包名数")
+in_text(S["uos_apt_repo_packages"], label="UOS 源提供的包数",
+        ctx=rf"源只提供 {S['uos_apt_repo_packages']} 个包")
+ok(S["uos_apt_positive_control"] is True,
+   "UOS 源规模采集必须带阳性对照 —— 否则「工具都装不上」区分不了「源里没有」与「源没通」")
 ok(S["sbom_passed"] == 9, "sbom 应 9 个镜像全通过")
 ok(S["mutation_skipped"] == 1, "变异测试有 1 条跳过（mtab），正文必须交代")
 in_text("1 跳过", label="变异跳过项")
@@ -124,6 +127,29 @@ t8 = (TAB / "t08_vendor_defects.csv").read_text().splitlines()
 ok(len(t8) - 1 == S["defects"], "t08 行数应等于缺陷数")
 for d in ("D01", "D02", "D05", "D08", "D09", "D10", "D12"):
     ok(d in REPORT or d in t8[0] or any(d in l for l in t8), f"缺陷 {d} 应在正文或表里出现")
+
+# ── 覆盖 review 点名的零覆盖数字（都带上下文，避免裸子串撞车）──────────────
+for d, n in S["masked_units_by_distro"].items():
+    nm = {"kylin10": "麒麟 V10", "kylin11": "麒麟 V11", "uos25": "UOS"}[d]
+    ok(any(re.search(rf"{n} 个", x) for x in [REPORT]), f"正文应写明 {nm} 的 masked 单元数 {n}")
+in_text(S["setuid_micro"]["kylin10"], label="V10 micro 的 setuid 数",
+        ctx=rf"V10 micro 档有 {S['setuid_micro']['kylin10']} 个")
+in_text(S["setuid_micro"]["kylin11"], label="micro 的 setuid 数",
+        ctx=rf"各只有 {S['setuid_micro']['kylin11']} 个 setuid")
+in_text(S["cells_supported"], label="支持格数", ctx=rf"支持 {S['cells_supported']}、")
+in_text(S["cells_gap"], label="缺口格数", ctx=rf"缺口 {S['cells_gap']}、")
+in_text(S["cells_na"], label="不适用格数", ctx=rf"不适用 {S['cells_na']}")
+in_text(S["mutation_caught"], label="变异用例数", ctx=rf"变异用例 \*\*{S['mutation_caught']}\*\* 条")
+
+# README 抬头的各项计数
+for v, lbl, ctx in [
+    (S["images_built"], "构建镜像数", r"构建镜像 \*\*{v}\*\* 个"),
+    (len(S["build_methods"]), "构建路径数", r"构建路径 \*\*{v}\*\* 条"),
+    (S["capability_cells"], "能力矩阵格数", r"能力矩阵 \*\*{v}\*\* 格"),
+    (S["defects"], "缺陷条数", r"厂商缺陷留档 \*\*{v}\*\* 条"),
+]:
+    in_text(v, where="readme", label=f"README {lbl}", ctx=ctx.replace("{v}", str(v)))
+    in_text(v, where="report", label=f"report {lbl}", ctx=ctx.replace("{v}", str(v)))
 
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
@@ -158,7 +184,19 @@ if m:
 mr = re.search(r"机器核对断言 \*\*(\d+)\*\* 条", README)
 ok(mr is not None, "README 抬头应声明机器核对断言条数")
 
-print(f"执行断言 {N} 条")
+# 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
+# if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
+# 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "131"))
+if N < BASELINE:
+    print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
+          f"（证据文件缺失？条件分支没进去？）")
+    sys.exit(1)
+# README 抬头的断言数必须与实际执行数相等（此前只捕获不比对，写 99999 也全绿）。
+# ⚠️ 这条检查**不走 ok()**：它自己若计入 N，抬头数就永远比实跑少 1，形成自指。
+if mr and int(mr.group(1)) != N:
+    BAD.append(f"README 抬头写的机器核对断言 {mr.group(1)} 条 ≠ 实际执行 {N} 条")
+print(f"执行断言 {N} 条（基线 {BASELINE}）")
 if BAD:
     print(f"❌ {len(BAD)} 条未过：")
     for b in BAD: print("  ✗", b)

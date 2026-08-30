@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T06:25:04Z",
+  "collected_at": "2026-08-30T07:07:29Z",
   "tools": [
     "iproute2",
     "iputils-ping",
@@ -308,7 +308,7 @@
     "kylin10": "g++ present=N repo= g++ | 4:9.3.0-11.185.1kylin2k6 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\ngcc present=N repo= gcc | 4:9.3.0-11.185.1kylin2k6 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\nmake present=N repo= make | 4.2.1-1.2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\ncmake present=N repo= cmake | 3.16.3-1kylin1k3 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
     "uos25": "g++ present=N repo=NOREPO\ngcc present=N repo=NOREPO\nmake present=N repo=NOREPO\ncmake present=N repo=NOREPO"
   },
-  "uos_apt_scale": "Total package names: 4758 (133 k)\nTotal package structures: 4679 (206 k)\n  Normal packages: 2710\n  Pure virtual packages: 3\n  Single virtual packages: 91\n  Mixed virtual packages: 1\n---pkgnames---\n2711\n---nano---\nnano:\n  Installed: (none)\n  Candidate: (none)",
+  "uos_apt_scale": "---stats---\nTotal package names: 4758 (133 k)\nTotal package structures: 4679 (206 k)\n  Normal packages: 2710\n  Pure virtual packages: 3\n  Single virtual packages: 91\n  Mixed virtual packages: 1\n---repo-entries---\n2496\n---positive-control---\nsample=1000-notepad\n1000-notepad |     5.14.0 | https://pro-store-packages.uniontech.com/appstore-V25 snipe/appstore amd64 Packages\n---nano---\nnano:\n  Installed: (none)\n  Candidate: (none)",
   "uos_iso_inventory": {
     "package_count": 1636,
     "source": "/w/build/uos25r",

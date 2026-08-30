@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **639** 格 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
 
 ## 1. 问题
 
@@ -106,7 +106,7 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 还有一类是补齐，理由是"缺了会让语义不自洽"。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是"今天"，否则可复现性当场报废。
 
-setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V11 与 UOS 的 micro 档各只有 2 个 setuid 二进制，麒麟 V10 的 micro 档有 10 个，其中包括 `/usr/sbin/kysec-wlinit`——一个 KYSEC 相关的程序，而容器里根本不加载 KYSEC LSM（见 §9.1）。V10 的 micro 档之所以这么"厚"，是因为它的 `Priority: required` 集本来就大（连 systemd 都在里面），这条路径没有更细的裁剪余地。用作纯运行时档时，这 10 个 setuid 属于需要知情的攻击面。
+setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V11 与 UOS 的 micro 档各只有 2 个 setuid 二进制，麒麟 V10 micro 档有 10 个，其中包括 `/usr/sbin/kysec-wlinit`——一个 KYSEC 相关的程序，而容器里根本不加载 KYSEC LSM（见 §9.1）。V10 的 micro 档之所以这么"厚"，是因为它的 `Priority: required` 集本来就大（连 systemd 都在里面），这条路径没有更细的裁剪余地。用作纯运行时档时，这 10 个 setuid 属于需要知情的攻击面。
 
 ### 5.1 加包要看真实代价
 
@@ -119,7 +119,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 ⚠️ 这张表是回退前后的一次性对照，用的是 `docker images` 解包占用口径（因为当时就是这么读的），与本文其余处的 rootfs tar 口径不同；回退后的构型已经覆盖了那次实验的产物，所以 407 MB 与 420 MB 这两个终点值**没有落盘凭据**，只是当时的观察记录。正文其余所有尺寸一律为 tar 口径。
 
-一个 `dig` 要 40 到 60 MB，与"小镜像"的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里九个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有，UOS 装不上（原因见 §6.2）。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，合计约 13 MB。这六个在 UOS 的 ISO 里都有，所以三家齐平；`wget` 则三家都没装——`curl` 已覆盖同类需求，不重复占体积。
+一个 `dig` 要 40 到 60 MB，与"小镜像"的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里九个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有，UOS 装不上（原因见 §6.2）。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，合计约 13 MB。这六个在 UOS 的 ISO 里都有，补齐后三家齐平（`ping` 与 `vi` 是最后补上的两个，此前矩阵里它们在 UOS 侧还是缺口）；`wget` 则三家都没装——`curl` 已覆盖同类需求，不重复占体积。
 
 ## 6. 能力矩阵：测什么、怎么测、测出什么
 
@@ -127,7 +127,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
 
-72 项 × 9 个镜像 = 648 格，全部实测（`capability_items=72`、`capability_cells=648`）。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
+71 项 × 9 个镜像 = 639 格，全部实测（`capability_items=71`、`capability_cells=639`）。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 
 三态判据写死在 `scripts/analyze.py` 的 `NA_POLICY` 里，是矩阵表和热力图的唯一真源（两处各写一份必然漂移）：
 
@@ -135,7 +135,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 - **不支持**：该档位确实存在这一需求却不满足，是缺口
 - **不适用**：该档位定位下这一需求不存在（依据 §3 的档位定位，不拿它掩盖缺口）
 
-648 格的分布是支持 391、缺口 56、不适用 201。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
+639 格的分布是支持 395、缺口 52、不适用 192。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)
 
@@ -149,7 +149,9 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 **麒麟 V11 的 gcc 会污染 stderr。** 每次编译往 stderr 吐 `grep: /CurrentlyBuilding: No such file or directory`，编译本身成功。这是厂商包装脚本的缺陷（D05），我们没改——改厂商脚本就越过了"等价环境"的底线。影响是：在这个镜像里判断编译是否失败，必须用退出码，不能用 stderr 非空。
 
-**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源里 4758 个包名（其中普通包 2710 个）全是应用商店的 GUI 应用，连 `nano` 都没有，OS 分发走 OSTree 加玲珑。
+**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源只提供 2496 个包，全部来自应用商店，连 `nano` 都没有，OS 分发走 OSTree 加玲珑。
+
+这个数字的口径要说清楚：2496 是**源索引里的条目数**（用 `apt-helper cat-file` 解开压缩的 `Packages` 索引数出来的）。不要用 `apt-cache stats` 的 `Total package names`——那个数（4758）把本机已装的 OS 包和只在依赖里被引用过的名字也算了进去，不是「源里有多少包」。另外采集时带了一条**阳性对照**：从源索引里取一个真实存在的包名，确认 `apt-cache madison` 查得到它。没有这条对照，「14 个工具全都装不上」就区分不了「源里没有」与「源根本没通」。
 
 UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权的专业源（`professional-security.chinauos.com`、`pro-driver-packages.uniontech.com`），未授权返回 401，会让整个 `apt-get update` 退出非零，哪怕 appstore 源本身是通的。镜像里带一个必然失败的源清单没有意义，现在默认注释掉并留了重新启用说明（缺陷 D08）。
 
@@ -161,11 +163,11 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 |---|---|---|---|
 | 源里可 `apt install` | **14 / 14** | **14 / 14** | **0 / 14** |
 
-逐工具明细见表 [`t11`](derived/tables/t11_tool_installability.csv)，14 个工具是 `iproute2`、`iputils-ping`、`bind9-dnsutils`、`lsof`、`vim-tiny`、`zstd`、`unzip`、`cmake`、`autoconf`、`automake`、`git`、`strace`、`gdb`、`python3-dev`。判据用 `apt-cache madison` 而不是 `apt-cache policy` 的 Candidate——后者对**已安装但源里没有**的包同样报候选版本，会把「已经装了」误计成「装得上」，在 UOS 上恰好会把 0/14 虚报成 4/14。
+逐工具明细见表 [`t11`](derived/tables/t11_tool_installability.csv)，14 个工具是 `iproute2`、`iputils-ping`、`bind9-dnsutils`、`lsof`、`vim-tiny`、`zstd`、`unzip`、`cmake`、`autoconf`、`automake`、`git`、`strace`、`gdb`、`python3-dev`。判据用 `apt-cache madison` 而不是 `apt-cache policy` 的 Candidate——后者对**已安装但源里没有**的包同样报候选版本，会把「已经装了」误计成「装得上」，在 UOS 上恰好会把 0/14 虚报成 6/14。
 
 麒麟两版是"没预装"，一条命令就有，不预装是档位设计（保持 server 小镜像）。UOS 是"装不上"：它没有 apt 形式的 OS 软件源，能力面由 ISO 内容封顶。
 
-我们进一步查了 UOS ISO（`uos_iso_packages=1636` 个包，清单落在 `raw/d6_installability.json`）里到底有什么：`ip`、`lsof`、`zstd`、`unzip`、`perl`、`dig`、`curl`、`iputils-ping`、`vim-tiny` 在里面（其中 `ip`/`lsof`/`zstd`/`unzip`/`ping`/`vim-tiny` 原先没切进来，已补进 base）；`g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf`、python3 开发头文件**不在里面**（表 [`t11`](derived/tables/t11_tool_installability.csv) 与 `raw/d6_installability.json` 的 ISO 清单）。
+我们进一步查了 UOS ISO（`uos_iso_packages=1636` 个包，清单落在 `raw/d6_installability.json`）里到底有什么：`ip`、`lsof`、`zstd`、`unzip`、`perl`、`dig`、`curl`、`iputils-ping`、`vim-tiny` 在里面（其中 `iputils-ping` 与 `vim-tiny` 是本轮审稿后才补进 base 的，`ip`/`lsof`/`zstd`/`unzip` 更早一轮已补）；`g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf`、python3 开发头文件**不在里面**（表 [`t11`](derived/tables/t11_tool_installability.csv) 与 `raw/d6_installability.json` 的 ISO 清单）。
 
 由此得到一条对使用方直接有影响的结论：**UOS V25 镜像不能作为 C++ 构建环境**——没有 g++ 且装不上。需要在 UOS 上产出 C++ 制品时，只能自行 vendor 工具链，或者用麒麟镜像构建、UOS 镜像只做运行时验证。
 
@@ -239,7 +241,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 **报告说 UOS ISO 里没有 `ping` 和 `vi`，也是错的。** 它们在 ISO 里（1636 个包的清单可查），是切片种子漏了，已补进 base。真正不在 ISO 里的是 `g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf` 与 python3 开发头文件。这个错误的性质值得记：它把一个**可修的疏漏**说成了**不可修的硬约束**，方向恰好与上一条相反。
 
-**可装性判据一度选错。** 最初用 `apt-cache policy` 的 Candidate 判「装不装得上」，但它对**已安装而源里没有**的包同样报候选版本（值是已装版本）。UOS 上这个差别很关键——我们主动切进去的 `iproute2`/`lsof`/`zstd`/`unzip` 会把 0/14 虚报成 4/14。改用 `apt-cache madison`（只列源提供的版本）后归零。
+**可装性判据一度选错。** 最初用 `apt-cache policy` 的 Candidate 判「装不装得上」，但它对**已安装而源里没有**的包同样报候选版本（值是已装版本）。UOS 上这个差别很关键——我们主动切进去的 6 个包（`iproute2`/`iputils-ping`/`vim-tiny`/`lsof`/`zstd`/`unzip`）会把 0/14 虚报成 6/14。改用 `apt-cache madison`（只列源提供的版本）后归零。
 
 **分析层从未被变异测试过。** 本项目对镜像内检查集做了变异测试并引以为据，却一直没对**分析层**做同样的事。审稿时在那里查出五类假阴性：`in_text` 用裸子串匹配（把 `400` 改成 `401` 竟能通过，因为正文别处有「未授权返回 401」）、抬头数字单点改错不报（正文别处还有同一个数）、正文一批数字零覆盖、「断言总数自洽」只检查那句话存在却从不比对数值、图表引用检查被附录索引自动满足因而永不失败。现在补了 `test/mutation-docs.sh` 专测这一层。**做了变异测试不等于覆盖了所有层**——这是对 §7 那段自信表述的一次必要削弱。
 
@@ -249,7 +251,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 |---|---|
 | [`fig01`](figures/fig01_official_availability.png) | 官方容器镜像可获得性与桌面镜像存在性探测 |
 | [`fig02`](figures/fig02_product_line.png) | 麒麟官方镜像与桌面版的产品线对照 |
-| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（648 格中的一部分行，三态判定与 t05 同源） |
+| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（639 格中的一部分行，三态判定与 t05 同源） |
 | [`fig04`](figures/fig04_tier_size.png) | 三档镜像的体积与包数 |
 | [`fig05`](figures/fig05_gates.png) | 五道门禁与能力矩阵格分布 |
 | [`fig06`](figures/fig06_defects.png) | 厂商缺陷分布 |

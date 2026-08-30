@@ -105,16 +105,15 @@ NA_POLICY = {
               "autotools", "cc_clean_stderr", "python3_dev", "python3", "python3_run",
               "python3_ssl", "perl", "git", "zstd", "unzip", "ps", "top", "sock_tools",
               "ip_tools", "ping", "dnsutil", "file", "pager", "editor", "lsof", "strace", "gdb",
-              "useradd", "useradd_works", "su_to_user", "sudo", "systemd", "default_target",
-              "masked_units", "policy_rcd"},
+              "useradd", "useradd_works", "su_to_user", "systemd", "policy_rcd"},
     # base 的 NA 集里原先有 strace —— 但 §3 给 base 的定位明写了「线上排查」，
     # 而 strace 是纯排查工具、不依赖工具链，把它判成「不适用」与定位直接冲突。
     # 改为如实记 N（麒麟侧一条 apt 就有，见 t11；UOS 侧是真缺口）。
     # gdb 保留 NA：它要调试符号与工具链生态，属 devel 范畴。
     "base":  {"cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
               "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
-              "autotools", "cc_clean_stderr", "python3_dev", "git", "gdb", "sudo"},
-    "devel": {"sudo"},
+              "autotools", "cc_clean_stderr", "python3_dev", "git", "gdb"},
+    "devel": set(),
 }
 # 探针输出里有两类东西，不能混算：
 #   INFO_PROBES 是**环境指纹**（架构、glibc 版本、setuid 数量……），值是版本号或计数，
@@ -124,10 +123,14 @@ NA_POLICY = {
 # 指纹另出一张 t10 表，哨兵由 collect 阶段硬断言，两者都不进三态矩阵。
 INFO_PROBES = {"arch", "glibc", "os_id", "setuid_bins", "file_caps", "default_target"}
 SENTINELS = {"probe_complete"}
+# sudo 在九档全是 NA，是零信息的凑数项（占 9 格），而且它从未被真判定过 ——
+# 与「648 格全部实测」的表述冲突。直接从矩阵里去掉，理由写在 report.md §3。
+# default_target 已进 INFO_PROBES，masked_units 根本不是探针 key，两个死条目一并清掉。
+EXCLUDED = {"sudo"}
 
 probes = d3["probes"]
 allkeys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
-keys = [k for k in allkeys if k not in INFO_PROBES and k not in SENTINELS]
+keys = [k for k in allkeys if k not in INFO_PROBES and k not in SENTINELS and k not in EXCLUDED]
 order = [f"{d}:{t}" for d in ["kylin11", "kylin10", "uos25"] for t in ["micro", "base", "devel"]]
 
 def tri(col, key):
@@ -198,9 +201,16 @@ csv("t09_build_paths.csv",
 S["build_methods"] = sorted({i["method"] for i in d5["isos"]})
 
 # ── T11 工具可装性：区分「没预装」与「装不上」的定量依据 ────────────────────
-rows = [[t] + [d6["images"][k]["candidates"].get(t, "?").split(":")[0] if
-               d6["images"][k]["candidates"].get(t, "NOREPO") != "NOREPO" else "装不上"
-               for k in ("kylin11", "kylin10", "uos25")] for t in d6["tools"]]
+def _cand(k, t):
+    """candidates[t] 形如 `iproute2: iproute2 | 6.1.0-ok1k0.1 | http://…`。
+    早先按 `:` 切第一段，拿到的是包名而不是版本，整张明细表退化成工具名重复三遍。
+    这里取 madison 输出的第二段（版本号），那才是「装得上、装的是哪版」的信息。"""
+    v = d6["images"][k]["candidates"].get(t, "NOREPO")
+    if v == "NOREPO":
+        return "装不上"
+    parts = [x.strip() for x in v.split("|")]
+    return parts[1] if len(parts) > 1 else v
+rows = [[t] + [_cand(k, t) for k in ("kylin11", "kylin10", "uos25")] for t in d6["tools"]]
 csv("t11_tool_installability.csv", ["tool", "kylin11", "kylin10", "uos25"], rows)
 for k in ("kylin11", "kylin10", "uos25"):
     S[f"installable_{k}"] = d6["images"][k]["installable"]
@@ -211,8 +221,14 @@ S["uos_iso_has_gxx"] = _has.get("g++")
 S["uos_iso_missing"] = sorted(k for k, v in _has.items() if v is False)
 # UOS apt 源规模：从 apt-cache stats 的原文里取
 import re as _re
-_m = _re.search(r"Total package names:\s*(\d+)", d6.get("uos_apt_scale") or "")
-S["uos_apt_package_names"] = int(_m.group(1)) if _m else None
+# 源规模用索引条目数，不用 Total package names（后者含已装与被引用的名字）
+_sc = d6.get("uos_apt_scale") or ""
+_m = _re.search(r"---repo-entries---\s*\n\s*(\d+)", _sc)
+S["uos_apt_repo_packages"] = int(_m.group(1)) if _m else None
+_m0 = _re.search(r"Total package names:\s*(\d+)", _sc)
+S["uos_apt_total_names"] = int(_m0.group(1)) if _m0 else None
+# 阳性对照：源里真实存在的包必须查得到，用来区分「源里没有」与「源没通」
+S["uos_apt_positive_control"] = bool(_re.search(r"---positive-control---\s*\nsample=\S+\n\s*\S+\s*\|", _sc))
 _m2 = _re.search(r"Normal packages:\s*(\d+)", d6.get("uos_apt_scale") or "")
 S["uos_apt_normal_packages"] = int(_m2.group(1)) if _m2 else None
 

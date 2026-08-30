@@ -48,5 +48,29 @@ jobs:
           for f in $(git ls-files '*.sh'); do bash -n "$f" || fail=1; done
           exit $fail
 
+      # raw/d4_gates.json 自称来自 artifacts/f4-*.log，但那一步从不在 CI 里重跑，
+      # 于是改了日志不会有任何东西报警（审稿实测：把「通过 365」改成 300，全绿）。
+      - name: Re-derive d4 from the committed gate logs and fail on drift
+        run: |
+          cp raw/d4_gates.json /tmp/d4.before
+          python3 scripts/collect_d4_gates.py
+          # 只比内容，不比 collected_at —— 那个字段每次重采都变，
+          # 直接 git diff 会让这一步永远失败（本地实测过，别再踩）。
+          python3 - <<'EOF'
+          import json, sys
+          a = json.load(open("/tmp/d4.before")); b = json.load(open("raw/d4_gates.json"))
+          a.pop("collected_at", None); b.pop("collected_at", None)
+          if a != b:
+              print("::error::raw/d4_gates.json 与 artifacts/f4-*.log 不一致 —— "
+                    "门禁日志被改过，或 d4 未随日志重采")
+              sys.exit(1)
+          print("d4 与门禁日志一致")
+          EOF
+          git checkout -- raw/d4_gates.json
+
       - name: Machine-check every claim in report.md / README.md
         run: python3 scripts/verify.py
+
+      # 给分析层做的门禁自己也要被执行 —— 否则又是「门禁没有门禁」
+      - name: Mutation-test the analysis layer itself
+        run: ./test/mutation-docs.sh

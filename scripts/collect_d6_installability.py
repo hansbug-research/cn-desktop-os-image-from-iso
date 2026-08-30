@@ -82,9 +82,23 @@ def main():
         data["cxx_probe"][did] = dsh(img, cxx_script)
 
     print("  UOS apt 源规模", file=sys.stderr)
+    # ⚠️ 口径：`apt-cache stats` 的 Total package names 不是「源里有多少包」——
+    # 它把本机已装的 OS 包和只在依赖里被引用过的名字也算进去了。真正该引用的是
+    # 源索引里的条目数，用 apt-helper 解开压缩的 Packages 索引来数。
+    # 另外补一条**阳性对照**：源里确实存在的某个包必须能被 madison 查到，
+    # 否则「14 个工具都装不上」区分不了「源里没有」与「源根本没通」。
     data["uos_apt_scale"] = dsh("uos-desktop-v25:base",
-        "apt-get update -qq >/dev/null 2>&1; apt-cache stats 2>/dev/null | head -6; "
-        "echo '---pkgnames---'; apt-cache pkgnames 2>/dev/null | sort -u | wc -l; "
+        "apt-get update -qq >/dev/null 2>&1\n"
+        "echo '---stats---'; apt-cache stats 2>/dev/null | head -6\n"
+        "echo '---repo-entries---'\n"
+        "apt-get indextargets --format '$(FILENAME)' 2>/dev/null | grep binary-amd64 | "
+        "while read f; do /usr/lib/apt/apt-helper cat-file \"$f\" 2>/dev/null; done | "
+        "grep -c '^Package: '\n"
+        "echo '---positive-control---'\n"
+        "p=$(apt-get indextargets --format '$(FILENAME)' 2>/dev/null | grep binary-amd64 | "
+        "while read f; do /usr/lib/apt/apt-helper cat-file \"$f\" 2>/dev/null; done | "
+        "sed -n 's/^Package: //p' | head -1)\n"
+        "echo \"sample=$p\"; apt-cache madison \"$p\" 2>/dev/null | head -1\n"
         "echo '---nano---'; apt-cache policy nano 2>/dev/null | head -3")
 
     # UOS ISO 内的包清单：从切片源的 dpkg info 目录数 .list 文件
@@ -104,6 +118,22 @@ def main():
         }
     else:
         print("!! 取不到 UOS 切片源的包清单（需要 builder 容器 dosb 在跑）", file=sys.stderr)
+
+    # 失败即退出，绝不写盘。这个脚本的退化输出恰好等于它的头条结论（0/14）——
+    # 一次没连上网的重采会把「麒麟 14/14」静默变成「麒麟 0/14」，看起来完全像真结果，
+    # 还会把已提交的 1636 包清单抹成 null。比 d4 那次更危险，所以守卫要更严。
+    bad = []
+    for did, _ in IMAGES:
+        r = data["images"].get(did, {})
+        if not r.get("raw"):
+            bad.append(f"{did} 的探针无输出（镜像不在？docker 不可用？）")
+    if not (data.get("uos_apt_scale") or "").strip():
+        bad.append("UOS apt 源规模没采到")
+    if not data.get("uos_iso_inventory"):
+        bad.append("UOS ISO 包清单没采到（需要 builder 容器 dosb 在跑，或设 UOS_SLICE_SRC）")
+    if bad:
+        print("!! 采集不完整，不写盘：\n  - " + "\n  - ".join(bad), file=sys.stderr)
+        sys.exit(1)
 
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     s = " ".join(f"{d}={data['images'][d]['installable']}/{len(TOOLS)}" for d, _ in IMAGES)

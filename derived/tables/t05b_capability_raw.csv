@@ -25,7 +25,7 @@ dns,Y,Y,Y,Y,Y,Y,Y,Y,Y
 dnsutil,N,N,N,N,N,N,N,N,N
 dpkg_local_deb,Y,Y,Y,Y,Y,Y,Y,Y,Y
 dpkg_query,Y,Y,Y,Y,Y,Y,Y,Y,Y
-editor,N,Y,Y,N,Y,Y,N,N,N
+editor,N,Y,Y,N,Y,Y,N,Y,Y
 file,N,Y,Y,N,Y,Y,N,Y,Y
 file_caps,n/a,1,1,1,2,2,n/a,0,0
 findutils,Y,Y,Y,Y,Y,Y,Y,Y,Y
@@ -46,7 +46,7 @@ openssl,Y,Y,Y,Y,Y,Y,Y,Y,Y
 os_id,kylin-v11,kylin-v11,kylin-v11,kylin-v10,kylin-v10,kylin-v10,uos-25,uos-25,uos-25
 pager,Y,Y,Y,Y,Y,Y,Y,Y,Y
 perl,Y,Y,Y,Y,Y,Y,N,N,Y
-ping,N,Y,Y,N,Y,Y,N,N,N
+ping,N,Y,Y,N,Y,Y,N,Y,Y
 pkgconfig,N,N,Y,N,N,Y,N,N,N
 policy_rcd,Y,Y,Y,Y,Y,Y,Y,Y,Y
 probe_complete,Y,Y,Y,Y,Y,Y,Y,Y,Y

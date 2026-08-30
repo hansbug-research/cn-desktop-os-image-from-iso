@@ -8,7 +8,7 @@
 #       apt-get check 均干净——崩溃发生在状态已落盘之后。
 #
 # ⚠️ 这个文件**会随镜像出厂**，改变的是运行时行为，不是只在构建期生效。
-#    见 README §7。关闭方法：删掉 /etc/apt/apt.conf.d/docker-dpkg-wrapper。
+#    见 report.md §9.2（被推翻的判断）。关闭方法：删掉 /etc/apt/apt.conf.d/docker-dpkg-wrapper。
 #
 # 设计上刻意保留判别力：
 #   · 只对 --unpack / --install 吸收 139，其它调用与其它退出码原样透传

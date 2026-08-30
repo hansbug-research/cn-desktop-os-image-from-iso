@@ -149,7 +149,7 @@ EOF
   # 会让整个 `apt-get update` 退出非零 —— 哪怕 appstore 源本身是通的。
   # 镜像里带一个必然失败的源清单没有意义，所以默认注释掉，并留下重新启用的说明。
   # 注意：即便全部打通，UOS V25 也没有 apt 形式的 OS 软件源（实测仅剩的 appstore 源
-  # 有 4731 个包名，但不含 nano 这类普通 OS 包）—— 它的 OS 分发走 OSTree + 玲珑。
+  # 源只提供 2496 个包且全来自应用商店，不含 nano 这类 OS 包）—— 它的 OS 分发走 OSTree + 玲珑。
   for _l in "$R"/etc/apt/sources.list.d/*.list; do
     [ -f "$_l" ] || continue
     if grep -qE '^deb .*(professional-security\.chinauos\.com|pro-driver-packages\.uniontech\.com)' "$_l"; then

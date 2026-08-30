@@ -1,8 +1,8 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **113** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **639** 格全部实测 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 机器核对断言 **131** 条（`python3 scripts/verify.py`）｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
 
-要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把"从桌面版 ISO 自己造分档镜像"这件事做通并留下完整证据：三条构建路径、九个镜像、648 格实测能力矩阵、五道验收门禁。
+要把编译好的软件交付到客户的银河麒麟或统信 UOS 桌面上，交付前得先在那个环境里验一遍。厂商发的是 ISO，容器镜像要么没有、要么不是同一个东西。本仓库把"从桌面版 ISO 自己造分档镜像"这件事做通并留下完整证据：三条构建路径、九个镜像、639 格实测能力矩阵、五道验收门禁。
 
 **完整报告：[`report.md`](report.md)**
 
@@ -18,7 +18,7 @@
 | 2 | **误读的技术根源是一个字段：两者 `os-release` 的 `ID` 都是 `kylin`。** 按 `ID` 判发行版是常见做法，而这个字段在这里不具备区分力，得看 `NAME` 或包格式 | [§2.1](report.md#21-麒麟有官方镜像是个误读那是另一条产品线)、`os_id_collision=True` |
 | 3 | **商业桌面线的官方容器镜像一个都没有。** 8 条存在性探测里只有 1 条命中：麒麟桌面 0 个、统信 UOS 0 个，连服务器线的 `kylin-server-minimal:v11` 也不存在。社区线则有（openKylin 2.0/3.0、deepin-core、beige、apricot） | [§2](report.md#2-国产桌面-os-的官方容器镜像现状)、[`t02`](derived/tables/t02_registry_existence_probes.csv) |
 | 4 | **一条 ISO 一条路。** 三个被试没有一条通用路径：V11 走 `mmdebstrap`，V10 因 debconf 依赖环 + 宿主 dpkg 1.22 与目标 1.19.7 的代差只能两阶段自举，UOS V25 是 OSTree 不可变系统只能从 squashfs 按包依赖闭包切片 | [§4](report.md#4-三条构建路径)、[`t09`](derived/tables/t09_build_paths.csv) |
-| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源内 4758 个包名全是应用商店 GUI 应用，连 `nano` 都没有），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
+| 5 | **UOS V25 不能作为 C++ 构建环境。** 它的 ISO（1636 个包）里没有 g++，而它没有 apt 形式的 OS 软件源（源只提供 2496 个包且全来自应用商店，连 `nano` 都没有），所以装不上。三个 devel 档 C 全通过，C++ 只有两家 | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 6 | **麒麟的"没预装"与 UOS 的"硬缺口"性质完全不同。** 14 个常见工具的源内可装性：麒麟 V11 **14 / 14**、麒麟 V10 **14 / 14**、UOS V25 **0 / 14**（判据用 `apt-cache madison` 而非 `policy` 的 Candidate，后者会把「已经装了」误计成「装得上」） | [§6.3](report.md#63-一个必须讲清的区别麒麟的没预装与-uos-的硬缺口) |
 | 7 | **dpkg 段错误的真根因是厂商的安全插件，不是 IO 选项。** 麒麟 V11 的 `kysec2-package-plugins` 往 `/var/lib/dpkg/plugins/` 装两个依赖内核态 KYSEC LSM 的 `.so`，而麒麟给 dpkg 打了补丁去 dlopen 它们。此前三次归因全错，其中一次是受控实验里的状态污染 | [§9.2](report.md#92-被推翻的判断与踩过的坑)、缺陷 D02 |
 | 8 | **加包要看真实代价。** 为补一个 `dig` 会经 `bind9-libs` 拖进 `libicu74`（36 MB），麒麟 V11 base 从 345 MB 涨到 407 MB；UOS base 补 `perl` 从 274 MB 涨到 420 MB。两项都已回退 | [§5.1](report.md#51-加包要看真实代价) |
@@ -41,7 +41,7 @@
 
 ## 3. 能力矩阵
 
-72 项 × 9 镜像 = 648 格，全部在镜像内**真跑**：编译要真编译真执行，TLS 要真握手，apt 要真装真卸。支持 391 格、缺口 56 格、不适用 201 格。
+71 项 × 9 镜像 = 639 格，全部在镜像内**真跑**：编译要真编译真执行，TLS 要真握手，apt 要真装真卸。支持 395 格、缺口 52 格、不适用 192 格。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)
 
@@ -132,9 +132,10 @@ tools/
 test/
   verify.sh                     全量验收（365 项，含检查总数基线断言）
   inner-checks.sh               在被测镜像内运行的检查集，结尾有完成哨兵
-  capabilities.sh               能力探针：79 项全部真跑（其中 72 项进三态矩阵，6 项是环境指纹、1 项是完成哨兵）
+  capabilities.sh               能力探针：79 项全部真跑（其中 71 项进三态矩阵，6 项是环境指纹、1 项是完成哨兵、1 项（sudo）因九档全不适用而移出）
   run-capabilities.sh           把探针跑遍九个镜像
-  mutation.sh                   变异测试：故意破坏镜像，确认检查集真的会失败
+  mutation.sh                   变异测试（镜像层）：故意破坏镜像，确认检查集真的会失败
+  mutation-docs.sh              变异测试（分析层）：改坏 stats/正文/凭据，确认 verify.py 真的会失败
   digest-chain.sh               manifest = tar = 镜像 三者对账
   sbom.sh / cve.sh / repro.sh   SBOM 门禁 / CVE（含覆盖度诚实性判据）/ 可复现性凭据
 gate/                         ABI 门禁二进制与其构建记录（build-gates.sh）
@@ -142,14 +143,16 @@ keys/                         麒麟 archive GPG keyring（来源与指纹见 re
 raw/                          一手数据，采集脚本的原始输出逐字保存
   d1_official_images.json       官方镜像可获得性与存在性探测
   d2_our_images.json            九个自建镜像的事实 + 官方镜像产品线对照
-  d3_capabilities.json          能力探针原始输出（79 项 × 9 镜像；三态矩阵取其中 72 项 = 648 格）
+  d3_capabilities.json          能力探针原始输出（79 项 × 9 镜像；三态矩阵取其中 71 项 = 639 格）
   d4_gates.json                 五道门禁结果与九份 manifest 的审计锚点
   d5_iso_and_defects.json       三条路径的配置事实 + 12 条厂商缺陷
+  d6_installability.json        14 个工具在各自源里的可装性、UOS 源规模与 ISO 包清单
 derived/                      从 raw/ 重算，不手写
   stats.json                    正文引用的全部统计量
-  tables/*.csv                  10 张可复算表
+  tables/*.csv                  13 张可复算表
 figures/*.png                 6 张图
-artifacts/                    审计凭据：九份 manifest、可复现性凭据、九份探针原始输出
+artifacts/                    审计凭据：九份 manifest、可复现性凭据、九份探针原始输出、
+                              四份门禁日志（f4-verify/digest/sbom/mutation.log，一手输出可核对）
 scripts/                      collect_d*.py 只采集不判断；analyze.py 只读 raw 只写 derived；
                               plot.py 只读 derived；verify.py 机器核对正文里的每个声明
 ```

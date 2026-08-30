@@ -23,7 +23,7 @@ dns,Y,Y,Y,Y,Y,Y,Y,Y,Y
 dnsutil,NA,N,N,NA,N,N,NA,N,N
 dpkg_local_deb,Y,Y,Y,Y,Y,Y,Y,Y,Y
 dpkg_query,Y,Y,Y,Y,Y,Y,Y,Y,Y
-editor,NA,Y,Y,NA,Y,Y,NA,N,N
+editor,NA,Y,Y,NA,Y,Y,NA,Y,Y
 file,NA,Y,Y,NA,Y,Y,NA,Y,Y
 findutils,Y,Y,Y,Y,Y,Y,Y,Y,Y
 gdb,NA,NA,N,NA,NA,N,NA,NA,N
@@ -41,7 +41,7 @@ nsswitch,Y,Y,Y,Y,Y,Y,Y,Y,Y
 openssl,Y,Y,Y,Y,Y,Y,Y,Y,Y
 pager,NA,Y,Y,NA,Y,Y,NA,Y,Y
 perl,NA,Y,Y,NA,Y,Y,NA,N,Y
-ping,NA,Y,Y,NA,Y,Y,NA,N,N
+ping,NA,Y,Y,NA,Y,Y,NA,Y,Y
 pkgconfig,NA,NA,Y,NA,NA,Y,NA,NA,N
 policy_rcd,NA,Y,Y,NA,Y,Y,NA,Y,Y
 ps,NA,Y,Y,NA,Y,Y,NA,Y,Y
@@ -57,7 +57,6 @@ sources_list,NA,Y,Y,NA,Y,Y,NA,Y,Y
 static_link,NA,NA,Y,NA,NA,Y,NA,NA,Y
 strace,NA,N,N,NA,N,N,NA,N,N
 su_to_user,NA,Y,Y,NA,Y,Y,NA,Y,Y
-sudo,NA,NA,NA,NA,NA,NA,NA,NA,NA
 systemd,NA,Y,Y,NA,Y,Y,NA,Y,Y
 tar,Y,Y,Y,Y,Y,Y,Y,Y,Y
 textutils,Y,Y,Y,Y,Y,Y,Y,Y,Y

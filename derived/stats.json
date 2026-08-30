@@ -4,11 +4,11 @@
     "selfhost",
     "slice"
   ],
-  "capability_cells": 648,
-  "capability_items": 72,
-  "cells_gap": 56,
-  "cells_na": 201,
-  "cells_supported": 391,
+  "capability_cells": 639,
+  "capability_items": 71,
+  "cells_gap": 52,
+  "cells_na": 192,
+  "cells_supported": 395,
   "defects": 12,
   "defects_by_distro": {
     "kylin10": 2,
@@ -64,7 +64,9 @@
     "micro"
   ],
   "uos_apt_normal_packages": 2710,
-  "uos_apt_package_names": 4758,
+  "uos_apt_positive_control": true,
+  "uos_apt_repo_packages": 2496,
+  "uos_apt_total_names": 4758,
   "uos_iso_has_gxx": false,
   "uos_iso_missing": [
     "autoconf",

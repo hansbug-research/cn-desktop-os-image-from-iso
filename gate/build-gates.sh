@@ -9,11 +9,11 @@
 #   t_low       manylinux2014（CentOS 7, GLIBC 2.17）→ GLIBC_2.14 / GLIBCXX_3.4.11（低地板）
 #
 # t_low 需要 manylinux2014 镜像，本机离线环境下拉不到，所以**不在本脚本里重建**，
-# 仅记录其来源与实测符号天花板（见 README §7）。要重建请在有外网的机器上执行：
+# 仅记录其来源与实测符号天花板（见 report.md §3.1（信任根））。要重建请在有外网的机器上执行：
 #   docker run --rm -v $PWD:/w quay.io/pypa/manylinux2014_x86_64 \
 #     g++ -O2 -static-libstdc++ -static-libgcc -o /w/t_low /w/t.cpp
 set -eu
-ROOT=${ROOT:-/data/dosbuild}
+ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根
 BUILDER_IMG=${BUILDER_IMG:-dosbuild-cache:latest}
 C="gatebuild-$$"
 trap 'docker rm -f "$C" >/dev/null 2>&1 || true' EXIT
