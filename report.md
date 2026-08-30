@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **639** 格 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **6** 组 ｜ 图 **6** 张 ｜ 可复算表 **13** 张
+> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条 ｜ 变异用例 **12** 条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **7** 组 ｜ 图 **6** 张 ｜ 可复算表 **14** 张
 
 ## 1. 问题
 
@@ -66,13 +66,21 @@
 
 ### 3.1 信任根：GPG keyring 的来源与指纹
 
-两条走在线源的路径（mmdebstrap、selfhost）在拉包前强制验签，`build/build-selfhost.sh` 的阶段 0 会独立跑一次 `gpgv` 核 `InRelease`，失败即中止。keyring 随仓库提交（`keys/`），来源与指纹如下，可独立核对：
+两条走在线源的路径（mmdebstrap、selfhost）在拉包前强制验签，`build/build-selfhost.sh` 的阶段 0 会独立跑一次 `gpgv` 核 `InRelease`，失败即中止。构建实际使用的 keyring 是 `keys/kylin-archive-keyring.gpg`，随仓库提交，来源与指纹如下，可独立核对：
 
-| 文件 | 来源 | 指纹 |
-|---|---|---|
-| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`（Kylin Archive Automatic Signing Key） |
+| 文件 | 来源 | 指纹 | 谁在用 |
+|---|---|---|---|
+| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及三处 `signed-by=` |
 
-⚠️ 两点要说明。其一，这是**首次使用即信任**（TOFU）：keyring 本身取自同一批软件源，无法用独立信道交叉验证，所以它证明的是「后续拉到的包与当初那份 keyring 同源」，不是「厂商官方身份已被第三方权威确认」。其二，该 key 的 uid 写的是 `For Kylin Arm64 Repo.`，而本研究只做 amd64——麒麟在 amd64 源上复用了这把 arm64 命名的 key，这是厂商侧的命名问题，不影响验签结果，但审计时会看着奇怪，故在此记明。
+实测该 keyring 单独即可验通麒麟 V11（`dists/11.0`）与 V10 SP1（`dists/10.1`）的 `InRelease`：
+
+```
+$ gpgv --keyring keys/kylin-archive-keyring.gpg InRelease   # 11.0 与 10.1 皆通过
+```
+
+三点要说明。其一，这是**首次使用即信任**（TOFU）：keyring 本身取自同一批软件源，无法用独立信道交叉验证，所以它证明的是「后续拉到的包与当初那份 keyring 同源」，不是「厂商官方身份已被第三方权威确认」。其二，该 key 的 uid 写的是 `For Kylin Arm64 Repo.`，而本研究只做 amd64——麒麟在 amd64 源上复用了这把 arm64 命名的 key，属厂商侧的命名问题，不影响验签结果，但审计时会看着奇怪，故记明。其三见下面这条更正。
+
+> **更正（审稿查出）**：早先构建实际使用的是 `keys/kylin-combined.gpg`，即上面这把 key 与 openKylin 的 `09FFC10E A273DD29 A986B110 8B313CEA FF592D96` 合并而成，而本节当时只记录了前者——**文档描述的文件与代码实际使用的文件不是同一个，第三方照着核会核错对象，且真实信任面比文档大一把 key**。补测后确认那把 openKylin key 对本项目的两个源没有任何作用（单用 `kylin-archive-keyring.gpg` 即可验通 11.0 与 10.1），于是把构建收窄到最小信任集，并从 `keys/` 里移除了 `kylin-combined.gpg` 与无消费方的 `openkylin-archive-keyring.gpg`。信任面该多大就多大，多一把没用的 key 就是多一份可被滥用的授权。
 
 UOS 走切片路径，不从在线源拉包，改为核对 squashfs 的 sha256（`distros/uos25.conf` 的 `SQUASHFS_SHA256`），信任根是 ISO 本身。
 
@@ -127,7 +135,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
 
-71 项 × 9 个镜像 = 639 格，全部实测（`capability_items=71`、`capability_cells=639`）。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
+72 项 × 9 个镜像 = 648 格，全部实测（`capability_items=72`、`capability_cells=648`）。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 
 三态判据写死在 `scripts/analyze.py` 的 `NA_POLICY` 里，是矩阵表和热力图的唯一真源（两处各写一份必然漂移）：
 
@@ -135,7 +143,7 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 - **不支持**：该档位确实存在这一需求却不满足，是缺口
 - **不适用**：该档位定位下这一需求不存在（依据 §3 的档位定位，不拿它掩盖缺口）
 
-639 格的分布是支持 395、缺口 52、不适用 192。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
+648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)
 
@@ -216,7 +224,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 - **仅 amd64。** 三条路径都只在 x86_64 上执行过，arm64 与 loongarch64 未验证。
 - **不覆盖内核态。** 容器共享宿主内核，厂商的 KYSEC、IMA/EVM 完整性度量、驱动都不在一致性范围内。麒麟的 `kysec2-package-plugins` 我们是直接不装的（见 D02）。
 - **UOS 的 `security.*` 扩展属性未保留。** rootless docker 无 `CAP_SYS_ADMIN`，`unsquashfs -xattrs` 会 FATAL。其中 IMA/EVM 那部分丢了没有实际影响（容器不加载相关 LSM），但 `security.capability`（file capabilities）在容器里是真会用的——如果业务二进制依赖 file capability 才能跑，在 UOS 三档里会表现成权限不足。
-- **漏洞跟踪没有做。** 通用扫描器对这三个发行版没有有效覆盖：麒麟 V11 被 trivy 判为 `none` 压根没扫，麒麟 V10 与 UOS 被**误判成 Debian**，拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0。一个一百多个包的 bookworm 代镜像报 0 个 HIGH/CRITICAL 是不可信的——那是"比不出来"，不是"没有漏洞"。`make cve` 因此强制区分这两种情况，把无有效覆盖的镜像明确标出、不计入通过。真实的漏洞跟踪需要接厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，不在本仓库范围内。
+- **漏洞跟踪没有做，因为通用扫描器对这三个发行版没有有效覆盖。** 这一条有一手数据（表 [`t13`](derived/tables/t13_cve_coverage.csv)，原始输出 `raw/d7_cve.json`）：用 trivy 0.70.0 扫九个镜像，**有效覆盖 0 个**——未识别的 3 个是麒麟 V11 三档（trivy 判为 `none`，压根没扫），误判成 Debian 的 6 个是麒麟 V10 与 UOS 各三档，九个镜像报出的 HIGH/CRITICAL 合计为 0。误判那六个最危险：拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0，而一个一百多个包的 bookworm 代镜像报 0 是不可信的——那是"比不出来"，不是"没有漏洞"。`make cve` 因此强制区分这两种情况，把无有效覆盖的镜像明确标出、不计入通过。真实的漏洞跟踪需要接厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，不在本仓库范围内。
 - **"官方"一词受限使用。** 只有能给出 registry 域名归属证据的才称官方。Docker Hub 上的 `kylin` 命名空间是无关第三方（内容是 Home Assistant 插件），不是厂商。
 
 ### 9.2 被推翻的判断与踩过的坑
@@ -251,7 +259,7 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 |---|---|
 | [`fig01`](figures/fig01_official_availability.png) | 官方容器镜像可获得性与桌面镜像存在性探测 |
 | [`fig02`](figures/fig02_product_line.png) | 麒麟官方镜像与桌面版的产品线对照 |
-| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（639 格中的一部分行，三态判定与 t05 同源） |
+| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（648 格中的一部分行，三态判定与 t05 同源） |
 | [`fig04`](figures/fig04_tier_size.png) | 三档镜像的体积与包数 |
 | [`fig05`](figures/fig05_gates.png) | 五道门禁与能力矩阵格分布 |
 | [`fig06`](figures/fig06_defects.png) | 厂商缺陷分布 |

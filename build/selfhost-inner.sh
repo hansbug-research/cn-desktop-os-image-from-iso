@@ -26,8 +26,8 @@ fi
 
 # ② base-files 在 --foreign 解包后常处于损坏态，重装修好
 mkdir -p /etc/apt/preferences.d /usr/share/keyrings
-cp /keys/kylin-combined.gpg /usr/share/keyrings/ 2>/dev/null || true
-printf 'deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] %s %s %s\n' "$MIRROR" "$SUITE" "$COMPONENTS" > /etc/apt/sources.list
+cp /keys/kylin-archive-keyring.gpg /usr/share/keyrings/ 2>/dev/null || true
+printf 'deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] %s %s %s\n' "$MIRROR" "$SUITE" "$COMPONENTS" > /etc/apt/sources.list
 printf 'APT::Key::gpgvcommand "gpgv";\n' > /etc/apt/apt.conf.d/docker-gpgv
 if [ -n "${PIN_NEVER:-}" ]; then
   { for p in $PIN_NEVER; do printf 'Package: %s\nPin: release *\nPin-Priority: -1\n\n' "$p"; done; } \
@@ -77,9 +77,9 @@ fi
 if [ -f /dosbuild-lib/common.sh ]; then
   # 仓库是挂载进来的，路径与构建容器不同，所以显式指定 ASSETS_DIR / KEYRING
   ASSETS_DIR=/dosbuild-assets
-  KEYRING=/keys/kylin-combined.gpg
+  KEYRING=/keys/kylin-archive-keyring.gpg
   . /dosbuild-lib/common.sh
-  SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] $MIRROR $SUITE $COMPONENTS"
+  SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
   adapt_container / "$SRCLIST" "${DID:-}"
   slim_locales /
   say "容器化适配: 复用 lib/common.sh::adapt_container"

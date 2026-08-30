@@ -1,0 +1,10 @@
+image,real_os_id,trivy_os_family,trivy_os_name,high_critical,verdict
+kylin-desktop-v11:micro,kylin,none,,0,未识别
+kylin-desktop-v11:base,kylin,none,,0,未识别
+kylin-desktop-v11:devel,kylin,none,,0,未识别
+kylin-desktop-v10:micro,kylin,debian,bullseye/sid,0,误判
+kylin-desktop-v10:base,kylin,debian,bullseye/sid,0,误判
+kylin-desktop-v10:devel,kylin,debian,bullseye/sid,0,误判
+uos-desktop-v25:micro,uos,debian,bookworm/sid,0,误判
+uos-desktop-v25:base,uos,debian,bookworm/sid,0,误判
+uos-desktop-v25:devel,uos,debian,bookworm/sid,0,误判

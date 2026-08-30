@@ -15,6 +15,11 @@ REPORT = (ROOT / "report.md").read_text()
 README = (ROOT / "README.md").read_text() if (ROOT / "README.md").exists() else ""
 TAB = ROOT / "derived" / "tables"
 
+# 正文 = 附录之前的部分。图表/缺陷 ID 的「被引用」只认正文：
+# 附录 A/B 是完整索引，把它算进来会让相关断言永不失败。
+_APPENDIX = REPORT.index("## 附录 A")
+BODY = REPORT[:_APPENDIX]
+
 N = 0; BAD = []
 def ok(cond, msg):
     global N
@@ -55,7 +60,7 @@ t3 = (TAB / "t03_product_line_comparison.csv").read_text()
 ok("rpm" in t3 and "dpkg" in t3, "t03 应同时含 rpm 与 dpkg 行")
 ok(S["existence_probes"] >= 8, "存在性探测至少 8 条")
 ok(S["existence_found"] == 1, "存在性探测应只有 1 条命中")
-in_text(S["existence_probes"], label="存在性探测条数")
+in_text(S["existence_probes"], label="存在性探测条数", ctx=rf"{S['existence_probes']} 条存在性探测")
 
 # ── 编译能力 ────────────────────────────────────────────────────────────────
 ok(S["devel_count"] == 3, "devel 档应为 3 个")
@@ -125,13 +130,17 @@ ok(S["defects"] == 12, "厂商缺陷应为 12 条")
 in_text(S["defects"], label="缺陷条数")
 t8 = (TAB / "t08_vendor_defects.csv").read_text().splitlines()
 ok(len(t8) - 1 == S["defects"], "t08 行数应等于缺陷数")
+# 早先写成 `d in REPORT or d in t8[0] or any(d in l for l in t8)` —— t08 按构造必然
+# 含每个 D**，第三支恒真，这 7 条断言零鉴别力（实测删光正文里的 D05 引用也全绿）。
+# 改成只查正文：被正文讨论过的缺陷 ID 才算「有交代」。
 for d in ("D01", "D02", "D05", "D08", "D09", "D10", "D12"):
-    ok(d in REPORT or d in t8[0] or any(d in l for l in t8), f"缺陷 {d} 应在正文或表里出现")
+    ok(d in BODY, f"缺陷 {d} 应在正文里被讨论（只在表里不算）")
 
 # ── 覆盖 review 点名的零覆盖数字（都带上下文，避免裸子串撞车）──────────────
 for d, n in S["masked_units_by_distro"].items():
     nm = {"kylin10": "麒麟 V10", "kylin11": "麒麟 V11", "uos25": "UOS"}[d]
-    ok(any(re.search(rf"{n} 个", x) for x in [REPORT]), f"正文应写明 {nm} 的 masked 单元数 {n}")
+    ok(re.search(rf"(?<![0-9]){n} 个", REPORT) is not None,
+       f"正文应写明 {nm} 的 masked 单元数 {n}（需带数字边界，否则 11 会被 111 满足）")
 in_text(S["setuid_micro"]["kylin10"], label="V10 micro 的 setuid 数",
         ctx=rf"V10 micro 档有 {S['setuid_micro']['kylin10']} 个")
 in_text(S["setuid_micro"]["kylin11"], label="micro 的 setuid 数",
@@ -151,11 +160,42 @@ for v, lbl, ctx in [
     in_text(v, where="readme", label=f"README {lbl}", ctx=ctx.replace("{v}", str(v)))
     in_text(v, where="report", label=f"report {lbl}", ctx=ctx.replace("{v}", str(v)))
 
+# ── README 抬头与结论表的逐项覆盖 ────────────────────────────────────────────
+# README 是「读者多半只看的那份」，此前它抬头的验收断言数、三态分布、门禁表、
+# 结论表里的关键数字全部零覆盖 —— 改成任意值都全绿。全部带上下文断言。
+for v, ctx, lbl in [
+    (S["verify_passed"], r"验收断言 \*\*{v}\*\* 条", "README 验收断言数"),
+    (S["cells_supported"], r"支持 {v} 格", "README 支持格数"),
+    (S["cells_gap"], r"缺口 {v} 格", "README 缺口格数"),
+    (S["cells_na"], r"不适用 {v} 格", "README 不适用格数"),
+    (S["capability_items"], r"{v} 项 × 9 镜像", "README 能力项数"),
+    (S["verify_passed"], r"{v} 通过 / 0 失败", "README 门禁表 verify"),
+    (S["verify_baseline"], r"基线 {v}", "README 门禁表基线"),
+    (S["digest_chain_passed"], r"\| {v} / 9 \|", "README 门禁表 digest"),
+    (S["mutation_caught"], r"{v} 抓到 / 0 漏", "README 门禁表 mutation"),
+    (S["repro_identical"], r"{v} / 6 逐位一致", "README 门禁表 repro"),
+    (S["existence_probes"], r"{v} 条存在性探测", "README 结论 3 探测数"),
+    (S["uos_iso_packages"], r"ISO（{v} 个包）", "README 结论 5 ISO 包数"),
+]:
+    in_text(v, where="readme", label=lbl, ctx=ctx.replace("{v}", str(v)))
+# 官方镜像的 glibc 全版本号必须原样出现（此前改成 2.99-fake 也全绿）
+_off = [r for r in (TAB / "t03_product_line_comparison.csv").read_text().splitlines()
+        if r.startswith("厂商官方")][0].split(",")
+ok(_off[6] in README and _off[6] in REPORT, f"官方镜像 glibc {_off[6]} 应在正文与 README 出现")
+ok(_off[5] in README, f"官方镜像包格式 {_off[5]} 应在 README 出现")
+
+# ── 漏洞扫描覆盖（十条主要结论里唯一涉及安全判断的一条，必须有凭据）──────────
+ok(S["cve_effective_coverage"] == 0, "三个发行版应无一有效的漏洞库覆盖")
+ok(S["cve_unrecognized"] + S["cve_misidentified"] == 9, "九个镜像应全部落在未识别或误判")
+in_text(S["cve_misidentified"], label="被误判的镜像数", ctx=rf"误判成 Debian 的 {S['cve_misidentified']} 个")
+in_text(S["cve_unrecognized"], label="未识别的镜像数", ctx=rf"未识别的 {S['cve_unrecognized']} 个")
+# 「报 0 个 HIGH/CRITICAL」这句必须是实测而非推断
+ok(S["cve_high_critical_total"] == 0,
+   "正文称扫描报 0 个 HIGH/CRITICAL，实测总数应为 0")
+
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
 # 图表引用只查**正文**：附录 A/B 是完整索引，若把附录算进来，这条断言永不失败
 # —— 它以为自己在防「图表没人引用」，实际什么也没防（实测 fig06 与 5 张表只在索引里）。
-_appendix = REPORT.index("## 附录 A")
-BODY = REPORT[:_appendix]
 for fig in sorted((ROOT / "figures").glob("*.png")):
     ok(fig.name in BODY, f"图 {fig.name} 只在附录索引里，正文未引用")
 for tab in sorted(TAB.glob("*.csv")):
@@ -169,10 +209,15 @@ for pat in ("*.tar", "*.iso", "*.squashfs"):
     found = [p for p in ROOT.rglob(pat) if ".git" not in p.parts]
     ok(not found, f"仓库不应包含 {pat}：{[str(x) for x in found[:3]]}")
 # 自然段内不硬换行：正文里不应出现「上一行以中文结尾、下一行紧接中文」的硬折
-hard = [i for i, l in enumerate(REPORT.splitlines()[:-1], 1)
-        if re.search(r"[一-鿿]$", l) and not l.startswith(("|", "-", ">", "#", " "))
-        and re.match(r"^[一-鿿]", REPORT.splitlines()[i] or " ")]
-ok(not hard, f"正文自然段内疑似硬换行，行号：{hard[:5]}")
+# 行尾判据要含中文标点：最常见的折行点是逗号顿号而不是汉字（实测行尾全角逗号漏检）。
+# 两份文档都要查 —— 早先只查了 report。
+for _name, _txt in (("report.md", REPORT), ("README.md", README)):
+    _L = _txt.splitlines()
+    hard = [i for i, l in enumerate(_L[:-1], 1)
+            if re.search(r"[一-鿿，、；：）】」》]$", l)
+            and not l.startswith(("|", "-", ">", "#", " ", "`", "*"))
+            and re.match(r"^[一-鿿（【「《]", _L[i] or " ")]
+    ok(not hard, f"{_name} 自然段内疑似硬换行，行号：{hard[:5]}")
 
 # 断言自计数。早先版本只检查「这句话存在」，捕获了数字却从不比对 ——
 # 把抬头的 365 改成 99999 照样全绿。那是本仓库 §9.2 自己批判的第三类假通过。
@@ -187,7 +232,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "131"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "152"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

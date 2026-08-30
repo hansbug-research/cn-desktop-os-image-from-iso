@@ -1,0 +1,105 @@
+{
+  "collected_at": "2026-08-30T07:34:27Z",
+  "scanner": "aquasec/trivy:0.70.0",
+  "images": [
+    {
+      "distro_id": "kylin11",
+      "image": "kylin-desktop-v11:micro",
+      "real_os_id": "kylin",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 0,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "kylin11",
+      "image": "kylin-desktop-v11:base",
+      "real_os_id": "kylin",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 0,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "kylin11",
+      "image": "kylin-desktop-v11:devel",
+      "real_os_id": "kylin",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 0,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "kylin10",
+      "image": "kylin-desktop-v10:micro",
+      "real_os_id": "kylin",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bullseye/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "kylin10",
+      "image": "kylin-desktop-v10:base",
+      "real_os_id": "kylin",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bullseye/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "kylin10",
+      "image": "kylin-desktop-v10:devel",
+      "real_os_id": "kylin",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bullseye/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "uos25",
+      "image": "uos-desktop-v25:micro",
+      "real_os_id": "uos",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bookworm/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "uos25",
+      "image": "uos-desktop-v25:base",
+      "real_os_id": "uos",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bookworm/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "uos25",
+      "image": "uos-desktop-v25:devel",
+      "real_os_id": "uos",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "bookworm/sid",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "误判"
+    }
+  ]
+}

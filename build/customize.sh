@@ -45,7 +45,7 @@ fi
 fix_unconfigured_noscript_pkgs "$R" "$ADM"
 chroot "$R" /bin/sh -c 'dpkg --configure -a >/dev/null 2>&1; true' || true
 
-SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-combined.gpg] $MIRROR $SUITE $COMPONENTS"
+SRCLIST="deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] $MIRROR $SUITE $COMPONENTS"
 adapt_container "$R" "$SRCLIST" "$DID"
 slim_locales "$R"
 [ "$TIER" = micro ] && rm -rf "$R/var/lib/apt" "$R/var/cache/apt" 2>/dev/null || true

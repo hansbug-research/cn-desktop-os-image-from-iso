@@ -24,9 +24,9 @@ def csv(name, header, rows):
                             else str(x) for x in r))
     (TAB / name).write_text("\n".join(out) + "\n")
 
-d1, d2, d3, d4, d5, d6 = (load(f"d{i}_{n}.json") for i, n in
+d1, d2, d3, d4, d5, d6, d7 = (load(f"d{i}_{n}.json") for i, n in
     [(1, "official_images"), (2, "our_images"), (3, "capabilities"), (4, "gates"),
-     (5, "iso_and_defects"), (6, "installability")])
+     (5, "iso_and_defects"), (6, "installability"), (7, "cve")])
 S = {}
 
 # ── T01 官方容器镜像可获得性 ────────────────────────────────────────────────
@@ -105,15 +105,15 @@ NA_POLICY = {
               "autotools", "cc_clean_stderr", "python3_dev", "python3", "python3_run",
               "python3_ssl", "perl", "git", "zstd", "unzip", "ps", "top", "sock_tools",
               "ip_tools", "ping", "dnsutil", "file", "pager", "editor", "lsof", "strace", "gdb",
-              "useradd", "useradd_works", "su_to_user", "systemd", "policy_rcd"},
+              "useradd", "useradd_works", "su_to_user", "systemd", "sudo"},  # policy_rcd 不在此列：verify.sh 对九个镜像一律要求它为 Y
     # base 的 NA 集里原先有 strace —— 但 §3 给 base 的定位明写了「线上排查」，
     # 而 strace 是纯排查工具、不依赖工具链，把它判成「不适用」与定位直接冲突。
     # 改为如实记 N（麒麟侧一条 apt 就有，见 t11；UOS 侧是真缺口）。
     # gdb 保留 NA：它要调试符号与工具链生态，属 devel 范畴。
     "base":  {"cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
               "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
-              "autotools", "cc_clean_stderr", "python3_dev", "git", "gdb"},
-    "devel": set(),
+              "autotools", "cc_clean_stderr", "python3_dev", "git", "gdb", "sudo"},
+    "devel": {"sudo"},
 }
 # 探针输出里有两类东西，不能混算：
 #   INFO_PROBES 是**环境指纹**（架构、glibc 版本、setuid 数量……），值是版本号或计数，
@@ -123,10 +123,12 @@ NA_POLICY = {
 # 指纹另出一张 t10 表，哨兵由 collect 阶段硬断言，两者都不进三态矩阵。
 INFO_PROBES = {"arch", "glibc", "os_id", "setuid_bins", "file_caps", "default_target"}
 SENTINELS = {"probe_complete"}
-# sudo 在九档全是 NA，是零信息的凑数项（占 9 格），而且它从未被真判定过 ——
-# 与「648 格全部实测」的表述冲突。直接从矩阵里去掉，理由写在 report.md §3。
-# default_target 已进 INFO_PROBES，masked_units 根本不是探针 key，两个死条目一并清掉。
-EXCLUDED = {"sudo"}
+# 早先把 sudo 从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」—— 这与数据相反：
+# 探针实测九档全部是 N（t05b 可查），它压根不在任何 NA_POLICY 集合里，`tri()` 会把它
+# 算成 9 格缺口，删掉它等于把缺口从 61 压到 52。现在改回正路：sudo 按档位定位归入
+# 三档的 NA 集（容器内默认就是 root，非 root 场景用 USER 指令而非提权），
+# 排除动作取消，去向在 report.md §6.1 里显式披露。
+EXCLUDED = set()
 
 probes = d3["probes"]
 allkeys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
@@ -147,8 +149,13 @@ csv("t05_capability_matrix.csv", ["capability"] + order,
 csv("t05b_capability_raw.csv", ["capability"] + order,
     [[k] + [probes[c].get(k, "") for c in order] for k in allkeys])
 # t10 环境指纹：这些是事实不是能力，单独成表
+# ⚠️ 探针的 os_id 输出的是 `ID-VERSION_ID`（如 kylin-v11），不是裸 ID。
+# 直接以 os_id 为名列出来，会让读者以为三家 ID 各不相同，与「麒麟官方与桌面的
+# os-release ID 都是 kylin」这条核心论点当面矛盾（裸 ID 的证据在 t01/t03）。
+# 这里改名为 os_id_version 如实标注。
+_FP_LABEL = {"os_id": "os_id_version（ID-VERSION_ID，裸 ID 见 t01/t03）"}
 csv("t10_environment_fingerprint.csv", ["fingerprint"] + order,
-    [[k] + [probes[c].get(k, "") for c in order] for k in sorted(INFO_PROBES)])
+    [[_FP_LABEL.get(k, k)] + [probes[c].get(k, "") for c in order] for k in sorted(INFO_PROBES)])
 S["capability_items"] = len(keys)
 S["info_probes"] = len(INFO_PROBES)
 S["capability_cells"] = len(keys) * len(order)
@@ -247,6 +254,19 @@ S["setuid_micro"] = {r["distro_id"]: len((r.get("setuid_bins") or "").split())
 _sb = [r for r in d4["gates"]["sbom"]["rows"] if len(r) >= 4 and r[3] == "✅"]
 S["sbom_passed"] = len(_sb)
 S["mutation_skipped"] = d4["gates"]["mutation"]["skipped"]
+
+# ── T13 漏洞扫描器的覆盖判定 ────────────────────────────────────────────────
+# 判定事实（真实 ID vs trivy 判定）而非漏洞明细：明细随库更新而漂，判定不会。
+csv("t13_cve_coverage.csv",
+    ["image", "real_os_id", "trivy_os_family", "trivy_os_name", "high_critical", "verdict"],
+    [[x["image"], x["real_os_id"], x["trivy_os_family"], x["trivy_os_name"],
+      x["high_critical"], x["verdict"]] for x in d7["images"]])
+_v = collections.Counter(x["verdict"] for x in d7["images"])
+S["cve_effective_coverage"] = _v.get("有效覆盖", 0)
+S["cve_misidentified"] = _v.get("误判", 0)
+S["cve_unrecognized"] = _v.get("未识别", 0)
+S["cve_high_critical_total"] = sum(x["high_critical"] for x in d7["images"])
+S["cve_scanner"] = d7["scanner"]
 
 (DER / "stats.json").write_text(json.dumps(S, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
 print(f"derived/：{len(list(TAB.glob('*.csv')))} 张表，stats.json {len(S)} 个统计量")

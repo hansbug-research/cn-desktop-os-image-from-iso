@@ -148,7 +148,7 @@ a1.bar(gl, gm, bottom=gv, color="#c62828", label="失败")
 a1.set_title("五道门禁"); a1.legend(fontsize=8); a1.tick_params(axis="x", labelsize=8.5)
 for i, v in enumerate(gv): a1.text(i, v + max(gv) * .02, str(v), ha="center", fontsize=9)
 labels = ["支持", "不支持", "不适用"]
-# 饼图用全量 711 格（stats.json），不是热力图挑出来展示的那些行
+# 饼图用全量格数（stats.json），不是热力图挑出来展示的那些行
 tot = {"支持": S["cells_supported"], "不支持": S["cells_gap"], "不适用": S["cells_na"]}
 a2.pie([tot[l] for l in labels], labels=[f"{l}\n{tot[l]}" for l in labels],
        colors=["#2e7d32", "#c62828", "#bdbdbd"], autopct="%1.1f%%", textprops={"fontsize": 9})

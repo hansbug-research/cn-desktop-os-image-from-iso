@@ -5,7 +5,7 @@ abstract: >-
   国产商业桌面操作系统（银河麒麟桌面 V10/V11、统信 UOS V25）没有官方容器镜像，
   而麒麟在 cr.kylinos.cn 上匿名可拉的那个镜像属于 RPM 系的服务器产品线，
   与 Debian 系的桌面版不是一条产品线。本研究从桌面版 ISO 出发，用三条不同的
-  构建路径造出 9 个分档镜像（micro/base/devel），以 711 格实测能力矩阵刻画
+  构建路径造出 9 个分档镜像（micro/base/devel），以 648 格实测能力矩阵刻画
   它们能干什么，并用五道验收门禁（含变异测试）证明检查集本身有效。
 authors:
   - name: hansbug-research

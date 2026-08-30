@@ -43,7 +43,7 @@ pager,NA,Y,Y,NA,Y,Y,NA,Y,Y
 perl,NA,Y,Y,NA,Y,Y,NA,N,Y
 ping,NA,Y,Y,NA,Y,Y,NA,Y,Y
 pkgconfig,NA,NA,Y,NA,NA,Y,NA,NA,N
-policy_rcd,NA,Y,Y,NA,Y,Y,NA,Y,Y
+policy_rcd,Y,Y,Y,Y,Y,Y,Y,Y,Y
 ps,NA,Y,Y,NA,Y,Y,NA,Y,Y
 python3,NA,Y,Y,NA,Y,Y,NA,Y,Y
 python3_dev,NA,NA,N,NA,NA,N,NA,NA,N
@@ -57,6 +57,7 @@ sources_list,NA,Y,Y,NA,Y,Y,NA,Y,Y
 static_link,NA,NA,Y,NA,NA,Y,NA,NA,Y
 strace,NA,N,N,NA,N,N,NA,N,N
 su_to_user,NA,Y,Y,NA,Y,Y,NA,Y,Y
+sudo,NA,NA,NA,NA,NA,NA,NA,NA,NA
 systemd,NA,Y,Y,NA,Y,Y,NA,Y,Y
 tar,Y,Y,Y,Y,Y,Y,Y,Y,Y
 textutils,Y,Y,Y,Y,Y,Y,Y,Y,Y

@@ -5,7 +5,7 @@ ROOT="${ROOT:-/w}"
 # 这两个可以被调用方单独覆盖：selfhost 路径在**目标容器内**执行，仓库是挂载进去的，
 # 路径与构建容器不同，所以不能写死成 $ROOT 的子目录。
 ASSETS_DIR="${ASSETS_DIR:-$ROOT/assets}"
-KEYRING="${KEYRING:-$ROOT/keys/kylin-combined.gpg}"
+KEYRING="${KEYRING:-$ROOT/keys/kylin-archive-keyring.gpg}"
 
 log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 die()  { printf '[%s] 致命: %s\n' "$(date +%H:%M:%S)" "$*" >&2; exit 1; }

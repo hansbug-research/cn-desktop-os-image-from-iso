@@ -42,7 +42,7 @@ if [ "$(cat "$ROOT_HOST/build/$DID-stage/.foreign-done" 2>/dev/null)" != "$STAGE
     rm -rf $STAGE
     unshare --pid --fork --mount-proc -- \
       debootstrap --foreign --variant=minbase --arch=amd64 --no-merged-usr \
-        --keyring=/w/keys/kylin-combined.gpg \
+        --keyring=/w/keys/kylin-archive-keyring.gpg \
         --components=$(echo $COMPONENTS | tr ' ' ',') \
         --include=$STAGE_INCLUDE \
         $SUITE $STAGE $MIRROR > /tmp/db.log 2>&1 || { echo '--- debootstrap 失败，末 30 行 ---'; tail -30 /tmp/db.log; exit 1; }

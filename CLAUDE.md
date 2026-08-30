@@ -24,9 +24,11 @@ python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.
 
 - `collect_d1_official_images.py` 官方容器镜像可获得性 + 存在性探测
 - `collect_d2_our_images.py` 九个自建镜像的事实 + 麒麟官方镜像的产品线对照
-- `collect_d3_capabilities.py` 711 格能力矩阵（默认读已落盘探针输出，`--run` 现场重跑）
+- `collect_d3_capabilities.py` 能力探针（三态矩阵 648 格）（默认读已落盘探针输出，`--run` 现场重跑）
 - `collect_d4_gates.py` 五道门禁结果与 manifest 审计锚点
 - `collect_d5_iso_and_defects.py` 三条路径配置 + 厂商缺陷清单
+- `collect_d6_installability.py` 工具在各自源里的可装性、UOS 源规模与 ISO 包清单
+- `collect_d7_cve.py` 通用漏洞扫描器对三个发行版的覆盖判定（有效覆盖／误判／未识别）
 
 ## 分析层也要被变异测试
 
