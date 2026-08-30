@@ -45,7 +45,7 @@ S["official_probed"] = len(d1["images"])
 S["official_available"] = sum(1 for i in d1["images"] if i["available"])
 
 # ── T02 存在性探测（桌面镜像到底有没有）────────────────────────────────────
-rows = [[p["ref"], "存在" if p["exists"] else "不存在", p.get("stderr_tail", "")[:120]]
+rows = [[p["ref"], "存在" if p["exists"] else "不存在", p.get("stderr_tail", "") or "—（拉取成功，无 stderr）"]
         for p in d1.get("existence_probes", [])]
 csv("t02_registry_existence_probes.csv", ["ref", "result", "evidence"], rows)
 S["existence_probes"] = len(rows)
@@ -235,8 +235,8 @@ S["defects_by_distro"] = dict(collections.Counter(x["distro"] for x in d5["defec
 # ── T09 三条构建路径 ────────────────────────────────────────────────────────
 csv("t09_build_paths.csv",
     ["distro", "method", "suite", "expect_glibc", "expect_glibcxx", "usrmerge", "immutable"],
-    [[i["distro_id"], i["method"], i["suite"], i["expect_glibc"], i["expect_glibcxx"],
-      i["usrmerge"] or "", i["immutable"] or ""] for i in d5["isos"]])
+    [[i["distro_id"], i["method"], i["suite"] or "—（无在线源）", i["expect_glibc"], i["expect_glibcxx"],
+      i["usrmerge"] or "—", i["immutable"] or "no"] for i in d5["isos"]])
 S["build_methods"] = sorted({i["method"] for i in d5["isos"]})
 
 # ── T11 工具可装性：区分「没预装」与「装不上」的定量依据 ────────────────────

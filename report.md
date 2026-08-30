@@ -50,7 +50,12 @@
 
 ## 3. 分档：为什么是 micro / base / devel
 
-容器镜像分档不是我们的发明，主流做法有稳定的模式。Red Hat 的 UBI 分 `micro`（无包管理器）、`minimal`（`microdnf`）、`standard`（完整 `dnf`）、`init`（带 systemd）；Debian 官方镜像有完整版与 `slim`；Ubuntu 有 Chisel 切片；Wolfi/apko 走的是逐包声明式组装。共同的分档轴只有两条：**装不装包管理器**，以及**装不装工具链**。
+容器镜像分档不是我们的发明，主流做法有稳定的模式。Red Hat 的 UBI 分 `micro`（无包管理器）、`minimal`（`microdnf`）、`standard`（完整 `dnf`）、`init`（带 systemd）[^ubi]；Debian 官方镜像有完整版与 `slim`[^debian]；Ubuntu 有 Chisel 切片[^chisel]；Wolfi/apko 走的是逐包声明式组装[^apko]。共同的分档轴只有两条：**装不装包管理器**，以及**装不装工具链**。
+
+[^ubi]: Red Hat, *Understanding the UBI image types*, https://catalog.redhat.com/software/base-images
+[^debian]: Debian Docker Team, `debian` official image variants, https://hub.docker.com/_/debian
+[^chisel]: Canonical, *Chiselled Ubuntu containers*, https://github.com/canonical/chisel
+[^apko]: Chainguard, `apko` — declarative apk-based image builder, https://github.com/chainguard-dev/apko
 
 我们按用途定了三档，每一档都对应一类真实需求：
 
@@ -96,7 +101,9 @@ UOS 走切片路径，不从在线源拉包，改为核对 squashfs 的 sha256�
 
 ## 4. 三条构建路径
 
-造 rootfs 的教科书做法是 `mmdebstrap` 或 `debootstrap` 从软件源拉起一个 chroot。三个被试里只有一个能这么走，另外两个各自撞上不同的墙，最后形成三条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。
+造 rootfs 的教科书做法是 `mmdebstrap`[^mmdeb] 或 `debootstrap` 从软件源拉起一个 chroot。
+
+[^mmdeb]: J. Schauer, `mmdebstrap` — a replacement for debootstrap, https://gitlab.mister-muffin.de/josch/mmdebstrap三个被试里只有一个能这么走，另外两个各自撞上不同的墙，最后形成三条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。
 
 ### 4.1 mmdebstrap：银河麒麟桌面 V11
 

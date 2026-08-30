@@ -1,4 +1,4 @@
 distro,method,suite,expect_glibc,expect_glibcxx,usrmerge,immutable
-kylin10,selfhost,10.1,2.31,3.4.28,no,
-kylin11,mmdebstrap,11.0,2.38,3.4.32,yes,
-uos25,slice,None,2.38,3.4.30,yes,yes
+kylin10,selfhost,10.1,2.31,3.4.28,no,no
+kylin11,mmdebstrap,11.0,2.38,3.4.32,yes,no
+uos25,slice,—（无在线源）,2.38,3.4.30,yes,yes
