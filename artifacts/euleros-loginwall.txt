@@ -1,0 +1,6 @@
+# EulerOS 下载端点的登录墙：对任意 nid 均返回 Uniportal 统一认证跳转头
+# 采集 2026-08-30T19:37:46Z ｜ curl -sI 'https://support.huawei.com/dl/download.do?nid=<nid>'
+# 三个 nid 含一个刻意乱填的，用以证明该头与 nid 是否真实存在无关
+nid=1              HTTP/1.1 200 Connection established HTTP/2 200  x-login-url: https://uniportal.huawei.com/uniportal1/ x-login-appid: x_app_id=huawei.support.microservice
+nid=265425005      HTTP/1.1 200 Connection established HTTP/2 200  x-login-url: https://uniportal.huawei.com/uniportal1/ x-login-appid: x_app_id=huawei.support.microservice
+nid=EDOC1100xxxx   HTTP/1.1 200 Connection established HTTP/2 200  x-login-url: https://uniportal.huawei.com/uniportal1/ x-login-appid: x_app_id=huawei.support.microservice

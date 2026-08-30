@@ -201,7 +201,7 @@ in_text(S["setuid_micro"]["kylin11"], label="micro 的 setuid 数",
 in_text(S["cells_supported"], label="支持格数", ctx=rf"支持 {S['cells_supported']}、")
 in_text(S["cells_gap"], label="缺口格数", ctx=rf"缺口 {S['cells_gap']}、")
 in_text(S["cells_na"], label="不适用格数", ctx=rf"不适用 {S['cells_na']}")
-in_text(S["mutation_caught"], label="变异用例数", ctx=rf"变异用例 \*\*{S['mutation_caught']}\*\* 条")
+in_text(S["mutation_caught"], label="变异用例数", ctx=rf"变异用例 \*\*{S['mutation_caught']}\*\*（镜像层）")
 
 # README 抬头的各项计数
 for v, lbl, ctx in [
@@ -611,6 +611,50 @@ _defs = re.findall(r"^\[\^(R\d+)\]:", REPORT, re.M)
 _ddup = sorted({d for d in _defs if _defs.count(d) > 1})
 ok(_ddup == [], f"脚注定义不许重复（重复：{_ddup}）")
 
+# 安可缺席的 7 家：先前只断言在列 3 家的名字，缺席那 7 家的点名没人守，
+# 结果正文把 FydeOS 写成了优麒麟（两者都不在列，但名单是错的）。逐名核对。
+for _n in S["aqkk_desktop_absent"]:
+    _short = _n.split("（")[0].replace("桌面操作系统", "").replace("安全操作系统", "").strip() or _n
+    ok(_short in REPORT, f"安可缺席名单里的「{_short}」必须在正文点到")
+ok("优麒麟 从未在列" not in REPORT and "一铭、优麒麟从未在列" not in REPORT,
+   "缺席名单不许把优麒麟写进「从未在列」那一串 —— 它确实不在列，但那一串点的是另外几家")
+# 加包代价那四个数：两个起点都有锚点，说成一个是错的
+_t04 = (TAB / "t04_built_images.csv").read_text()
+ok("345MB" in _t04 and "281MB" in _t04,
+   "345 MB 与 281 MB 都应在 t04 的 unpacked_size 列里")
+in_text("只有两个起点有现存锚点", label="加包代价四个数的锚点计数")
+
+# sudo 的 61 / 189 / 639 三个数：正文引它们，就必须由矩阵现算并逐个绑住 ——
+# 「数写进正文却没有断言守」正是 §9.2 认定的病根形态。
+ok(S["sudo_cells_n"] == 9, f'sudo 应有 9 格探针为 N，实际 {S["sudo_cells_n"]}')
+ok(S["cells_gap_if_sudo_counted"] == S["cells_gap"] + S["sudo_cells_n"],
+   "「sudo 计入缺口」的基线必须等于当前缺口加 sudo 格数")
+in_text(S["cells_gap_if_sudo_counted"], label="sudo 计入缺口时的基线",
+        ctx=rf"缺口数由 {S['cells_gap_if_sudo_counted']} 变为 {S['cells_gap']}")
+in_text(S["cells_na"] - S["sudo_cells_n"], label="删除 sudo 后的不适用数",
+        ctx=rf"不适用从 {S['cells_na']} 降到 {S['cells_na'] - S['sudo_cells_n']}")
+in_text(S["capability_cells"] - S["sudo_cells_n"], label="删除 sudo 后的总格数",
+        ctx=rf"总格数从 {S['capability_cells']} 降到 {S['capability_cells'] - S['sudo_cells_n']}")
+
+# README 也要查段落重复 —— 上一轮四个 ❌ 里的第 4 个就在 README，
+# 而重复检测当时只切了 REPORT。
+_rparas = [x.strip() for x in README.split("\n\n") if len(x.strip()) >= 80]
+_rdup = sorted({x[:50] for x in _rparas if _rparas.count(x) > 1})
+ok(_rdup == [], f"README 不许有重复段落（重复 {len(_rdup)} 处，首处：{_rdup[:1]}）")
+# 表格行级重复：整张表被复制时表头会重复，但只复制表体不会 —— 单独查数据行
+_trows = [l for l in REPORT.split("\n") if l.startswith("| ") and len(l) >= 60
+          and not l.startswith("|---") and "---|" not in l]
+_tdup = sorted({l[:50] for l in _trows if _trows.count(l) > 1})
+ok(_tdup == [], f"表格数据行不许重复（重复 {len(_tdup)} 处，首处：{_tdup[:1]}）")
+
+# 分析层变异用例数：镜像层是 12（来自 d4 门禁日志），分析层是 mutation-docs.sh 里的
+# mut/mutcmd 调用数。两者不是一个数，抬头混写会让人以为门禁只有 12 例。
+_mdocs = (ROOT / "test" / "mutation-docs.sh").read_text()
+_ncases = len(re.findall(r"^mut(?:cmd)? ", _mdocs, re.M))
+ok(_ncases >= 14, f"分析层变异用例应不少于 14 例，实际 {_ncases}")
+in_text(_ncases, label="抬头写明的分析层变异用例数",
+        ctx=rf"\+ \*\*{_ncases}\*\*（分析层）")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -625,7 +669,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "326"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "345"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

@@ -26,6 +26,7 @@
   "capability_cells": 648,
   "capability_items": 72,
   "cells_gap": 52,
+  "cells_gap_if_sudo_counted": 61,
   "cells_na": 198,
   "cells_na_from_N": 173,
   "cells_na_from_Y": 10,
@@ -231,6 +232,7 @@
     "kylin11": 2,
     "uos25": 2
   },
+  "sudo_cells_n": 9,
   "tiers": [
     "base",
     "devel",

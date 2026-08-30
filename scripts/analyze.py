@@ -328,6 +328,12 @@ S["na_na_detail"] = sorted(_na_na_cells)
 S["na_na_by_item"] = dict(collections.Counter(x.split("@")[0] for x in _na_na_cells))
 S["cells_supported"] = _tri.count("Y")
 S["cells_gap"] = _tri.count("N")
+
+# sudo 若按探针原始值计入缺口，缺口会是多少 —— §7 与 §9.2 都引这个基线（61）。
+# 正文写死一个手算数正是 §9.2 批判的形态，所以从矩阵现算。
+_sudo_n = sum(1 for c in order if probes[c].get("sudo", "") == "N")
+S["sudo_cells_n"] = _sudo_n
+S["cells_gap_if_sudo_counted"] = S["cells_gap"] + _sudo_n
 S["cells_na"] = _tri.count("NA")
 
 # ── T06 编译能力（本研究的首要用途）────────────────────────────────────────

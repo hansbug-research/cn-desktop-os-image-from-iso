@@ -644,7 +644,7 @@
       "lineage": "⚠️ 官方只说「基于 Linux 稳定内核」。桌面线血统第三方说法互相矛盾（Debian 系 vs RHEL 系），不下结论。同厂服务器线 CGSL V7 明确基于 6.6 内核",
       "latest_version": "官网下载中心 x86 最新为 V4.5.2；此前 V4.4.0 提供 X86/ARM/MIPS/LoongArch 四架构。⚠️ 官方未标任何发布日期。桌面 V4.x 与服务器 V7 是两套版本号体系",
       "desktop": "EX-NDE 超凡桌面（Qt 自研 + NDE-Wayland；支持桌面/服务器/平板三种交互模式）。该桌面 2023-04 在 OpenCloudOS V9 发布会上开源，Gitee 组织 opencloudos-exnde，安装包约 104MB，目前只支持 OpenCloudOS 8",
-      "maintained": "品牌活跃（桌面线最近更新未查到）",
+      "maintained": "品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体",
       "image_candidates": [],
       "identify": [],
       "official_image_note": "未公开。官网仅一句「支持容器化场景」。查过官网 downloads/support、镜像站 nsosmirrors.gd-linux.com（实测 403 需登录）、cr./registry.gd-linux.com（不解析）、Docker Hub newstart（0 仓库）。",

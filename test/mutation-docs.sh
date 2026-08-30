@@ -10,6 +10,18 @@ ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}
 cd "$ROOT" || exit 1
 PASS=0; FAIL=0
 
+mutcmd() { # $1=说明 $2=文件 $3=任意 shell 命令（sed 表达不出的变异用它，如「复制一段」）
+  local name=$1 file=$2 cmd=$3
+  cp "$file" "$file.mutbak"
+  eval "$cmd"
+  if python3 scripts/verify.py >/dev/null 2>&1; then
+    echo "  ❌ $name — verify 没抓到"; FAIL=$((FAIL+1))
+  else
+    echo "  ✅ $name — verify 如期失败"; PASS=$((PASS+1))
+  fi
+  mv "$file.mutbak" "$file"
+}
+
 mut() { # $1=说明 $2=文件 $3=sed 表达式
   local name=$1 file=$2 expr=$3
   cp "$file" "$file.mutbak"
@@ -41,6 +53,39 @@ _UI=$(python3 -c "import json;s=json.load(open('derived/stats.json'));print(f\"{
 mut "README：UOS 可装性"             README.md "s|\*\*${_UI}\*\*|**9 / 14**|"
 
 echo
+# 段落/表格/脚注重复 —— 这三条门禁是 2026-08-30 那次编辑事故之后加的：
+# 一次「删除」实际把待删块换成了前一段的副本，26 行陈旧重复在 322 条断言全过的
+# 情况下躺在已发布报告里。按仓库规矩，新门禁必须自带变异用例。
+mutcmd "正文：复制一个长段落" report.md 'python3 - <<PY
+import pathlib
+p=pathlib.Path("report.md"); s=p.read_text()
+ps=[x for x in s.split("\n\n") if len(x.strip())>=120]
+s=s.replace(ps[3], ps[3]+"\n\n"+ps[3], 1)
+p.write_text(s)
+PY'
+mutcmd "正文：复制名录表表头" report.md 'python3 - <<PY
+import pathlib
+p=pathlib.Path("report.md"); s=p.read_text()
+h="| | OS | 类型 | 厂商/主导方 |"
+i=s.index(h); s=s[:i]+s[i:i+len(h)]+"\n"+s[i:]
+p.write_text(s)
+PY'
+mutcmd "正文：复制一条脚注定义" report.md 'python3 - <<PY
+import pathlib, re
+p=pathlib.Path("report.md"); s=p.read_text()
+m=re.search(r"^\[\^R\d+\]:.*$", s, re.M)
+s=s[:m.start()]+m.group(0)+"\n"+s[m.start():]
+p.write_text(s)
+PY'
+mutcmd "README：复制一个长段落" README.md 'python3 - <<PY
+import pathlib
+p=pathlib.Path("README.md"); s=p.read_text()
+ps=[x for x in s.split("\n\n") if len(x.strip())>=120]
+s=s.replace(ps[0], ps[0]+"\n\n"+ps[0], 1)
+p.write_text(s)
+PY'
+
+
 [ "$FAIL" = 0 ] && echo "✅ $PASS 项变异全部被 verify.py 抓到（分析层门禁有效）" \
                 || echo "❌ $((PASS+FAIL)) 项里有 $FAIL 项未被抓到"
 exit $([ "$FAIL" = 0 ] && echo 0 || echo 1)
