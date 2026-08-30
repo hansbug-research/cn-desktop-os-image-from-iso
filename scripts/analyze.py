@@ -102,14 +102,31 @@ S["distros"] = sorted({r["distro_id"] for r in d2["ours"]})
 # t15 是**我们的实测**（registry 存在性，判据是退出码）。
 # 合成一张会让读者无法分辨哪一格可以复核、哪一格只能溯源到厂商说法。
 if d8:
+    # 名录表用**紧凑字段**（s_lineage/s_version/s_desktop），长注释走表下编号注。
+    # 早先每格塞一整段，结果 21 行里项目的三个被试反而最不显眼，读者以为名录里没有它们。
     rows = []
     for e in d8["entries"]:
-        rows.append([e["name"], e["type"], e["vendor"], e["lineage"],
-                     e["latest_version"], e["desktop"], e["maintained"],
+        rows.append(["★" if e.get("subject") else "",
+                     e["name"],
+                     "商业" if e["type"].startswith("商业") else "社区开源",
+                     e["vendor"],
+                     e.get("s_lineage", e["lineage"]),
+                     e.get("s_version", e["latest_version"]),
+                     e.get("s_desktop", e["desktop"]),
+                     e["maintained"].split("（")[0].split("：")[0],
                      " ".join(e["sources"])])
     csv("t14_os_census.csv",
-        ["os", "type", "vendor", "lineage", "latest_version", "desktop",
+        ["subject", "os", "type", "vendor", "lineage", "latest_version", "desktop",
          "maintained", "sources"], rows)
+
+    # t14b 保留完整长文，供需要逐字核对的人查——紧凑表牺牲的细节不能凭空消失
+    rows = []
+    for e in d8["entries"]:
+        rows.append([e["name"], e["lineage"], e["latest_version"], e["desktop"],
+                     e["maintained"], e.get("official_image_note", "")])
+    csv("t14b_os_census_detail.csv",
+        ["os", "lineage_full", "version_full", "desktop_full", "maintained_full",
+         "official_image_note"], rows)
 
     rows = []
     for pr in d8["probes"]:
@@ -127,6 +144,7 @@ if d8:
     S["census_community"] = sum(1 for e in d8["entries"] if e["type"].startswith("社区"))
     S["census_probes"] = len(d8["probes"])
     S["census_probes_exist"] = sum(1 for p in d8["probes"] if p["exists"])
+    S["census_subjects"] = [e["name"] for e in d8["entries"] if e.get("subject")]
     # 名录里每条都必须有出处 —— 这是本节的立论基础，不能有一条裸奔
     S["census_entries_without_source"] = [e["name"] for e in d8["entries"]
                                           if not e.get("sources")]

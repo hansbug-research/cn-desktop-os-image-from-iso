@@ -35,6 +35,10 @@
   "census_present": true,
   "census_probes": 42,
   "census_probes_exist": 18,
+  "census_subjects": [
+    "银河麒麟桌面操作系统",
+    "统信桌面操作系统 V25（UOS）"
+  ],
   "cve_effective_coverage": 0,
   "cve_high_critical_total": 0,
   "cve_misidentified": 6,

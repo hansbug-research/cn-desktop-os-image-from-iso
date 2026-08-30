@@ -439,6 +439,22 @@ in_text(len(_cen["scope"]["exclusions"]), label="剔除项条数",
 in_text(len(_cen["scope"]["small_community"]), label="小型社区条数",
         ctx=rf"另有 {len(_cen['scope']['small_community'])} 个\*\*小型社区发行版")
 
+# §2.1 的 ★ 被试标记与 §2.4 的选型论证：名录必须真的标出被试，
+# 且被试必须与我们实际构建的镜像对得上（否则名录与后文脱节，审稿时正好挑这个）。
+ok(len(S["census_subjects"]) == 2,
+   f'名录里应有 2 个被试标记（银河麒麟桌面、统信 UOS），实际 {S["census_subjects"]}')
+ok(any("麒麟" in x for x in S["census_subjects"]) and any("UOS" in x for x in S["census_subjects"]),
+   "被试标记必须落在银河麒麟与统信 UOS 上")
+# 被试与 t04 里实际构建的三个镜像的发行版必须一致
+_built = {r["distro"] for r in [dict(zip(*[iter([])]))] } if False else set(
+    l.split(",")[0] for l in (TAB / "t04_built_images.csv").read_text().splitlines()[1:] if l)
+ok(_built == {"kylin11", "kylin10", "uos25"},
+   f"实际构建的发行版应为 kylin11/kylin10/uos25，实际 {sorted(_built)}")
+in_text("★ 标记的两个是本项目的被试", label="名录里说明 ★ 含义")
+in_text("银河麒麟桌面 V10 SP1、银河麒麟桌面 V11、统信 UOS V25", label="§2.4 点明三个被试 ISO")
+ok("材料可得性" in REPORT,
+   "ISO 授权这条限制必须如实写成材料可得性，不许包装成技术理由")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -453,7 +469,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "245"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "252"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

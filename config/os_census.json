@@ -4,32 +4,58 @@
   "vantage_note": "采集主机出口在中国大陆，境外站点经本地代理。registry 探测失败需区分网络位置与策略拒绝；厂商命名空间为空只能证明「该处未公开」，不能证明厂商没有私有 registry。",
   "entries": [
     {
-      "name": "openEuler",
-      "type": "社区开源（厂商主导：华为发起，开放原子开源基金会运营）",
-      "vendor": "openEuler 社区",
-      "lineage": "独立选型，早期 RHEL/CentOS 血统、现自主演进；rpm/dnf",
-      "latest_version": "24.03 LTS SP4（2026-06-30）；创新版 25.09（2025-09-30）",
-      "desktop": "无桌面版 ISO；UKUI/DDE/Kiran 以软件包提供（早期还有 GNOME 与 Xfce，官方文档已在 24.03 LTS SP1 与 SP4 相继下架）；官方开发者桌面形态为 DevStation，桌面环境是 GNOME（依据 25.09 版 ISO 的 .rpmlist：gnome-shell-44.6 / gnome-session-44.0 / gdm-45.0.1 + vscodium，同清单里 ukui/dde/kiran/xfce/plasma 命中均为 0）",
+      "name": "银河麒麟桌面操作系统",
+      "type": "商业",
+      "vendor": "麒麟软件有限公司（中国电子 CEC 旗下）",
+      "lineage": "⚠️ 官方未声明。V10 SP1 实测为 Debian/Ubuntu 系（deb/apt、ID_LIKE=debian）；V11 官网只写「基于全新内核开发」+ 磐石架构 + 开明包格式 + OSTree 原子更新，全文不提上游发行版，但出现「一键转换 deb 包为开明包」，间接指向 deb 底座。流传的「V11 桌面基于 openKylin」未找到任何一手出处，按未证实处理",
+      "latest_version": "V11（2025-08-26 在 2025 中国操作系统产业大会发布，官方称首个采用 6.6 内核的商业版国产操作系统；官网挂 2603 版本说明，PDF 上传路径日期 20260228/20260423/20260511）；V10 SP1 最新为 2503 版本（2025-04）",
+      "desktop": "V10 SP1 = UKUI；V11 = ⚠️ 未公开（官网 V11 产品页全文未出现 UKUI 字样，只写「新桌面、新壁纸、新屏保」）",
       "maintained": "活跃",
       "image_candidates": [
-        "docker.io/openeuler/openeuler:24.03-lts",
-        "docker.io/openeuler/desktop:latest",
-        "docker.io/openeuler/devstation:latest",
-        "docker.io/openeuler/ukui:latest",
-        "docker.io/openeuler/dde:latest"
+        "cr.kylinos.cn/kylin/kylin-server-v10sp3-x86_64:20230324",
+        "cr.kylinos.cn/kylin/kylin-desktop-v11:latest",
+        "cr.kylinos.cn/kylin/kylin-desktop-v10sp1-x86_64:latest"
       ],
-      "identify": [
-        "docker.io/openeuler/openeuler:24.03-lts"
-      ],
-      "official_image_note": "官方基础镜像在 Docker Hub 与 Quay，均为服务器/基础镜像；453 个仓库中零桌面。唯一桌面向的官方容器交付物是 DevStation 的 rootfs tar.xz，只放在 repo.openeuler.org、不在任何 registry，且仅 24.03 LTS SP3 一版有。",
+      "identify": [],
+      "official_image_note": "桌面版在厂商 registry 里就不存在——这是比「我们拉不到」更强的证据。cr.kylinos.cn（Harbor v2.11.1，站点标题「服务器软件中心」）的公开项目可匿名枚举：basekylin(160)/eco(107)/kylin(27)/hostos(2)/goharbor(18)/k8s.gcr.io(26)/ingress-nginx(2)/bitnami(1)。kylin 项目 27 个仓库全部枚举，全是 kylin-server-v10sp1|sp2|sp3 的 {基础,-init,-minimal,-micro} × {x86_64,aarch64,loongarch64}，含 desktop 或 ukui 的为 0 个。另注：厂商自己就在用 micro/minimal/init 分档。registry.kylinos.cn 是另一个 Harbor，只有空的 library 项目。",
       "sources": [
-        "https://www.openeuler.org/zh/download/",
-        "https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html",
-        "https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/",
-        "https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/",
-        "https://gitee.com/openeuler/openeuler-docker-images",
-        "https://hub.docker.com/r/openeuler/openeuler"
-      ]
+        "https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html",
+        "https://www.kylinos.cn/productPc/desktop/desktopMainV11/",
+        "https://www.kylinos.cn/productPc/desktop/desktopMain/",
+        "https://cr.kylinos.cn/api/v2.0/projects",
+        "https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories"
+      ],
+      "subject": true,
+      "order": 1,
+      "s_lineage": "Debian/Ubuntu 系（⚠️ 官方未声明，注 1）",
+      "s_version": "V11（2025-08）/ V10 SP1 2503（2025-04）",
+      "s_desktop": "V10 SP1 = UKUI；V11 未公开（注 2）"
+    },
+    {
+      "name": "统信桌面操作系统 V25（UOS）",
+      "type": "商业",
+      "vendor": "统信软件技术有限公司（UnionTech）",
+      "lineage": "⚠️ 官方未书面确认。官方话语体系只讲 DTK + Qt 与内核版本（V20 线 4.19/5.10，V25 线 6.6），全程不提 Debian；业界共识为 Debian 系。社区上游为 deepin（统信全资子公司），而 deepin 自 23 起已自建独立基础仓库",
+      "latest_version": "桌面专业版 V25（2026-04-15 正式发布；镜像名 uos-desktop-25-professional-2500-amd64-202604.iso，内部版本号 2500）；V20 线仍维护，桌面专业版最新 1070u4",
+      "desktop": "DDE（V25 起走 Treeland Wayland + Qt6 路线）",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/uniontech/uos:latest",
+        "registry.uniontech.com/uos-server-base/uos-server-20-1070a:latest"
+      ],
+      "identify": [],
+      "official_image_note": "官方容器镜像平台确实存在（统信容器镜像平台 UOS Container Registry，门户 uoscr.chinauos.com，pull 域名 registry.uniontech.com），但里面没有桌面版。⚠️ 先纠一个方法学陷阱：从本机经代理访问这两个域名均返回 000，看起来「不可达」，直连（curl --noproxy）实为 **200** —— 代理会把中国大陆站点绕到境外从而造出假的不可达结论。直连后枚举其 Harbor API：18 个公开项目，含 desktop/dde/ukui 的为 0 个；基础镜像项目名就叫 uos-server-base，8 个仓库全是 uos-server-20-*（含 loongarch/sw64 分支）。官方产品页也写明适用范围是「统信服务器操作系统 V20 及统信云原生操作系统 V20，暂不支持其他操作系统」，全文未提 desktop。",
+      "sources": [
+        "https://uniontech.com/m/news-info/2877.html",
+        "https://www.uniontech.com/os-containerImage.html",
+        "https://registry.uniontech.com/api/v2.0/projects",
+        "https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories"
+      ],
+      "subject": true,
+      "order": 2,
+      "s_lineage": "Debian 系（⚠️ 官方未书面确认，注 3）",
+      "s_version": "V25（2026-04-15）；V20 线 1070u4",
+      "s_desktop": "DDE（V25 起 Treeland + Qt6）"
     },
     {
       "name": "openKylin（开放麒麟）",
@@ -55,7 +81,11 @@
         "https://gitee.com/openkylin/openkylin-docker-images",
         "https://mirror.nju.edu.cn/openkylin/dists/",
         "https://hub.docker.com/r/openkylin/openkylin"
-      ]
+      ],
+      "order": 3,
+      "s_lineage": "Debian 系",
+      "s_version": "3.0「黄河」（2026-08-28）",
+      "s_desktop": "UKUI 4.24（⚠️ 桌面 ISO 仅三架构，注 4）"
     },
     {
       "name": "deepin（深度）",
@@ -82,7 +112,86 @@
         "https://cdimage.deepin.com/releases/",
         "https://faq.uniontech.com/desktop/f435/install/da34",
         "https://hub.docker.com/r/linuxdeepin/deepin"
-      ]
+      ],
+      "order": 4,
+      "s_lineage": "Debian 系",
+      "s_version": "25.2.1（2026-08-04，仅在线更新）",
+      "s_desktop": "DDE 7.0 + Treeland"
+    },
+    {
+      "name": "openEuler",
+      "type": "社区开源（厂商主导：华为发起，开放原子开源基金会运营）",
+      "vendor": "openEuler 社区",
+      "lineage": "独立选型，早期 RHEL/CentOS 血统、现自主演进；rpm/dnf",
+      "latest_version": "24.03 LTS SP4（2026-06-30）；创新版 25.09（2025-09-30）",
+      "desktop": "无桌面版 ISO；UKUI/DDE/Kiran 以软件包提供（早期还有 GNOME 与 Xfce，官方文档已在 24.03 LTS SP1 与 SP4 相继下架）；官方开发者桌面形态为 DevStation，桌面环境是 GNOME（依据 25.09 版 ISO 的 .rpmlist：gnome-shell-44.6 / gnome-session-44.0 / gdm-45.0.1 + vscodium，同清单里 ukui/dde/kiran/xfce/plasma 命中均为 0）",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/openeuler/openeuler:24.03-lts",
+        "docker.io/openeuler/desktop:latest",
+        "docker.io/openeuler/devstation:latest",
+        "docker.io/openeuler/ukui:latest",
+        "docker.io/openeuler/dde:latest"
+      ],
+      "identify": [
+        "docker.io/openeuler/openeuler:24.03-lts"
+      ],
+      "official_image_note": "官方基础镜像在 Docker Hub 与 Quay，均为服务器/基础镜像；453 个仓库中零桌面。唯一桌面向的官方容器交付物是 DevStation 的 rootfs tar.xz，只放在 repo.openeuler.org、不在任何 registry，且仅 24.03 LTS SP3 一版有。",
+      "sources": [
+        "https://www.openeuler.org/zh/download/",
+        "https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html",
+        "https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/",
+        "https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/",
+        "https://gitee.com/openeuler/openeuler-docker-images",
+        "https://hub.docker.com/r/openeuler/openeuler"
+      ],
+      "order": 5,
+      "s_lineage": "独立选型，rpm/dnf",
+      "s_version": "24.03 LTS SP4（2026-06-30）",
+      "s_desktop": "无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）"
+    },
+    {
+      "name": "麒麟信安操作系统（KylinSec）",
+      "type": "商业",
+      "vendor": "湖南麒麟信安科技",
+      "lineage": "openEuler 系（列于 openEuler 官方商业发行版页）",
+      "latest_version": "V6 SP1（2026-06）",
+      "desktop": "自研 Kiran / KiranUI",
+      "maintained": "活跃",
+      "image_candidates": [
+        "docker.io/kylinsec/kylinsec:latest"
+      ],
+      "identify": [],
+      "official_image_note": "Docker Hub kylinsec 命名空间 0 个仓库。只能证明该处未公开，不能证明厂商无私有 registry。",
+      "sources": [
+        "https://www.openeuler.org/zh/download/commercial-release/",
+        "https://www.kylinsec.com.cn/detail/13151/1.html"
+      ],
+      "order": 6,
+      "s_lineage": "openEuler 系",
+      "s_version": "V6 SP1（2026-06）",
+      "s_desktop": "自研 Kiran / KiranUI"
+    },
+    {
+      "name": "方德桌面操作系统 V5.0",
+      "type": "商业",
+      "vendor": "中科方德软件有限公司",
+      "lineage": "⚠️ 官方未声明，只说「基于核高基重大专项安全加固内核成果持续优化发展」。旁证指向 deb 系：官方源 repos.os.nfschina.com/debian-sign/ 与 update.os.nfschina.com/repo_desktop_4.0/ 内含 mate-desktop-environment 等 deb 包",
+      "latest_version": "V5.0 首发 2022-06-17；兆芯适配版 2025-05 上线；Pro 版 V5.0（内核 6.6）2025-09-12 通过《安全可靠测评结果公告（2025年第3号）》，与银河麒麟桌面 V11 并列为首批基于 Linux 6.6 LTS 过评的两款桌面 OS",
+      "desktop": "⚠️ 未公开（官方未命名；官方源内含 MATE 包，疑为 MATE 衍生但不确定）",
+      "maintained": "活跃",
+      "image_candidates": [],
+      "identify": [],
+      "official_image_note": "未公开。查过官网镜像下载栏（提供 ISO 非容器）、GitHub 组织 nfschina、官方 APT/RPM 源目录、Docker Hub nfschina（0 仓库）、cr./registry./mirror./mirrors.nfschina.com（域名均不解析）。",
+      "sources": [
+        "https://www.nfschina.com/",
+        "https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/",
+        "https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html"
+      ],
+      "order": 7,
+      "s_lineage": "deb 系（⚠️ 官方未声明，注 6）",
+      "s_version": "V5.0（2022-06）；Pro 版 2025-09 过评",
+      "s_desktop": "⚠️ 未公开（疑 MATE 衍生）"
     },
     {
       "name": "Ubuntu Kylin（优麒麟）",
@@ -102,7 +211,58 @@
         "https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/",
         "https://www.ubuntukylin.com/downloads/",
         "https://www.ubuntukylin.com/news/ubuntukylin2604-cn.html"
-      ]
+      ],
+      "order": 8,
+      "s_lineage": "Ubuntu 直系",
+      "s_version": "26.04.1 LTS（2026-08-27，支持 3 年）",
+      "s_desktop": "UKUI"
+    },
+    {
+      "name": "Loongnix（龙芯）",
+      "type": "社区开源（厂商主导：龙芯中科）",
+      "vendor": "龙芯中科 / Loongnix 社区",
+      "lineage": "Debian 系。25 线 ⚠️**推断为** Debian 13 trixie（依据是 pool 里 bash 5.2.37-2、libc-bin 2.41-13 正是 trixie 组合；官方无明文声明），架构 loong64 新世界 ABI；20 线为 Debian 10 buster、架构 loongarch64 旧世界 ABI。⚠️ 陷阱：两条线的 dists/*/Release 都误写 Origin: Debian / Version: 10.4，不能据此判断血统",
+      "latest_version": "Loongnix-25.1 正式版（2026-08-20）；20 线 Loongnix-20.7 正式版（2026-07-17）",
+      "desktop": "KDE（硬证据是 ISO 文件名 Loongnix-25.1.livecd.kde-loong64.hybrid.iso、Loongnix-20.7.livecd.kde.loongarch64.iso）。「Loongnix 用 MATE」是 20 系列早期旧资料，已过时",
+      "maintained": "活跃",
+      "image_candidates": [
+        "cr.loongnix.cn/loongson/loongnix:20.7",
+        "cr.loongnix.cn/loongson/loongnix:25.1",
+        "cr.loongnix.cn/loongson/loongnix:25",
+        "cr.loongnix.cn/loongson/loongnix-desktop:25.1"
+      ],
+      "identify": [
+        "cr.loongnix.cn/loongson/loongnix:20.7"
+      ],
+      "official_image_note": "厂商自有 registry cr.loongnix.cn（实为 Red Hat Quay，有效 API 是 /api/v1/*）。实测 loongson/loongnix 只有 20 / 20-ssh / 20.7 三个 tag，25 与 25.1 均不存在——即最新桌面版没有对应官方容器镜像，能拉到的是上一代（Debian 10 血统、旧世界 ABI）。",
+      "sources": [
+        "https://www.loongnix.cn/",
+        "https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true"
+      ],
+      "order": 9,
+      "s_lineage": "Debian 系（25 线⚠️推断 trixie，注 7）",
+      "s_version": "25.1（2026-08-20）/ 20.7（2026-07-17）",
+      "s_desktop": "KDE"
+    },
+    {
+      "name": "凝思安全操作系统",
+      "type": "商业",
+      "vendor": "北京凝思软件股份有限公司",
+      "lineage": "Debian 系，本名录里证据最硬的一条：官方 V6.0.80 发布说明写 grub2 升级到 2.06-3~deb10u4linx5（deb10 = Debian 10 buster），官方文档中出现 iceweasel（Debian 独有的 Firefox 改名）+ glibc 2.28 组合。厂商自身表述只到「以 Linux 社区发行版本为基础」。另有 openEuler 分支产品（欧拉版 V6.0.99）",
+      "latest_version": "X86_64 为 V6.0.80 子版本 20250816（cat /etc/issue → LinxOS 6.0.80 20250816）；并行在架 V6.0.100 与 V6.0.99 欧拉版。⚠️ V6.0.100 正式发布日期未查到",
+      "desktop": "⚠️ 无独立命名的「桌面版」产品：图形场景由基础版与图形工作站版承担，可选 GNOME 3.14 / KDE 4.11 / MATE 1.8 / XFCE 4.10，无自研 DE。V6.0.80 发布说明的适用范围原文是「适用 X86_64 架构的服务器和工作站」",
+      "maintained": "活跃（发布说明 20250816；针对 CVE-2025-26465/26466、CVE-2024-27078 的升级预案持续发布）",
+      "image_candidates": [],
+      "identify": [],
+      "official_image_note": "未公开。注意系统自带「支持 docker 1.11.2」是「能跑容器」不是「发镜像」。查过官网 download 全目录、Docker Hub linx（只有无关的 linx/apache）、cr./registry.linx-info.com（不解析）。",
+      "sources": [
+        "https://www.linx-info.com/download/document/6.0.80/",
+        "https://www.linx-info.com/download/security/"
+      ],
+      "order": 10,
+      "s_lineage": "Debian 系（证据最硬，注 8）",
+      "s_version": "V6.0.80-20250816；并行 V6.0.100",
+      "s_desktop": "⚠️ 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE"
     },
     {
       "name": "Anolis OS（龙蜥）",
@@ -127,7 +287,11 @@
         "https://mirrors.openanolis.cn/anolis/23.5/DDE/",
         "https://gitee.com/anolis/docker-images",
         "https://hub.docker.com/r/openanolis/anolisos"
-      ]
+      ],
+      "order": 11,
+      "s_lineage": "RHEL 兼容系",
+      "s_version": "23.5（官方公告未同步）",
+      "s_desktop": "无桌面 ISO；有独立 DDE 仓库"
     },
     {
       "name": "OpenCloudOS",
@@ -155,7 +319,32 @@
         "https://docs.opencloudos.org/OCS/Install_Guide/ocs-desktop/",
         "https://gitee.com/opencloudos-exnde",
         "https://hub.docker.com/u/opencloudos"
-      ]
+      ],
+      "order": 12,
+      "s_lineage": "自主演进，RHEL 系包管理",
+      "s_version": "9.6（2026-07-13）",
+      "s_desktop": "无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE"
+    },
+    {
+      "name": "新支点桌面操作系统（NewStart NSDL）",
+      "type": "商业",
+      "vendor": "广东中兴新支点技术有限公司（中兴通讯全资子公司）",
+      "lineage": "⚠️ 官方只说「基于 Linux 稳定内核」。桌面线血统第三方说法互相矛盾（Debian 系 vs RHEL 系），不下结论。同厂服务器线 CGSL V7 明确基于 6.6 内核",
+      "latest_version": "官网下载中心 x86 最新为 V4.5.2；此前 V4.4.0 提供 X86/ARM/MIPS/LoongArch 四架构。⚠️ 官方未标任何发布日期。桌面 V4.x 与服务器 V7 是两套版本号体系",
+      "desktop": "EX-NDE 超凡桌面（Qt 自研 + NDE-Wayland；支持桌面/服务器/平板三种交互模式）。该桌面 2023-04 在 OpenCloudOS V9 发布会上开源，Gitee 组织 opencloudos-exnde，安装包约 104MB，目前只支持 OpenCloudOS 8",
+      "maintained": "⚠️ 品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体",
+      "image_candidates": [],
+      "identify": [],
+      "official_image_note": "未公开。官网仅一句「支持容器化场景」。查过官网 downloads/support、镜像站 nsosmirrors.gd-linux.com（实测 403 需登录）、cr./registry.gd-linux.com（不解析）、Docker Hub newstart（0 仓库）。",
+      "sources": [
+        "https://www.gd-linux.com/downloads",
+        "https://www.gd-linux.com/desktop/",
+        "https://gitee.com/opencloudos-exnde"
+      ],
+      "order": 13,
+      "s_lineage": "⚠️ 未查到官方结论",
+      "s_version": "V4.5.2（⚠️ 官方未标日期）",
+      "s_desktop": "EX-NDE 超凡桌面（Qt 自研）"
     },
     {
       "name": "AOSC OS（安同 OS）",
@@ -174,65 +363,11 @@
         "https://aosc.io/downloads/",
         "https://github.com/AOSC-Dev/aosc-os-docker-files",
         "https://hub.docker.com/r/aosc/aosc-os"
-      ]
-    },
-    {
-      "name": "麒麟信安操作系统（KylinSec）",
-      "type": "商业",
-      "vendor": "湖南麒麟信安科技",
-      "lineage": "openEuler 系（列于 openEuler 官方商业发行版页）",
-      "latest_version": "V6 SP1（2026-06）",
-      "desktop": "自研 Kiran / KiranUI",
-      "maintained": "活跃",
-      "image_candidates": [
-        "docker.io/kylinsec/kylinsec:latest"
       ],
-      "identify": [],
-      "official_image_note": "Docker Hub kylinsec 命名空间 0 个仓库。只能证明该处未公开，不能证明厂商无私有 registry。",
-      "sources": [
-        "https://www.openeuler.org/zh/download/commercial-release/",
-        "https://www.kylinsec.com.cn/detail/13151/1.html"
-      ]
-    },
-    {
-      "name": "EulerOS（华为）",
-      "type": "商业",
-      "vendor": "华为",
-      "lineage": "openEuler 的商业/闭源对应物",
-      "latest_version": "未公开（面向服务器与华为云 B2B）",
-      "desktop": "未见桌面版",
-      "maintained": "活跃（服务器向）",
-      "image_candidates": [
-        "docker.io/euleros/euleros:latest"
-      ],
-      "identify": [],
-      "official_image_note": "Docker Hub euleros 命名空间 0 个仓库。未见桌面版产品线。",
-      "sources": [
-        "https://www.openeuler.org/zh/download/commercial-release/"
-      ]
-    },
-    {
-      "name": "Loongnix（龙芯）",
-      "type": "社区开源（厂商主导：龙芯中科）",
-      "vendor": "龙芯中科 / Loongnix 社区",
-      "lineage": "Debian 系。25 线 ⚠️**推断为** Debian 13 trixie（依据是 pool 里 bash 5.2.37-2、libc-bin 2.41-13 正是 trixie 组合；官方无明文声明），架构 loong64 新世界 ABI；20 线为 Debian 10 buster、架构 loongarch64 旧世界 ABI。⚠️ 陷阱：两条线的 dists/*/Release 都误写 Origin: Debian / Version: 10.4，不能据此判断血统",
-      "latest_version": "Loongnix-25.1 正式版（2026-08-20）；20 线 Loongnix-20.7 正式版（2026-07-17）",
-      "desktop": "KDE（硬证据是 ISO 文件名 Loongnix-25.1.livecd.kde-loong64.hybrid.iso、Loongnix-20.7.livecd.kde.loongarch64.iso）。「Loongnix 用 MATE」是 20 系列早期旧资料，已过时",
-      "maintained": "活跃",
-      "image_candidates": [
-        "cr.loongnix.cn/loongson/loongnix:20.7",
-        "cr.loongnix.cn/loongson/loongnix:25.1",
-        "cr.loongnix.cn/loongson/loongnix:25",
-        "cr.loongnix.cn/loongson/loongnix-desktop:25.1"
-      ],
-      "identify": [
-        "cr.loongnix.cn/loongson/loongnix:20.7"
-      ],
-      "official_image_note": "厂商自有 registry cr.loongnix.cn（实为 Red Hat Quay，有效 API 是 /api/v1/*）。实测 loongson/loongnix 只有 20 / 20-ssh / 20.7 三个 tag，25 与 25.1 均不存在——即最新桌面版没有对应官方容器镜像，能拉到的是上一代（Debian 10 血统、旧世界 ABI）。",
-      "sources": [
-        "https://www.loongnix.cn/",
-        "https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true"
-      ]
+      "order": 14,
+      "s_lineage": "完全独立自建，自研 oma",
+      "s_version": "滚动（下载页 2026-06-21）",
+      "s_desktop": "KDE Plasma"
     },
     {
       "name": "RevyOS",
@@ -250,7 +385,11 @@
       "sources": [
         "https://revyos.github.io/",
         "https://mirror.iscas.ac.cn/revyos/"
-      ]
+      ],
+      "order": 15,
+      "s_lineage": "Debian 13 trixie；RISC-V",
+      "s_version": "镜像站 20260504（文档滞后）",
+      "s_desktop": "Xfce4"
     },
     {
       "name": "Bianbu OS",
@@ -267,30 +406,55 @@
       "official_image_note": "未查到官方容器镜像。注意「赛昉」是 StarFive，与 Bianbu 无关。",
       "sources": [
         "https://bianbu.spacemit.com/"
-      ]
+      ],
+      "order": 16,
+      "s_lineage": "Ubuntu 26.04；RISC-V",
+      "s_version": "v4.0.6（2026-08-26）",
+      "s_desktop": "⚠️ 未核实"
     },
     {
-      "name": "银河麒麟桌面操作系统",
-      "type": "商业",
-      "vendor": "麒麟软件有限公司（中国电子 CEC 旗下）",
-      "lineage": "⚠️ 官方未声明。V10 SP1 实测为 Debian/Ubuntu 系（deb/apt、ID_LIKE=debian）；V11 官网只写「基于全新内核开发」+ 磐石架构 + 开明包格式 + OSTree 原子更新，全文不提上游发行版，但出现「一键转换 deb 包为开明包」，间接指向 deb 底座。流传的「V11 桌面基于 openKylin」未找到任何一手出处，按未证实处理",
-      "latest_version": "V11（2025-08-26 在 2025 中国操作系统产业大会发布，官方称首个采用 6.6 内核的商业版国产操作系统；官网挂 2603 版本说明，PDF 上传路径日期 20260228/20260423/20260511）；V10 SP1 最新为 2503 版本（2025-04）",
-      "desktop": "V10 SP1 = UKUI；V11 = ⚠️ 未公开（官网 V11 产品页全文未出现 UKUI 字样，只写「新桌面、新壁纸、新屏保」）",
-      "maintained": "活跃",
+      "name": "FydeOS",
+      "type": "商业（其开源上游 openFyde 为社区开源，同厂主导）",
+      "vendor": "燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实）",
+      "lineage": "Chromium OS 衍生 + Gentoo Portage overlay 体系。openFyde 宣称 0 闭源组件，FydeOS 含闭源组件并提供自动更新",
+      "latest_version": "商业版 FydeOS v23「Chromatic Cadence」（对应 Chromium OS r150，⚠️ 精确发布日期未查到）；开源版 openFyde r144",
+      "desktop": "ChromeOS 风格自研 shell（Chromium OS Ash/Aura），非传统 Linux DE，无 X11/Wayland 传统 DE 概念",
+      "maintained": "活跃（openFyde overlay 2026-06-11 更新）",
       "image_candidates": [
-        "cr.kylinos.cn/kylin/kylin-server-v10sp3-x86_64:20230324",
-        "cr.kylinos.cn/kylin/kylin-desktop-v11:latest",
-        "cr.kylinos.cn/kylin/kylin-desktop-v10sp1-x86_64:latest"
+        "docker.io/openfyde/openfyde:latest"
       ],
       "identify": [],
-      "official_image_note": "桌面版在厂商 registry 里就不存在——这是比「我们拉不到」更强的证据。cr.kylinos.cn（Harbor v2.11.1，站点标题「服务器软件中心」）的公开项目可匿名枚举：basekylin(160)/eco(107)/kylin(27)/hostos(2)/goharbor(18)/k8s.gcr.io(26)/ingress-nginx(2)/bitnami(1)。kylin 项目 27 个仓库全部枚举，全是 kylin-server-v10sp1|sp2|sp3 的 {基础,-init,-minimal,-micro} × {x86_64,aarch64,loongarch64}，含 desktop 或 ukui 的为 0 个。另注：厂商自己就在用 micro/minimal/init 分档。registry.kylinos.cn 是另一个 Harbor，只有空的 library 项目。",
+      "official_image_note": "未公开（Docker Hub 搜 openfyde count=0，无自建 registry）。架构只有 amd64 与 arm64，无 RISC-V。",
       "sources": [
-        "https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html",
-        "https://www.kylinos.cn/productPc/desktop/desktopMainV11/",
-        "https://www.kylinos.cn/productPc/desktop/desktopMain/",
-        "https://cr.kylinos.cn/api/v2.0/projects",
-        "https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories"
-      ]
+        "https://fydeos.com/blog/release-note-v23/",
+        "https://openfyde.io/",
+        "https://github.com/orgs/openFyde/repositories"
+      ],
+      "order": 17,
+      "s_lineage": "Chromium OS + Gentoo Portage",
+      "s_version": "v23（openFyde r144）",
+      "s_desktop": "ChromeOS 风格自研 shell"
+    },
+    {
+      "name": "普华桌面操作系统",
+      "type": "商业（公司活跃，桌面线沉寂）",
+      "vendor": "普华基础软件股份有限公司（中国电科投资设立）",
+      "lineage": "⚠️ 官方未声明，只写「以开源 Linux 为基础」。服务器线（现名普华太极）明确融合 openEuler，桌面线是否同源官方未说",
+      "latest_version": "⚠️ 两个官方来源不一致，如实并列：官网产品详情页是 V4.0（4.4 内核，V4.0 系列发布于 2016 年）；Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0。V5.0 的发布日期、内核、桌面环境全部未查到",
+      "desktop": "V4.1 = KDE 5.4（Plasma）；V5.0 未查到",
+      "maintained": "⚠️ 桌面线沉寂但未 EOL：官网近两年新闻全是车用 AUTOSAR / 开源小满 EasyXMen 方向，首页版权信息只到 2009–2022，但未见任何停售或 EOL 公告，产品页仍在架",
+      "image_candidates": [],
+      "identify": [],
+      "official_image_note": "未公开。查过官网、AtomHub、Docker Hub isoft（只有无关的 master 一个仓库）、registry.i-soft.com.cn（域名不解析）。",
+      "sources": [
+        "https://www.i-soft.com.cn/detail/59.html",
+        "https://www.i-soft.com.cn/product/currency.html",
+        "http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html"
+      ],
+      "order": 18,
+      "s_lineage": "⚠️ 官方未声明",
+      "s_version": "⚠️ 官方两处不一致：V4.0 / V5.0（注 9）",
+      "s_desktop": "V4.1 = KDE 5.4；V5.0 未查到"
     },
     {
       "name": "中标麒麟桌面操作系统（NeoKylin）",
@@ -312,95 +476,11 @@
         "https://cs2c.com.cn/about/company/1349.html",
         "https://hub.docker.com/v2/orgs/cs2cneokylin/",
         "https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64"
-      ]
-    },
-    {
-      "name": "统信桌面操作系统 V25（UOS）",
-      "type": "商业",
-      "vendor": "统信软件技术有限公司（UnionTech）",
-      "lineage": "⚠️ 官方未书面确认。官方话语体系只讲 DTK + Qt 与内核版本（V20 线 4.19/5.10，V25 线 6.6），全程不提 Debian；业界共识为 Debian 系。社区上游为 deepin（统信全资子公司），而 deepin 自 23 起已自建独立基础仓库",
-      "latest_version": "桌面专业版 V25（2026-04-15 正式发布；镜像名 uos-desktop-25-professional-2500-amd64-202604.iso，内部版本号 2500）；V20 线仍维护，桌面专业版最新 1070u4",
-      "desktop": "DDE（V25 起走 Treeland Wayland + Qt6 路线）",
-      "maintained": "活跃",
-      "image_candidates": [
-        "docker.io/uniontech/uos:latest",
-        "registry.uniontech.com/uos-server-base/uos-server-20-1070a:latest"
       ],
-      "identify": [],
-      "official_image_note": "官方容器镜像平台确实存在（统信容器镜像平台 UOS Container Registry，门户 uoscr.chinauos.com，pull 域名 registry.uniontech.com），但里面没有桌面版。⚠️ 先纠一个方法学陷阱：从本机经代理访问这两个域名均返回 000，看起来「不可达」，直连（curl --noproxy）实为 **200** —— 代理会把中国大陆站点绕到境外从而造出假的不可达结论。直连后枚举其 Harbor API：18 个公开项目，含 desktop/dde/ukui 的为 0 个；基础镜像项目名就叫 uos-server-base，8 个仓库全是 uos-server-20-*（含 loongarch/sw64 分支）。官方产品页也写明适用范围是「统信服务器操作系统 V20 及统信云原生操作系统 V20，暂不支持其他操作系统」，全文未提 desktop。",
-      "sources": [
-        "https://uniontech.com/m/news-info/2877.html",
-        "https://www.uniontech.com/os-containerImage.html",
-        "https://registry.uniontech.com/api/v2.0/projects",
-        "https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories"
-      ]
-    },
-    {
-      "name": "方德桌面操作系统 V5.0",
-      "type": "商业",
-      "vendor": "中科方德软件有限公司",
-      "lineage": "⚠️ 官方未声明，只说「基于核高基重大专项安全加固内核成果持续优化发展」。旁证指向 deb 系：官方源 repos.os.nfschina.com/debian-sign/ 与 update.os.nfschina.com/repo_desktop_4.0/ 内含 mate-desktop-environment 等 deb 包",
-      "latest_version": "V5.0 首发 2022-06-17；兆芯适配版 2025-05 上线；Pro 版 V5.0（内核 6.6）2025-09-12 通过《安全可靠测评结果公告（2025年第3号）》，与银河麒麟桌面 V11 并列为首批基于 Linux 6.6 LTS 过评的两款桌面 OS",
-      "desktop": "⚠️ 未公开（官方未命名；官方源内含 MATE 包，疑为 MATE 衍生但不确定）",
-      "maintained": "活跃",
-      "image_candidates": [],
-      "identify": [],
-      "official_image_note": "未公开。查过官网镜像下载栏（提供 ISO 非容器）、GitHub 组织 nfschina、官方 APT/RPM 源目录、Docker Hub nfschina（0 仓库）、cr./registry./mirror./mirrors.nfschina.com（域名均不解析）。",
-      "sources": [
-        "https://www.nfschina.com/",
-        "https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/",
-        "https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html"
-      ]
-    },
-    {
-      "name": "普华桌面操作系统",
-      "type": "商业（公司活跃，桌面线沉寂）",
-      "vendor": "普华基础软件股份有限公司（中国电科投资设立）",
-      "lineage": "⚠️ 官方未声明，只写「以开源 Linux 为基础」。服务器线（现名普华太极）明确融合 openEuler，桌面线是否同源官方未说",
-      "latest_version": "⚠️ 两个官方来源不一致，如实并列：官网产品详情页是 V4.0（4.4 内核，V4.0 系列发布于 2016 年）；Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0。V5.0 的发布日期、内核、桌面环境全部未查到",
-      "desktop": "V4.1 = KDE 5.4（Plasma）；V5.0 未查到",
-      "maintained": "⚠️ 桌面线沉寂但未 EOL：官网近两年新闻全是车用 AUTOSAR / 开源小满 EasyXMen 方向，首页版权信息只到 2009–2022，但未见任何停售或 EOL 公告，产品页仍在架",
-      "image_candidates": [],
-      "identify": [],
-      "official_image_note": "未公开。查过官网、AtomHub、Docker Hub isoft（只有无关的 master 一个仓库）、registry.i-soft.com.cn（域名不解析）。",
-      "sources": [
-        "https://www.i-soft.com.cn/detail/59.html",
-        "https://www.i-soft.com.cn/product/currency.html",
-        "http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html"
-      ]
-    },
-    {
-      "name": "凝思安全操作系统",
-      "type": "商业",
-      "vendor": "北京凝思软件股份有限公司",
-      "lineage": "Debian 系，本名录里证据最硬的一条：官方 V6.0.80 发布说明写 grub2 升级到 2.06-3~deb10u4linx5（deb10 = Debian 10 buster），官方文档中出现 iceweasel（Debian 独有的 Firefox 改名）+ glibc 2.28 组合。厂商自身表述只到「以 Linux 社区发行版本为基础」。另有 openEuler 分支产品（欧拉版 V6.0.99）",
-      "latest_version": "X86_64 为 V6.0.80 子版本 20250816（cat /etc/issue → LinxOS 6.0.80 20250816）；并行在架 V6.0.100 与 V6.0.99 欧拉版。⚠️ V6.0.100 正式发布日期未查到",
-      "desktop": "⚠️ 无独立命名的「桌面版」产品：图形场景由基础版与图形工作站版承担，可选 GNOME 3.14 / KDE 4.11 / MATE 1.8 / XFCE 4.10，无自研 DE。V6.0.80 发布说明的适用范围原文是「适用 X86_64 架构的服务器和工作站」",
-      "maintained": "活跃（发布说明 20250816；针对 CVE-2025-26465/26466、CVE-2024-27078 的升级预案持续发布）",
-      "image_candidates": [],
-      "identify": [],
-      "official_image_note": "未公开。注意系统自带「支持 docker 1.11.2」是「能跑容器」不是「发镜像」。查过官网 download 全目录、Docker Hub linx（只有无关的 linx/apache）、cr./registry.linx-info.com（不解析）。",
-      "sources": [
-        "https://www.linx-info.com/download/document/6.0.80/",
-        "https://www.linx-info.com/download/security/"
-      ]
-    },
-    {
-      "name": "新支点桌面操作系统（NewStart NSDL）",
-      "type": "商业",
-      "vendor": "广东中兴新支点技术有限公司（中兴通讯全资子公司）",
-      "lineage": "⚠️ 官方只说「基于 Linux 稳定内核」。桌面线血统第三方说法互相矛盾（Debian 系 vs RHEL 系），不下结论。同厂服务器线 CGSL V7 明确基于 6.6 内核",
-      "latest_version": "官网下载中心 x86 最新为 V4.5.2；此前 V4.4.0 提供 X86/ARM/MIPS/LoongArch 四架构。⚠️ 官方未标任何发布日期。桌面 V4.x 与服务器 V7 是两套版本号体系",
-      "desktop": "EX-NDE 超凡桌面（Qt 自研 + NDE-Wayland；支持桌面/服务器/平板三种交互模式）。该桌面 2023-04 在 OpenCloudOS V9 发布会上开源，Gitee 组织 opencloudos-exnde，安装包约 104MB，目前只支持 OpenCloudOS 8",
-      "maintained": "⚠️ 品牌活跃（服务器线 V7、2026 年入围中央政府采购、安全公告持续），但桌面线自身的最近更新时间未查到——活跃度证据全部来自服务器线与公司整体",
-      "image_candidates": [],
-      "identify": [],
-      "official_image_note": "未公开。官网仅一句「支持容器化场景」。查过官网 downloads/support、镜像站 nsosmirrors.gd-linux.com（实测 403 需登录）、cr./registry.gd-linux.com（不解析）、Docker Hub newstart（0 仓库）。",
-      "sources": [
-        "https://www.gd-linux.com/downloads",
-        "https://www.gd-linux.com/desktop/",
-        "https://gitee.com/opencloudos-exnde"
-      ]
+      "order": 19,
+      "s_lineage": "⚠️ 未查到；历史被归为 RHEL 系",
+      "s_version": "⚠️ 未查到 V7 之后新版本",
+      "s_desktop": "未查到"
     },
     {
       "name": "一铭桌面操作系统（EmindDesktop）",
@@ -416,26 +496,32 @@
       "sources": [
         "http://www.emindsoft.com.cn/index.php",
         "http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/"
-      ]
+      ],
+      "order": 20,
+      "s_lineage": "⚠️ 官方未声明",
+      "s_version": "4.0 SP1（2016-06）",
+      "s_desktop": "未查到"
     },
     {
-      "name": "FydeOS",
-      "type": "商业（其开源上游 openFyde 为社区开源，同厂主导）",
-      "vendor": "燧炻创新 / Fyde Innovations（⚠️ 工商全称未核实）",
-      "lineage": "Chromium OS 衍生 + Gentoo Portage overlay 体系。openFyde 宣称 0 闭源组件，FydeOS 含闭源组件并提供自动更新",
-      "latest_version": "商业版 FydeOS v23「Chromatic Cadence」（对应 Chromium OS r150，⚠️ 精确发布日期未查到）；开源版 openFyde r144",
-      "desktop": "ChromeOS 风格自研 shell（Chromium OS Ash/Aura），非传统 Linux DE，无 X11/Wayland 传统 DE 概念",
-      "maintained": "活跃（openFyde overlay 2026-06-11 更新）",
+      "name": "EulerOS（华为）",
+      "type": "商业",
+      "vendor": "华为",
+      "lineage": "openEuler 的商业/闭源对应物",
+      "latest_version": "未公开（面向服务器与华为云 B2B）",
+      "desktop": "未见桌面版",
+      "maintained": "活跃（服务器向）",
       "image_candidates": [
-        "docker.io/openfyde/openfyde:latest"
+        "docker.io/euleros/euleros:latest"
       ],
       "identify": [],
-      "official_image_note": "未公开（Docker Hub 搜 openfyde count=0，无自建 registry）。架构只有 amd64 与 arm64，无 RISC-V。",
+      "official_image_note": "Docker Hub euleros 命名空间 0 个仓库。未见桌面版产品线。",
       "sources": [
-        "https://fydeos.com/blog/release-note-v23/",
-        "https://openfyde.io/",
-        "https://github.com/orgs/openFyde/repositories"
-      ]
+        "https://www.openeuler.org/zh/download/commercial-release/"
+      ],
+      "order": 21,
+      "s_lineage": "openEuler 商业/闭源对应物",
+      "s_version": "未公开",
+      "s_desktop": "未见桌面版"
     }
   ],
   "scope": {
