@@ -16,6 +16,43 @@ for f in ["Noto Sans CJK SC", "Noto Sans CJK JP", "WenQuanYi Zen Hei", "Source H
         plt.rcParams["font.sans-serif"] = [f]; break
 plt.rcParams["axes.unicode_minus"] = False
 S = json.loads((DER / "stats.json").read_text())
+# ── 图的数据侧车 ────────────────────────────────────────────────────────────
+# PNG 字节不能当可复现单位：它取决于 matplotlib / freetype / 命中的字体，跨机必然不同
+# （实测把字节比对放进 CI，runner 上六张全变）。但「图里画的是哪些值」是机器无关的，
+# 也正是要防的东西——图画着旧数据。所以每次 savefig 顺手把喂进去的数值与文字落进
+# figures/plotdata.json，CI 逐字节比这份侧车。只记数据不记坐标：位置受布局与字体影响。
+_PLOTDATA = {}
+
+
+def _patch_data(p):
+    if hasattr(p, "get_width") and hasattr(p, "get_height"):
+        return [round(float(p.get_width()), 6), round(float(p.get_height()), 6)]
+    if hasattr(p, "theta1"):          # Wedge（饼图扇区）：角度跨度就是它的数据
+        return ["wedge", round(float(p.theta1), 4), round(float(p.theta2), 4)]
+    return [type(p).__name__]
+
+def save(fig, name):
+    rec = []
+    for ax in fig.get_axes():
+        a = {"title": ax.get_title(),
+             "xlabel": ax.get_xlabel(), "ylabel": ax.get_ylabel(),
+             "xticklabels": [t.get_text() for t in ax.get_xticklabels()],
+             "yticklabels": [t.get_text() for t in ax.get_yticklabels()],
+             "texts": [t.get_text() for t in ax.texts],
+             # patch 不止 Rectangle：fig05 用了饼图，Wedge 没有 width/height。
+             # 按类型各取自己的数据量，取不到的记类型名，别让一种图形拖垮整份侧车。
+             "bars": [_patch_data(p) for p in ax.patches],
+             "lines": [[round(float(v), 6) for v in ln.get_ydata()] for ln in ax.lines],
+             "images": [[[round(float(v), 6) for v in row]
+                         for row in np.asarray(im.get_array()).tolist()]
+                        for im in ax.images],
+             "legend": ([t.get_text() for t in ax.get_legend().get_texts()]
+                        if ax.get_legend() else [])}
+        rec.append(a)
+    _PLOTDATA[name] = rec
+    fig.savefig(FIG / name, dpi=150)
+    plt.close(fig)
+
 def table(n):
     with open(DER / "tables" / n) as fh: return list(csvmod.DictReader(fh))
 
@@ -57,7 +94,7 @@ for i, e in enumerate(ex):
 bx.set_title(f"② 桌面镜像存在性探测（{S['existence_probes']} 条，仅 {S['existence_found']} 条存在）\n"
              f"麒麟桌面官方镜像 {S['kylin_desktop_official_images']} 个，"
              f"统信 UOS 官方镜像 {S['uos_official_images']} 个", fontsize=10)
-fig.tight_layout(); fig.savefig(FIG / "fig01_official_availability.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig01_official_availability.png")
 
 # fig02 产品线对照：麒麟官方 server 与桌面派生的四维差异
 t3 = table("t03_product_line_comparison.csv")
@@ -87,7 +124,7 @@ for i in range(1, len(rows) + 1):
 ax.set_title("麒麟「官方镜像」与麒麟桌面版不是一条产品线：包格式、glibc、软件源三者全不同，\n"
              "而两者 os-release 的 ID 都是 kylin（红色格）—— 这正是被误认成同一产品线的原因",
              fontsize=10.5, pad=12)
-fig.tight_layout(); fig.savefig(FIG / "fig02_product_line.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig02_product_line.png")
 
 # fig03 能力矩阵热力图
 t5 = table("t05_capability_matrix.csv")
@@ -117,7 +154,7 @@ ax.grid(which="minor", color="w", linewidth=.6); ax.tick_params(which="minor", l
 ax.set_title(f"能力矩阵（{S['capability_items']} 项 × 9 镜像 = {S['capability_cells']} 格，全部实测）\n"
              f"绿=支持 {S['cells_supported']}　红=不支持 {S['cells_gap']}　"
              f"灰=不适用 {S['cells_na']}（按档位定位判，判据见 analyze.py 的 NA_POLICY）", fontsize=10.5)
-fig.tight_layout(); fig.savefig(FIG / "fig03_capability_matrix.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig03_capability_matrix.png")
 
 # fig04 尺寸与包数分档
 t4 = table("t04_built_images.csv")
@@ -133,7 +170,7 @@ a2.bar(x, pkgs, color=cols); a2.set_xticks(x); a2.set_xticklabels(LBL, fontsize=
 a2.set_ylabel("已安装包数"); a2.set_title("三档镜像的包数")
 for i, v in enumerate(pkgs): a2.text(i, v + 4, str(v), ha="center", fontsize=8)
 fig.suptitle("micro=纯运行时　base=平台可用　devel=构建用", fontsize=10)
-fig.tight_layout(); fig.savefig(FIG / "fig04_tier_size.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig04_tier_size.png")
 
 # fig05 门禁与变异测试
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.5, 4))
@@ -153,7 +190,7 @@ tot = {"支持": S["cells_supported"], "不支持": S["cells_gap"], "不适用":
 a2.pie([tot[l] for l in labels], labels=[f"{l}\n{tot[l]}" for l in labels],
        colors=["#2e7d32", "#c62828", "#bdbdbd"], autopct="%1.1f%%", textprops={"fontsize": 9})
 a2.set_title(f"能力矩阵格分布（{sum(tot.values())} 格）")
-fig.tight_layout(); fig.savefig(FIG / "fig05_gates.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig05_gates.png")
 
 # fig06 厂商缺陷分布
 t8 = table("t08_vendor_defects.csv")
@@ -164,6 +201,11 @@ ks = list(cnt.keys()); vs = [cnt[k] for k in ks]
 ax.bar(ks, vs, color=["#1565c0", "#42a5f5", "#90caf9", "#bdbdbd"][:len(ks)])
 for i, v in enumerate(vs): ax.text(i, v + .06, str(v), ha="center", fontsize=10)
 ax.set_ylabel("条数"); ax.set_title(f"采集期确证的厂商缺陷共 {S['defects']} 条（每条都记录了根因与处理落点）")
-fig.tight_layout(); fig.savefig(FIG / "fig06_defects.png", dpi=150); plt.close(fig)
+fig.tight_layout(); save(fig, "fig06_defects.png")
 
-print(f"figures/：{len(list(FIG.glob('*.png')))} 张")
+
+# 侧车落盘：排序键 + 固定缩进，保证同一份数据得到同一份字节
+(FIG / "plotdata.json").write_text(
+    json.dumps(_PLOTDATA, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
+assert len(_PLOTDATA) == 6, f"应产出 6 张图，实际 {len(_PLOTDATA)} 张"
+print(f"figures/：{len(_PLOTDATA)} 张 + plotdata.json 侧车")

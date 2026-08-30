@@ -39,20 +39,30 @@ jobs:
             exit 1
           fi
 
-      # 光重画不比对等于没查。图必须逐字节复现（plot.py 已清掉 matplotlib
-      # 默认写入的 Software/CreationDate 元数据），且必须真的比到 6 张——
-      # 「遍历后报成功」在空集合上恒真，本地实测踩过一次。
-      - name: Rebuild figures and fail on drift
+      # 图不做逐字节比对：PNG 字节取决于 matplotlib / freetype / 已装字体的版本，
+      # 跨机本来就不可能一致（我先加了字节门禁，CI 立刻红——本地同机能过，
+      # runner 上六张全不同）。跨机真能成立的判据只有：plot.py 干净跑完、
+      # 产出恰好 6 张、每张都不是空图。同机的字节复算留在本地 review 流程里。
+      - name: Rebuild figures
         run: |
           python3 scripts/plot.py
-          if ! git diff --quiet -- figures/; then
-            echo "::error::figures/ 与 raw/ 不一致——请在本地重跑 scripts/plot.py 并提交结果"
-            git diff --stat -- figures/
+          n=$(ls figures/*.png 2>/dev/null | wc -l)
+          [ "$n" -eq 6 ] || { echo "::error::图基线 6 张，实际 $n 张（改了张数请同步基线与正文）"; exit 1; }
+          small=0
+          for f in figures/*.png; do
+            b=$(stat -c%s "$f")
+            [ "$b" -ge 10000 ] || { echo "::error::$f 只有 $b 字节，疑似空图"; small=1; }
+          done
+          [ "$small" -eq 0 ] || exit 1
+          # 真正要防的是「图画着旧数据」。plot.py 会把每张图实际画进去的数值与文字
+          # 落进 figures/plotdata.json，这份是机器无关的（实测换字体重跑逐字节不变，
+          # 而 PNG 六张全变），所以拿它比漂移。
+          if ! git diff --quiet -- figures/plotdata.json; then
+            echo "::error::figures/plotdata.json 与 derived/ 不一致——图画的是旧数据，请重跑 scripts/plot.py 并提交"
+            git diff -- figures/plotdata.json | head -40
             exit 1
           fi
-          n=$(git ls-files 'figures/*.png' | wc -l)
-          [ "$n" -eq 6 ] || { echo "::error::图基线 6 张，实际 $n 张（改了张数请同步基线与正文）"; exit 1; }
-          echo "figures: $n 张逐字节零漂移"
+          echo "figures: $n 张重画成功，plotdata.json 零漂移"
 
       - name: Shell syntax check on the whole build chain
         run: |

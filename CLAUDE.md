@@ -73,3 +73,11 @@ python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.
 - 版本号写全，含厂商后缀（`2.38-1ok6.9k0.5`，不是 `2.38`）。
 - 尺寸口径要标明：rootfs tar 字节流、`docker images` 解包占用、`inspect .Size` 压缩内容，三者差别很大，不许混用。
 - 被推翻的早期结论、未处理的遗留项都留在文档里，不许静默删除。这些是可靠性的凭据，不是瑕疵。
+
+## 图的可复现单位是侧车，不是 PNG
+
+`figures/*.png` 的字节取决于 matplotlib / freetype / 命中的字体，跨机必然不同——把字节比对写进 CI 会直接红（实测：本地同机全过，GitHub runner 上六张全变）。`scripts/plot.py` 因此在 savefig 的同时把每张图**实际画进去的数值与文字**落进 `figures/plotdata.json`（只记数据不记坐标，位置受布局与字体影响）。
+
+- 门禁比 `plotdata.json`，不比 PNG。实测：换字体重跑侧车逐字节不变；改 `stats.json` 里一个被画进标题的数，侧车立刻变。
+- 加新图时 `save(fig, name)` 必须走这个 helper，直接 `fig.savefig` 会绕过侧车。
+- 侧车里的图张数有 `assert len(_PLOTDATA) == 6`，改张数要同步它与 CI 的基线。
