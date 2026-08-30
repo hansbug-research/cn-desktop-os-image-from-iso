@@ -33,6 +33,7 @@
   "devel_count": 3,
   "devel_cxx_ok": 2,
   "digest_chain_passed": 9,
+  "digest_log_prefixes_checked": 9,
   "distros": [
     "kylin10",
     "kylin11",
@@ -98,6 +99,11 @@
     "kylin10": 11,
     "kylin11": 7,
     "uos25": 7
+  },
+  "micro_active_deb_lines": {
+    "kylin10:micro": 0,
+    "kylin11:micro": 0,
+    "uos25:micro": 0
   },
   "micro_sources_list_bytes": {
     "kylin10:micro": 0,

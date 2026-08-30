@@ -32,7 +32,9 @@ def in_text(s, where="report", label=None, ctx=None):
     102 改成 101 也通过，因为有「policy-rc.d 返回 101」。两个统计量同时改错，
     靠两个语义无关的巧合蒙混过去。"""
     t = REPORT if where == "report" else README
-    pat = ctx.format(v=s) if ctx else rf"(?<![0-9]){re.escape(str(s))}(?![0-9])"
+    # ⚠️ ctx 一律视为**已成形的正则**，不再走 .format() —— 正则量词 `{0,8}` 会被
+    # format 当成占位符而抛 KeyError。需要插值的调用方自己用 f-string 拼好。
+    pat = ctx if ctx else rf"(?<![0-9]){re.escape(str(s))}(?![0-9])"
     ok(re.search(pat, t) is not None, f"{where} 里找不到 {label or s!r}"
        + (f"（模式 {pat}）" if ctx else ""))
 
@@ -57,6 +59,22 @@ ok(S["na_na_by_item"].get("cc_clean_stderr") == 6,
    f"n/a 明细里 cc_clean_stderr 应为 6 格，实际 {S['na_na_by_item']}")
 ok(sum(v for k, v in S["na_na_by_item"].items() if k.startswith("apt_")) == 9,
    f"n/a 明细里 apt 相关应为 9 格，实际 {S['na_na_by_item']}")
+# ⚠️ 上面两条只核 stats 内部自洽，**不核正文把哪个数归给哪一项** —— 把 9 与 6 对调
+# 三处全绿，而上一轮出错的就是「成因写错」这件事本身。所以必须把数字与项目绑在一起。
+_apt_n = sum(v for k, v in S["na_na_by_item"].items() if k.startswith("apt_"))
+_cc_n = S["na_na_by_item"].get("cc_clean_stderr", 0)
+# 逐处核对，而不是「全文任一处命中即可」—— 只改一处、另一处仍对，宽松匹配会被满足。
+for where, txt in (("report", REPORT), ("readme", README)):
+    n_apt = len(re.findall(rf"{_apt_n} 格[是为][^。；]{{0,16}}?apt 三项", txt))
+    n_cc = len(re.findall(rf"{_cc_n} 格[是为][^。；]{{0,20}}?`cc_clean_stderr`", txt))
+    # 每一处提到 apt 成因的地方都必须配 9，提到 cc_clean_stderr 的都必须配 6：
+    # 用「出现次数必须相等」把两者钉成对，单改一处就会失衡。
+    tot_apt = len(re.findall(r"格[是为][^。；]{0,16}?apt 三项", txt))
+    tot_cc = len(re.findall(r"格[是为][^。；]{0,20}?`cc_clean_stderr`", txt))
+    ok(n_apt == tot_apt and n_apt >= 1,
+       f"{where} 里提到 apt 成因的 {tot_apt} 处，只有 {n_apt} 处写的是 {_apt_n} 格")
+    ok(n_cc == tot_cc and n_cc >= 1,
+       f"{where} 里提到 cc_clean_stderr 成因的 {tot_cc} 处，只有 {n_cc} 处写的是 {_cc_n} 格")
 
 # ── 核心结论：麒麟官方镜像不是桌面产品线 ────────────────────────────────────
 ok(S["kylin_desktop_official_images"] == 0, "麒麟桌面官方镜像应为 0")
@@ -72,7 +90,8 @@ t3 = (TAB / "t03_product_line_comparison.csv").read_text()
 ok("rpm" in t3 and "dpkg" in t3, "t03 应同时含 rpm 与 dpkg 行")
 ok(S["existence_probes"] >= 8, "存在性探测至少 8 条")
 ok(S["existence_found"] == 1, "存在性探测应只有 1 条命中")
-in_text(S["existence_probes"], label="存在性探测条数", ctx=rf"{S['existence_probes']} 条存在性探测")
+in_text(S["existence_probes"], label="存在性探测条数",
+        ctx=rf"另一组 {S['existence_probes']} 条是针对桌面 tag 的存在性探测")
 
 # ── 编译能力 ────────────────────────────────────────────────────────────────
 ok(S["devel_count"] == 3, "devel 档应为 3 个")
@@ -143,7 +162,7 @@ in_text(S["uos_iso_packages"], where="readme", label="README 的 UOS ISO 包数"
 for row in (ROOT / "derived" / "tables" / "t04_built_images.csv").read_text().splitlines()[1:]:
     c = row.split(",")
     in_text(f"{c[3]} MB / {c[5]} 包", where="readme", label=f"README 九镜像表 {c[0]}:{c[1]}",
-            ctx=r"{v}")
+            ctx=re.escape(f"{c[3]} MB / {c[5]} 包"))
 
 # ── 厂商缺陷 ────────────────────────────────────────────────────────────────
 ok(S["defects"] == 12, "厂商缺陷应为 12 条")
@@ -160,8 +179,11 @@ for d in ("D01", "D02", "D05", "D08", "D09", "D10", "D12"):
 for d, n in S["masked_units_by_distro"].items():
     nm = {"kylin10": "麒麟 V10", "kylin11": "麒麟 V11", "uos25": "UOS"}[d]
     # 同样要绑主体：只防数字边界挡不住「V11 与 UOS 各 11 个、V10 是 7 个」这种对调
-    ok(re.search(rf"{nm}[^。]{{0,20}}?(?<![0-9]){n} 个", REPORT) is not None,
-       f"正文应把 {nm} 与它的 masked 单元数 {n} 绑在一起写（防归属对调）")
+    # 正文的写法是「麒麟 V10 三档均为 11 个」与「麒麟 V11 与 UOS 的 base/devel 各 7 个」，
+    # 主体与数字之间隔着「三档均为」「的 base/devel 各」这类词，放宽到同句内即可，
+    # 但必须同句 —— 只防数字边界挡不住整体对调。
+    ok(re.search(rf"{nm}[^。；]{{0,24}}?(?<![0-9]){n} 个", REPORT) is not None,
+       f"正文应把 {nm} 与它的 masked 单元数 {n} 写在同一句里（防归属对调）")
 in_text(S["setuid_micro"]["kylin10"], label="V10 micro 的 setuid 数",
         ctx=rf"V10 micro 档有 {S['setuid_micro']['kylin10']} 个")
 in_text(S["setuid_micro"]["kylin11"], label="micro 的 setuid 数",
@@ -253,6 +275,10 @@ for k, v in S["keyrings_by_image"].items():
         ok(inj == [], f"{k} 是纯运行时档、没有 apt，不该由构建注入 keyring，实际注入 {inj}")
         nb = S["micro_sources_list_bytes"].get(k)
         ok(nb == 0, f"{k} 没有 apt，出厂的 sources.list 应为空，实际 {nb} 字节")
+        # 真正该数的是 active deb 行数：源清单可以在 sources.list.d/ 下，
+        # 只量 sources.list 会漏掉（uos25:micro 曾因此带着一条 appstore 源全绿）。
+        ad = S["micro_active_deb_lines"].get(k)
+        ok(ad == 0, f"{k} 没有 apt，不该出厂任何 active 在线源，实际 {ad} 条 deb 行")
     elif d.startswith("kylin"):
         ok(v == ["kylin-archive-keyring.gpg"],
            f"{k} 的 keyring 应只有 kylin-archive-keyring.gpg，实际 {v}")
@@ -263,6 +289,8 @@ ok(S["anchor_mismatches"] == [],
 ok(S["anchored_records"] >= 12, f"d6/d7 应有锚点的记录数过少：{S['anchored_records']}")
 ok(S["anchor_pairs_checked"] == 12,
    f"实际比过的锚点对数应为 12，实际 {S['anchor_pairs_checked']} —— 少了就是有对账被静默跳过")
+ok(S["digest_log_prefixes_checked"] == 9,
+   f"应从 f4-digest.log 抽出 9 条 sha256 前缀对账，实际 {S['digest_log_prefixes_checked']}")
 ok(S["anchor_bad_hex"] == [], f"d2 的 tar_sha256 必须都是 64 位 hex，异常：{S['anchor_bad_hex']}")
 
 # ── 结构性检查 ──────────────────────────────────────────────────────────────
@@ -304,7 +332,7 @@ ok(mr is not None, "README 抬头应声明机器核对断言条数")
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "177"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "185"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")

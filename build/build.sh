@@ -97,7 +97,10 @@ build_slice() {
   # ⚠️ 顺序要紧：厂商的 sources.list.d 必须在 adapt_container **之前**拷进去 ——
   # adapt_container 里要把两个返回 401 的授权源注释掉，文件还不存在的话那段就空跑
   # （我就这么把它空跑过一次，改完源清单毫无变化）。
-  if [ -d "$SRC_ROOTFS/etc/apt/sources.list.d" ]; then
+  # micro 档没有 apt，带一份在线源清单出厂毫无意义 —— 上一轮只按「路径」收窄了
+  # sources.list，漏了 sources.list.d，于是 uos25:micro 仍带着一条 active 的
+  # appstore https 源，而当时新加的度量只 wc -c 那一个文件、结构性看不见它。
+  if [ "$TIER" != micro ] && [ -d "$SRC_ROOTFS/etc/apt/sources.list.d" ]; then
     mkdir -p "$D/etc/apt/sources.list.d"
     cp -a "$SRC_ROOTFS/etc/apt/sources.list.d/." "$D/etc/apt/sources.list.d/" 2>/dev/null || true
   fi

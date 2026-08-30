@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T11:38:46Z",
+  "collected_at": "2026-08-30T12:01:42Z",
   "gates": {
     "verify": {
       "passed": 365,
@@ -8,6 +8,17 @@
       "baseline": 360,
       "failures": [],
       "log_tail": "── uos-desktop-v25:base  (281MB)  Uos  包=164\n── uos-desktop-v25:devel  (638MB)  Uos  包=208\n\n══ 汇总: 通过 365 / 失败 0 / 警告 0\n   检查总数 365（基线 360）\n✅ 全部必过项通过"
+    },
+    "digest_prefixes": {
+      "kylin11-micro": "4ac37272ca53",
+      "kylin11-base": "543bb715cfbd",
+      "kylin11-devel": "ffc161134d7a",
+      "kylin10-micro": "136ef44865d2",
+      "kylin10-base": "e5cde2f5ceb8",
+      "kylin10-devel": "3e2931b0be26",
+      "uos25-micro": "974cba17ccf8",
+      "uos25-base": "f80abeda8651",
+      "uos25-devel": "bcd57e55fd3f"
     },
     "digest_chain": {
       "passed": 9,

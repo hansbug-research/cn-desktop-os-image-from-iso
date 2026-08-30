@@ -291,6 +291,8 @@ S["injected_keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
 S["alien_keyring_images"] = sorted(
     k for k, v in S["keyrings_by_image"].items()
     if k.startswith("uos25") and any("kylin" in x for x in v))
+S["micro_active_deb_lines"] = {f'{r["distro_id"]}:{r["tier"]}': int(r.get("active_deb_lines") or 0)
+                               for r in d2["ours"] if r["tier"] == "micro"}
 S["micro_sources_list_bytes"] = {f'{r["distro_id"]}:{r["tier"]}': int(r.get("sources_list_bytes") or 0)
                                  for r in d2["ours"] if r["tier"] == "micro"}
 S["masked_units_by_distro"] = {r["distro_id"]: len((r.get("masked_units") or "").split())
@@ -347,7 +349,7 @@ for x in d7["images"]:
         if a != ref:
             _mismatch.append(("d7", x["image"]))
 # d2 ↔ d4 那条边原先缺着：三条链只连了两条边，三方同改成同一个假哈希就能全绿通过。
-# d4 在 CI 里是从已提交的 artifacts/*.manifest 反向重算的，补上这条边整个三角就闭合。
+# d4 在 CI 里是从已提交的 artifacts/*.manifest 反向重算的，补上这条边，d2/d4/d6/d7 四方闭合；artifacts/*.manifest 那一侧由 CI 的反向重算保证。
 _d4 = {k: v.get("tarball_sha256") for k, v in d4["manifests"].items()}
 for k, v in _d2_tar.items():
     ref = _d4.get(k.replace(":", "-"))
@@ -355,6 +357,13 @@ for k, v in _d2_tar.items():
         _mismatch.append(("d2↔d4-manifest", k))
     elif not ref:
         _mismatch.append(("d4-manifest 缺失", k))
+# f4-digest.log 的前缀 vs manifest 的 sha256：多连一条独立见证的边
+_pref = d4["gates"].get("digest_prefixes") or {}
+for k, pre in _pref.items():
+    full = _d4.get(k)
+    if not full or not full.startswith(pre):
+        _mismatch.append(("f4-digest.log 前缀", k))
+S["digest_log_prefixes_checked"] = len(_pref)
 S["anchor_pairs_checked"] = _pairs
 S["anchor_bad_hex"] = _badhex
 S["anchor_mismatches"] = _mismatch

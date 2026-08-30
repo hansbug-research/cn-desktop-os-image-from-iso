@@ -40,6 +40,10 @@ def main():
     }
     dg = tail(SRC / "f4-digest.log")
     m = re.search(r"通过 (\d+) / 失败 (\d+)", dg)
+    # digest 日志里逐镜像记着 sha256 前缀，是一份独立见证 —— 此前只留 log_tail 末 3 行
+    # 把前缀丢了，于是「全协同篡改」时它还在场外没人核。抽出来供 verify 对账。
+    _pref = dict(re.findall(r"✅ (\S+)\s+manifest=tar=镜像\s+\(([0-9a-f]{12})", dg))
+    data["gates"]["digest_prefixes"] = _pref
     data["gates"]["digest_chain"] = {"passed": int(m.group(1)) if m else None,
                                      "failed": int(m.group(2)) if m else None,
                                      "log_tail": "\n".join(dg.splitlines()[-3:])}

@@ -22,7 +22,7 @@
 
 `cr.kylinos.cn` 上确实有匿名可拉的官方镜像，容易让人以为麒麟桌面版的容器化问题已经解决。实测下来不是这么回事。
 
-在 8 条存在性探测里，`cr.kylinos.cn` 上唯一拉得到的是 `kylin/kylin-server-minimal:v10sp1`；`kylin-desktop` 的 v10、v11、latest 三个 tag 全部不存在，`kylin-linux-desktop:v10` 不存在，连服务器线的 `kylin-server-minimal:v11` 也不存在。
+另一组 8 条是针对桌面 tag 的存在性探测（表 [`t02`](derived/tables/t02_registry_existence_probes.csv)，与上面那 8 个候选引用不是同一套，只有 `docker.io/uniontech/uos:latest` 同时在两表）。在这 8 条里，`cr.kylinos.cn` 上唯一拉得到的是 `kylin/kylin-server-minimal:v10sp1`；`kylin-desktop` 的 v10、v11、latest 三个 tag 全部不存在，`kylin-linux-desktop:v10` 不存在，连服务器线的 `kylin-server-minimal:v11` 也不存在。
 
 而那个唯一拉得到的镜像，与桌面版不是一条产品线：
 
@@ -44,7 +44,7 @@
 
 需要说清楚强度边界：以上是对 8 条探测的观察，证明的是"匿名不可获得"，不能证明厂商内部或授权渠道没有桌面镜像。同一 org 的前序研究 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study) 结论 7 指出厂商 server 镜像可以作为对应桌面版的 **ABI 预检代理**（因为同厂同版本的 server 镜像 ABI 地板不高于桌面版）。引用时要连它自己的限定一起带上：该结论原文注明「支撑它的只有 2 个数据点且都来自麒麟，不可外推」。
 
-这与本节结论不冲突：符号地板的单向预检，和用户态环境的一致复现，是两个不同强度的需求。前者只要地板够低就行，后者要求包格式、系统库、软件源都对得上。本节的存在性探测还能反过来给那条结论补一个边界——`kylin-server-minimal:v11` **不存在**，所以麒麟 V11 若要找「同厂 server 预检代理」，实际可用的是社区线的 openKylin 镜像而非厂商 server 镜像。
+这与本节结论不冲突：符号地板的单向预检，和用户态环境的一致复现，是两个不同强度的需求。前者只要地板够低就行，后者要求包格式、系统库、软件源都对得上。本节的存在性探测还能反过来给那条结论补一个边界——`kylin-server-minimal:v11` **不存在**，所以麒麟 V11 若要找「同厂 server 预检代理」，厂商 server 镜像这条路走不通，只剩社区线的 openKylin 可考虑——但 openKylin 既不是「同厂 server」（`ID=openkylin`、glibc 2.38/2.43），它对麒麟 V11 桌面的 ABI 地板关系本仓库也没有实测，所以这只是一个候选方向而非结论。
 
 ## 3. 分档：为什么是 micro / base / devel
 
@@ -70,7 +70,7 @@
 
 | 文件 | 来源 | 指纹 | 谁在用 |
 |---|---|---|---|
-| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:55` 与 `build/selfhost-inner.sh:30,82`（写进镜像的 `sources.list`） |
+| `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:55` 与 `build/selfhost-inner.sh:30,90`（写进镜像的 `sources.list`） |
 
 实测该 keyring 单独即可验通麒麟 V11（`dists/11.0`）与 V10 SP1（`dists/10.1`）的 `InRelease`：
 
@@ -118,7 +118,7 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 一类是标准的容器精简：`policy-rc.d` 返回 101 阻止装包时起服务、apt 配置去掉缓存与翻译文件、`/usr/share/doc` 按 `path-exclude` + `path-include copyright` 只保留版权声明（GPL 要求）、清空 `machine-id`、删除 ssh host key 与 `resolv.conf`、去掉内核与固件。
 
-另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元（udev、内核挂载、audit socket、厂商 LSM 守护）会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：base/devel 档里麒麟 V11 与 UOS 各 7 个、麒麟 V10 是 11 个；V11 与 UOS 的 micro 档是 0 个（它们的 micro 里没有 systemd 单元文件，无从 mask，`default.target` 也因此为空）——它的镜像里还有 udev 那一组单元，而另两家根本没有这些单元文件，无从 mask（缺陷 D12）。
+另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个，它们的 micro 里连 systemd 单元目录都没有，`default.target` 也因此为空（缺陷 D12）。
 
 还有一类是补齐，理由是"缺了会让语义不自洽"。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是"今天"，否则可复现性当场报废。
 
@@ -142,6 +142,10 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 ### 6.1 测法
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
+
+探针输出与被测镜像的**新鲜度**也要能被机器发现。第五轮踩过一次：给 UOS 补了 `iputils-ping`/`vim-tiny` 重建镜像之后探针没重跑，矩阵里那两项还是「不支持」，头条数字因此错了 4 格。现在 `collect_d3_capabilities.py` 记下每份探针输出的 mtime 与对应镜像的 `Created`，前者早于后者即 `exit 1` 不写盘，`verify.py` 也有对应断言（`probe_stale_vs_image`、`probe_provenance_recorded`）。
+
+⚠️ 这条判据的局限要说清楚：它依赖文件 mtime，而 git 不保留 mtime——新克隆里 `caps-*.txt` 的 mtime 是签出时刻，必然晚于镜像，所以它只在「原地重采」这一种场景下有鉴别力，**不构成提交物的 provenance 保证**。真正的内容锚点应由探针在运行时把该档 tarball 的 sha256 写进输出（d6/d7 已经用 `anchor_tar_sha256` 做到了，d3 因为探针与采集解耦而尚未做）。这是本仓库已知的一处可审计性缺口，不是事实错误。
 
 72 项 × 9 个镜像 = 648 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=648`）。严格说其中 15 格是「前置条件不存在」而非「跑过了」：9 格是 micro 档的 apt 三项（没有 apt，`apt_update`/`apt_roundtrip`/`apt_check` 无从执行），6 格是 `cc_clean_stderr`（没有编译器就无所谓 stderr 干净不干净，micro 与 base 各三家）。探针对这两类如实输出 `n/a`，拆分见下。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 

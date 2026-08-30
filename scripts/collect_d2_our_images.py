@@ -65,6 +65,12 @@ def facts(img):
         # sources.list 的字节数：micro 档没有 apt，出厂时应为空。
         # 早先只检查了 keyring，漏了这一半 —— 麒麟 V10 的 micro 档就一直留着一条 active 源。
         "sources_list_bytes": sh("wc -c < /etc/apt/sources.list 2>/dev/null || echo 0"),
+        # ⚠️ 只 wc sources.list 是不够的：真正的源清单可以在 sources.list.d/ 下。
+        # 上一轮就是因为只量了那一个文件，uos25:micro 带着一条 active appstore 源
+        # 却全绿通过。改成数**未注释的 deb 行**，覆盖两处。
+        "active_deb_lines": sh("cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list "
+                               "/etc/apt/sources.list.d/*.sources 2>/dev/null "
+                               "| grep -cE '^[[:space:]]*deb' || echo 0"),
         "keyrings_unowned": sh("for f in /usr/share/keyrings/*.gpg; do [ -e \"$f\" ] || continue; "
                                "dpkg -S \"$f\" >/dev/null 2>&1 || basename \"$f\"; done "
                                "| sort | tr '\\n' ' '"),
