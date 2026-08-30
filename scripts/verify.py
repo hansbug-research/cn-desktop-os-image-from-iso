@@ -376,6 +376,20 @@ in_text(S["unpack_overhead_pct_min"], where="readme", label="README 解包开销
 in_text(S["unpack_overhead_pct_max"], where="readme", label="README 解包开销上界",
         ctx=r"–%s%%）" % S["unpack_overhead_pct_max"])
 
+# README 里指向 report.md 的章节锚点：改标题会无声断链，发布页上直接点不动。
+# 按 GitHub 的规则本地生成 anchor（小写、去标点、空格转连字符）再比对。
+# 实测过 GitHub 确实把「」与 ASCII 引号一样剥掉（curl 渲染页核过 user-content-* id）。
+def _gh_anchor(title):
+    t = title.strip().lower()
+    t = re.sub(r"[^\w\u4e00-\u9fff \-]", "", t)   # 保留字母数字下划线、CJK、空格、连字符
+    return t.replace(" ", "-")
+
+_heads = {_gh_anchor(m.group(1)) for m in re.finditer(r"^#{2,4}\s+(.+)$", REPORT, re.M)}
+_refs = set(re.findall(r"report\.md#([^\)\s]+)", README))
+_dead = sorted(_refs - _heads)
+ok(_dead == [], f"README 指向 report.md 的章节锚点必须都存在（断链：{_dead}）")
+ok(len(_refs) >= 7, f"README 应至少有 7 个 report 章节锚点，实际 {len(_refs)}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -390,7 +404,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "217"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "219"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
