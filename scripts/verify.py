@@ -956,6 +956,20 @@ ok(len(_rows) >= 8, f"§2.6 的 TODO 表应有至少 8 条，实际 {len(_rows)}
 ok(sum(1 for l in _rows if "优先" in l) >= 4, "TODO 里应有至少 4 条标为优先（麒麟信安与凝思各两条）")
 ok(sum(1 for l in _rows if "待定" in l) >= 2, "Loongnix 那两条应标为待定")
 
+# 替换整段时最容易悄悄丢掉支撑性信息点。这几条是 §2.5 各项排除与推荐的**依据**，
+# 缺了任一条，对应结论就变成无据断言（本轮替换 §2.4 末段时真丢过两条）。
+for _kw, _why in (
+    ("2025 年第 3 号公告", "方德与银河麒麟 V11 同批过评 —— 「该做的第三家是方德」的依据"),
+    ("桌面线自身的最近更新时间未查到", "新支点桌面线活跃度存疑 —— 排除它的第二个理由"),
+    ("车用 AUTOSAR", "普华桌面线沉寂的依据"),
+    ("不可脚本化", "把网盘分发归入「拿不到」的理由"),
+    ("上游镜像近似", "openKylin/deepin 归入「视需求做」的理由"),
+    ("只差一个 tag", "Loongnix 那个陷阱比 §2.3 更隐蔽的原因"),
+    ("dnf --installroot", "麒麟信安扩包格式维度的具体代价"),
+    ("不适合商业部署", "AOSC 归入「不建议做」的依据"),
+):
+    ok(_kw in REPORT, f"§2.5 缺少支撑信息点「{_kw}」——{_why}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -970,7 +984,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "463"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "471"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
