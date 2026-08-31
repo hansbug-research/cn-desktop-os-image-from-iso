@@ -944,9 +944,6 @@ for _n in ("麒麟信安操作系统（KylinSec）", "凝思安全操作系统",
        f"§2.5 把 {_n} 列为优先候选，其 ISO 必须是直接下载，实际 {_ent25[_n]['s_iso_access']}")
     ok(_n.split("（")[0] in REPORT, f"§2.5 必须点到候选 {_n}")
 # 安可桌面附表那三家与「第三家拿不到 ISO」这处尴尬，都由数据现算
-ok(set(S["aqkk_desktop_listed"]) == {"银河麒麟桌面操作系统", "统信桌面操作系统 V25（UOS）",
-                                     "方德桌面操作系统 V5.0"},
-   "§2.5 那处「按采购目录该做的第三家是方德」依赖安可在列恰为这三家")
 ok("恰好是 ISO 拿不到的那家" in REPORT, "§2.5 必须点明方德是拿不到 ISO 的那家")
 # TODO 表必须存在且条目数不少于 8
 _todo = REPORT[REPORT.index("### 2.6 后续 TODO"):]
@@ -970,6 +967,61 @@ for _kw, _why in (
 ):
     ok(_kw in REPORT, f"§2.5 缺少支撑信息点「{_kw}」——{_why}")
 
+# ⚠️ 先前 20 条断言只核「名录支不支持 verify.py 里硬写的名字」，不核「报告的表里
+# 到底写了谁」—— 实测三张表的内容可以整段漂移而全绿（删掉一家、把某家从③挪到优先、
+# 整行删掉一条标准、改「剩下 N 个」都不报）。改为从报告里**解析出**那三张表再对账。
+_s25 = REPORT[REPORT.index("### 2.5 后续候选"):REPORT.index("### 2.6 后续 TODO")]
+# ① 三条排除标准必须都在，且每条的「排除」格必须点到该标准对应的全部厂商
+_EXCL = {"① 已基本淘汰、使用率极低": ("中标麒麟", "一铭", "普华"),
+         "② 官方已有能满足对标需求的交付形态": ("Anolis OS", "OpenCloudOS"),
+         "③ ISO 拿不到": ("方德", "EulerOS", "新支点")}
+for _std, _who in _EXCL.items():
+    _row = [l for l in _s25.split("\n") if l.startswith("| " + _std)]
+    ok(len(_row) == 1, f"§2.5 排除表必须有且仅有一行「{_std}」，实际 {len(_row)} 行")
+    if _row:
+        # 只看**排除**那一列（第 2 格）。查整行会被第 3 格的依据文字兜住 ——
+        # 实测删掉排除格里的「、普华」后整行仍含「普华」（依据格里也写着），检查放行。
+        _cells = [c.strip() for c in _row[0].strip().strip("|").split("|")]
+        _excl_cell = _cells[1] if len(_cells) > 1 else ""
+        for _w in _who:
+            ok(_w in _excl_cell,
+               f"§2.5 标准「{_std}」的排除格必须点到 {_w}，实际该格：{_excl_cell}")
+        for _bad in ("麒麟信安", "Loongnix"):
+            ok(_bad not in _excl_cell,
+               f"§2.5 标准「{_std}」的排除格不许出现优先候选 {_bad}")
+# 「剩下 N 个」必须等于 21 − 被试 − 被排除
+_n_excl = sum(len(v) for v in _EXCL.values())
+_expect = S["census_os_count"] - len(S["census_subjects"]) - _n_excl
+_m = re.search(r"剩下 (\d+) 个再看交付需求", _s25)
+ok(_m is not None and int(_m.group(1)) == _expect,
+   f"§2.5「剩下 N 个」应为 {S['census_os_count']} − {len(S['census_subjects'])} − {_n_excl} = {_expect}，"
+   f"实际写 {_m.group(1) if _m else '缺'}")
+_m = re.search(r"除两个被试条目之外的 (\d+) 个 OS", _s25)
+ok(_m is not None and int(_m.group(1)) == S["census_os_count"] - len(S["census_subjects"]),
+   f"§2.5 的非被试 OS 数应为 {S['census_os_count'] - len(S['census_subjects'])}")
+# ② 优先候选表：三家各占一行，且每行必须写明它扩的维度
+for _who, _dim in (("麒麟信安 KylinSec", "包格式"), ("凝思安全操作系统", "场景类型"),
+                   ("Loongnix（龙芯）", "架构与 ABI 世代")):
+    _row = [l for l in _s25.split("\n") if l.startswith("| **" + _who.split("（")[0])]
+    ok(len(_row) >= 1, f"§2.5 优先候选表必须有 {_who} 那一行")
+    if _row:
+        ok(_dim in _row[0], f"{_who} 那一行必须写明它扩的维度「{_dim}」")
+# ③ TODO 表逐行绑：麒麟信安与凝思的行必须标优先，Loongnix 的行必须标待定
+_s26 = REPORT[REPORT.index("### 2.6 后续 TODO"):]
+_s26 = _s26[:_s26.index("\n## ")] if "\n## " in _s26 else _s26
+for _kw, _flag in (("麒麟信安 KylinSec", "优先"), ("凝思安全操作系统", "优先"),
+                   ("Loongnix 25.1", "待定")):
+    _row = [l for l in _s26.split("\n") if re.match(r"^\| \d+ \|", l) and _kw in l]
+    ok(len(_row) == 1, f"§2.6 TODO 必须有且仅有一行提到 {_kw}，实际 {len(_row)}")
+    if _row:
+        ok(_row[0].rstrip().rstrip("|").split("|")[-1].strip().startswith(_flag),
+           f"§2.6 里 {_kw} 那一行的状态必须是「{_flag}」，实际：{_row[0][-24:]}")
+# 依赖关系「随 N」「先于 N」引用的编号必须存在
+for _m in re.finditer(r"(随|先于) (\d+)", _s26):
+    _n = int(_m.group(2))
+    ok(any(re.match(rf"^\| {_n} \|", l) for l in _s26.split("\n")),
+       f"§2.6 里的依赖「{_m.group(0)}」指向不存在的条目 {_n}")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -984,7 +1036,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "471"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "504"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
