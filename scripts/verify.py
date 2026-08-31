@@ -918,6 +918,44 @@ for _w, _lbl in ((REPORT, "report"), (README, "README")):
     _junk = re.findall(r"(?<!`)\\[1-9](?!`)|\\g<\d>", _w)
     ok(_junk == [], f"{_lbl} 里不许出现正则替换残留（发现：{_junk[:5]}）")
 
+# ── §2.5／§2.6 后续候选与 TODO ────────────────────────────────────────────
+# 三条排除标准筛掉的每一家，都必须能在名录里找到对应依据，否则就是凭印象排除。
+_ent25 = {e["name"]: e for e in _ent8_names}
+# ① 淘汰：名录的维护状态必须真的写着停更/沉寂/疑似停止
+for _n, _kw in (("中标麒麟桌面操作系统（NeoKylin）", ("停更",)),
+                ("一铭桌面操作系统（EmindDesktop）", ("疑似停止",)),
+                ("普华桌面操作系统", ("沉寂",))):
+    _m = _ent25[_n].get("s_maintained") or _ent25[_n]["maintained"]
+    ok(any(k in _m for k in _kw),
+       f"§2.5 以「已淘汰」排除 {_n}，名录的维护状态必须支持这一点，实际：{_m[:30]}")
+# ② 官方已有满足需求的形态：名录的桌面一列必须写着无桌面 ISO
+for _n in ("openEuler", "Anolis OS（龙蜥）", "OpenCloudOS"):
+    ok("无桌面 ISO" in _ent25[_n]["s_desktop"],
+       f"§2.5 以「官方基础镜像 + 按包装」排除 {_n}，名录必须显示它无桌面 ISO")
+# ③ ISO 拿不到：分类必须落在拿不到或不可脚本化那几类
+for _n, _cls in (("方德桌面操作系统 V5.0", ("未查到公开下载",)),
+                 ("EulerOS（华为）", ("未查到公开下载",)),
+                 ("新支点桌面操作系统（NewStart NSDL）", ("网盘分发",))):
+    ok(_ent25[_n]["s_iso_access"] in _cls,
+       f"§2.5 以「ISO 拿不到」排除 {_n}，其 ISO 获取分类必须是 {_cls}，实际 {_ent25[_n]['s_iso_access']}")
+# 三个优先候选的 ISO 必须真的是直接下载 —— 否则「优先做」就落不了地
+for _n in ("麒麟信安操作系统（KylinSec）", "凝思安全操作系统", "Loongnix（龙芯）"):
+    ok(_ent25[_n]["s_iso_access"] == "直接下载",
+       f"§2.5 把 {_n} 列为优先候选，其 ISO 必须是直接下载，实际 {_ent25[_n]['s_iso_access']}")
+    ok(_n.split("（")[0] in REPORT, f"§2.5 必须点到候选 {_n}")
+# 安可桌面附表那三家与「第三家拿不到 ISO」这处尴尬，都由数据现算
+ok(set(S["aqkk_desktop_listed"]) == {"银河麒麟桌面操作系统", "统信桌面操作系统 V25（UOS）",
+                                     "方德桌面操作系统 V5.0"},
+   "§2.5 那处「按采购目录该做的第三家是方德」依赖安可在列恰为这三家")
+ok("恰好是 ISO 拿不到的那家" in REPORT, "§2.5 必须点明方德是拿不到 ISO 的那家")
+# TODO 表必须存在且条目数不少于 8
+_todo = REPORT[REPORT.index("### 2.6 后续 TODO"):]
+_todo = _todo[:_todo.index("\n## ")] if "\n## " in _todo else _todo
+_rows = [l for l in _todo.split("\n") if re.match(r"^\| \d+ \|", l)]
+ok(len(_rows) >= 8, f"§2.6 的 TODO 表应有至少 8 条，实际 {len(_rows)}")
+ok(sum(1 for l in _rows if "优先" in l) >= 4, "TODO 里应有至少 4 条标为优先（麒麟信安与凝思各两条）")
+ok(sum(1 for l in _rows if "待定" in l) >= 2, "Loongnix 那两条应标为待定")
+
 # §6.2「连 nano 都没有」——负面结论必须连对照组一起绑，
 # 否则「源里没有」与「探测本身坏了」在证据上不可区分。
 ok(S["uos_nano_candidate_none"] is True, "UOS 的 nano 在 apt 源里无候选")
@@ -932,7 +970,7 @@ in_text(S["unpack_overhead_pct_max"], label="解包开销上界",
 # 断言总数基线。没有它，删掉 artifacts/repro-evidence.txt 会让 7 条交叉断言整块被
 # if 跳过，断言数从 113 悄悄掉到 106 而汇总照样全绿 —— 证据消失即断言消失。
 # 这与 test/verify.sh 里对镜像检查数设基线是同一个道理，之前只给那边设了。
-BASELINE = int(os.environ.get("VERIFY_BASELINE", "443"))
+BASELINE = int(os.environ.get("VERIFY_BASELINE", "463"))
 if N < BASELINE:
     print(f"❌ 执行断言 {N} 条，低于基线 {BASELINE} —— 有断言被静默跳过"
           f"（证据文件缺失？条件分支没进去？）")
