@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """D7：通用漏洞扫描器对这三个发行版的覆盖情况。
 
-为什么必须落盘：README 的十条主要结论里，只有「trivy 对这三家没有有效覆盖」这一条
+为什么必须落盘：README 的十条主要结论里，只有「trivy 对这几家没有有效覆盖」这一条
 原先全靠正文散文与 test/cve.sh 的注释背书，raw/ 里没有任何原始输出。它偏偏又是
 唯一涉及安全判断的一条 —— 无凭据的安全结论比没有结论更危险。
 
@@ -9,7 +9,9 @@
 Metadata.OS.Family / Name，以及 HIGH+CRITICAL 计数。两者不一致即「误判」，
 trivy 判 none 即「未识别」。漏洞明细会随库更新而漂，判定事实不会。
 """
-import json, os, pathlib, shlex, subprocess, sys, time
+import json, pathlib, sys, os, pathlib, shlex, subprocess, sys, time
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import PAIRS, DIDS, TIERS  # 被试清单的唯一真源：config/subjects.json
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -28,8 +30,7 @@ OUT = ROOT / "raw" / "d7_cve.json"
 TRIVY = os.environ.get("TRIVY", "aquasec/trivy:0.70.0")
 SOCK = os.environ.get("SOCK") or f"/run/user/{os.getuid()}/docker.sock"
 IMAGES = [(d, f"{r}:{t}") for d, r in
-          [("kylin11", "kylin-desktop-v11"), ("kylin10", "kylin-desktop-v10"),
-           ("uos25", "uos-desktop-v25")] for t in ("micro", "base", "devel")]
+          [*PAIRS] for t in ("micro", "base", "devel")]
 
 def sh(c, timeout=420):
     return subprocess.run(c, shell=True, capture_output=True, text=True, timeout=timeout).stdout
@@ -66,8 +67,14 @@ def main():
             "verdict": ("未识别" if (os_meta.get("Family") or "none") == "none"
                         else "有效覆盖" if os_meta.get("Family") == real else "误判"),
         })
-    if len(data["images"]) != 9:
-        print("!! 采集不足 9 个镜像 —— 不写盘", file=sys.stderr); sys.exit(1)
+    # 门槛从单一真源推，不写死。方向是对的（采集不全就不写盘，免得产出一份看着
+    # 完整的残缺数据集），但写死 9 会在被试增加后**把成功的采集判成失败** ——
+    # 实测 15 个镜像全扫完却拒绝写盘。凡与被试数量相关的常量都必须从
+    # config/subjects.json 推。
+    _expect = len(DIDS) * len(TIERS)
+    if len(data["images"]) != _expect:
+        print(f"!! 采集到 {len(data['images'])} 个镜像，期望 {_expect} 个 —— 不写盘",
+              file=sys.stderr); sys.exit(1)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     from collections import Counter
     c = Counter(x["verdict"] for x in data["images"])

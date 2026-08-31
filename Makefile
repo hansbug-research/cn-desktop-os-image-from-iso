@@ -5,7 +5,7 @@ DISTROS := $(patsubst distros/%.conf,%,$(wildcard distros/*.conf))
 TIERS   := micro base devel
 DEXEC   := docker exec -e http_proxy= -e https_proxy= $(BUILDER) bash -c
 
-.PHONY: builder-alive digest-chain cve repro help all builder builder-image localrepo kylin11 kylin10 uos25 import manifest verify sbom mutation clean-tags distclean
+.PHONY: builder-alive digest-chain cve repro help all builder builder-image localrepo kylin11 kylin10 uos25 kylinsec6 linx6 import manifest verify sbom mutation clean-tags distclean
 # 这台机器有过资源耗尽历史；并行构建会抢同一个 builder 容器与 out/ 目录
 .NOTPARALLEL:
 
@@ -61,10 +61,22 @@ uos25: builder builder-alive uos25-src
 kylin10: builder
 	@ROOT_HOST=$(ROOT) ./build/build-selfhost.sh $(TIERS)
 
+# 麒麟信安走 rpmmedia：介质自带 repodata，解析闭包后用 rpm --root 装。
+kylinsec6: builder builder-alive
+	@$(DEXEC) 'umask 022; ROOT=/w /w/build/build.sh kylinsec6 $(TIERS)'
+
+# 凝思走 selfhost 两阶段：与 kylin10 同因（目标 dpkg 在 chroot 内配置会死锁），
+# 但介质无签名，靠 conf 里的 NO_CHECK_GPG + ISO 官方 md5/sha256 兜完整性。
+linx6: builder
+	@DID=linx6 ROOT_HOST=$(ROOT) ./build/build-selfhost.sh $(TIERS)
+
+# tar 缺失必须报错。`|| true` 会让「这一档没建成」表现为 import 成功，
+# 而 manifest 随后照常更新 —— 与 builder-alive 那次是同一类错。
 import:
-	@for d in $(DISTROS); do \
+	@set -e; for d in $(DISTROS); do \
 	  for t in $(TIERS); do \
-	    [ -f out/$$d-$$t.tar ] && ROOT=$(ROOT) ./build/import.sh $$d $$t || true; \
+	    [ -f out/$$d-$$t.tar ] || { echo "!! 缺产物 out/$$d-$$t.tar"; exit 1; }; \
+	    ROOT=$(ROOT) ./build/import.sh $$d $$t; \
 	  done; done
 
 manifest:
@@ -91,7 +103,12 @@ sbom:
 verify:
 	@ROOT=$(ROOT) ./test/verify.sh
 
-all: localrepo kylin11 uos25 kylin10 import manifest verify sbom
+# 顺序有依赖，不能随意调换：
+#   · import 与 manifest 必须在全部构建之后（manifest 记 tar 的 sha256 与镜像 ID）
+#   · repro 会**覆写 out/*.tar**，所以它排在 import/manifest 之后时，
+#     digest-chain 会因三端脱钩而断裂 —— 要么 repro 在前，要么跑完重做那两步。
+#     这里把 repro 放在最后，并在其后重做 import+manifest（见 report §7、§9.2）。
+all: localrepo kylin11 kylin10 uos25 kylinsec6 linx6 import manifest verify sbom digest-chain
 
 clean-tags:
 	@for i in kylin-desktop-v11 kylin-desktop-v10 uos-desktop-v25; do \

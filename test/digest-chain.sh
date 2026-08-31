@@ -1,4 +1,8 @@
 #!/bin/bash
+# ⚠️ 顺序依赖：本门禁校验「manifest ↔ tar ↔ 本地镜像」三端一致，而 test/repro.sh
+# 的第二次构建会**覆写 out/*.tar**。所以 repro 必须跑在 import 与 gen-manifest
+# 之前，或者跑完后重新执行这两步 —— 否则三端里只有 tar 是新的，本门禁必然断裂。
+# 这不是假失败：三端确实脱钩了。见 report.md §7 与 §9.2。
 # 摘要链门禁：manifest 记的 sha256 —— out/*.tar 实际字节 —— 本地已打标签的镜像，
 # 三者必须首尾相扣。
 #
@@ -9,9 +13,9 @@
 # 这条链专防一类事故：镜像重建了但 manifest 没更新（审计凭据与实物脱钩）。
 set -u
 ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根
-declare -A IMG=([kylin11]=kylin-desktop-v11 [kylin10]=kylin-desktop-v10 [uos25]=uos-desktop-v25)
+. "$(dirname "${BASH_SOURCE[0]:-$0}")/../lib/subjects.sh"   # IMG / ALL_DIDS 的唯一真源
 PASS=0; FAIL=0
-for d in kylin11 kylin10 uos25; do
+for d in $ALL_DIDS; do
   for t in micro base devel; do
     tar="$ROOT/out/$d-$t.tar"; man="$ROOT/out/$d-$t.manifest"; img="${IMG[$d]}:$t"
     [ -f "$tar" ] || { echo "  ✗ $d-$t 缺 tar"; FAIL=$((FAIL+1)); continue; }
@@ -39,4 +43,4 @@ for d in kylin11 kylin10 uos25; do
 done
 echo "══ 摘要链: 通过 $PASS / 失败 $FAIL"
 [ "$FAIL" = 0 ] || { echo "❌ 摘要链断裂"; exit 1; }
-echo "✅ 九个镜像的 manifest / tar / 镜像三者一致"
+echo "✅ 全部 $PASS 个镜像的 manifest / tar / 镜像三者一致"

@@ -4,7 +4,9 @@
 采集与判断分离：这里只把事实抓下来，产品线是否「同一条」由 analyze.py 依据
 包格式 / 软件源域名 / glibc / 代号四个字段判定，判据写在 report.md。
 """
-import json, os, shlex, subprocess, sys, time, pathlib
+import json, pathlib, sys, os, shlex, subprocess, sys, time, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import PAIRS, DIDS, TIERS  # 被试清单的唯一真源：config/subjects.json
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 构建产物目录。默认是仓库自身的 out/（`make` 就写在那儿）；
@@ -13,7 +15,7 @@ OUTDIR = pathlib.Path(os.environ.get("DOSBUILD_OUT") or (ROOT / "artifacts"))
 OUT = ROOT / "raw" / "d2_our_images.json"
 
 OURS = [(d, t, img) for d, img in
-        [("kylin11", "kylin-desktop-v11"), ("kylin10", "kylin-desktop-v10"), ("uos25", "uos-desktop-v25")]
+        PAIRS
         for t in ("micro", "base", "devel")]
 # 产品线对照组：厂商官方镜像（唯一匿名可拉的那个）
 OFFICIAL = "cr.kylinos.cn/kylin/kylin-server-minimal:v10sp1"
@@ -41,8 +43,16 @@ def facts(img):
         "os_release": sh("cat /etc/os-release 2>/dev/null"),
         "pkg_format": sh("command -v rpm >/dev/null 2>&1 && echo rpm || "
                          "{ command -v dpkg >/dev/null 2>&1 && echo dpkg || echo none; }"),
-        "pkg_count": sh("A=''; [ -f /usr/lib/dpkg/var/status ] && A='--admindir=/usr/lib/dpkg/var'; "
-                        "rpm -qa 2>/dev/null | wc -l; dpkg-query $A -W 2>/dev/null | wc -l"),
+        # ⚠️ 必须**分支**而不是把两条命令串起来。原先写成 `rpm -qa | wc -l;
+        # dpkg-query | wc -l`，两条都执行，输出拼成两行 —— 值变成 '112\n0'。
+        # 这类脏值的危险在于它不总会炸：int() 会抛异常（能发现），
+        # 而字符串直接拼进 README 表格会静默产出「112\n0 包」。
+        "pkg_count": sh("if command -v rpm >/dev/null 2>&1 && ! command -v dpkg >/dev/null 2>&1; then "
+                        "  rpm -qa 2>/dev/null | wc -l; "
+                        "else "
+                        "  A=''; [ -f /usr/lib/dpkg/var/status ] && A='--admindir=/usr/lib/dpkg/var'; "
+                        "  dpkg-query $A -W 2>/dev/null | wc -l; "
+                        "fi"),
         "glibc_banner": sh("ldd --version 2>&1 | head -1"),
         "glibc_pkg": sh("A=''; [ -f /usr/lib/dpkg/var/status ] && A='--admindir=/usr/lib/dpkg/var'; "
                         "dpkg-query $A -W -f='${Version}' libc6 2>/dev/null || "
@@ -91,6 +101,12 @@ def main():
         img = f"{repo}:{tier}"
         print(f"  采集 {img}", file=sys.stderr)
         rec = {"distro_id": did, "tier": tier, "image": img}
+        # 新鲜度：d3 有「探针输出不得早于镜像」的断言，d2 一直没有对应的 ——
+        # 于是镜像迭代五轮而 d2 只采过一次时，无人报警，README 的镜像表、
+        # §3 的规模表、体积统计全建立在过期数据上。记下镜像的 Created，
+        # 由 verify.py 断言它不晚于本次采集时刻。
+        rec["image_created"] = run(
+            f"docker image inspect {img} --format '{{{{.Created}}}}'").strip()
         rec.update(facts(img))
         # tar 的字节数与 sha256 是 t04 体积列与摘要链的来源。仓库不含 tar（体积原因），
         # 所以优先从 artifacts/ 的 manifest 里读已记录的 sha256；两处都没有就报错，
@@ -99,7 +115,8 @@ def main():
         man = OUTDIR / f"{did}-{tier}.manifest"
         if tar.exists():
             rec["tar_bytes"] = tar.stat().st_size
-            rec["tar_sha256"] = run(f"sha256sum {tar}").split()[0]
+            # 最大的 tar 已到 1.08 GB，且采集常与构建争抢磁盘；180 s 会误判成失败。
+            rec["tar_sha256"] = run(f"sha256sum {tar}", timeout=1800).split()[0]
             rec["tar_source"] = "本地 tar 实测"
         elif man.exists():
             import re as _re

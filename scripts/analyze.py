@@ -4,8 +4,10 @@
 这条分界线的意义：重跑分析不需要重跑实验。正文里的每个统计量都必须出自
 derived/stats.json，不许在 Markdown 里手写。
 """
-import json, pathlib, re, collections
+import json, sys, pathlib, re, collections
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import DIDS, TIERS, IMAGES
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW, DER = ROOT / "raw", ROOT / "derived"
 TAB = DER / "tables"; TAB.mkdir(parents=True, exist_ok=True)
@@ -232,7 +234,7 @@ if d8:
 #   devel = 构建用（工具链齐备）
 # 这份策略是矩阵表与热力图的**唯一真源** —— 两处各写一份必然漂移。
 NA_POLICY = {
-    "micro": {"apt", "apt_update", "apt_roundtrip", "apt_check", "sources_list", "apt_keyring",
+    "micro": {"pkgmgr", "pkg_update", "pkg_roundtrip", "pkg_check", "pkg_sources", "pkg_keyring",
               "cc_present", "compile_c", "static_link", "cxx_present", "compile_cxx", "cxx17",
               "cxx20", "libc_headers", "binutils", "make", "make_build", "pkgconfig", "cmake",
               "autotools", "cc_clean_stderr", "python3_dev", "python3", "python3_run",
@@ -254,7 +256,12 @@ NA_POLICY = {
 #     于是 6 项 × 9 镜像里凭空多出 49 个假「缺口」——占当时缺口总数的近一半。
 #   probe_complete 是**哨兵**（探针有没有跑完），也不是能力项。
 # 指纹另出一张 t10 表，哨兵由 collect 阶段硬断言，两者都不进三态矩阵。
-INFO_PROBES = {"arch", "glibc", "os_id", "setuid_bins", "file_caps", "default_target"}
+INFO_PROBES = {"arch", "glibc", "os_id", "setuid_bins", "file_caps", "default_target",
+               # 以下四项随「探针按包管理系分支」一起加入，全是事实不是能力：
+               "pkgsys",        # deb / rpm / none —— 该镜像的包管理系
+               "pkgmgr_name",   # apt-get / dnf / none —— 具体是哪个包管理器
+               "pkgdb_count",   # 包数据库里的条数
+               "probe_sha"}     # 探针自身的版本指纹
 SENTINELS = {"probe_complete"}
 # 早先把 sudo 从矩阵里删掉，理由写成「九档全是 NA、从未被真判定过」—— 这与数据相反：
 # 探针实测九档全部是 N（t05b 可查），它压根不在任何 NA_POLICY 集合里，`tri()` 会把它
@@ -265,8 +272,26 @@ EXCLUDED = set()
 
 probes = d3["probes"]
 allkeys = sorted({k for v in probes.values() for k in v if not k.startswith("_")})
+
+# 结构门禁：tri() 的兜底分支是「不是 Y 就算 N」。对布尔项没问题，对**非布尔**的新增
+# 探针项就是灾难 —— `pkgsys=rpm` 会被读成「不支持 pkgsys」，凭空多一行缺口，而且
+# 看起来完全像一条正常的缺口，不报任何错。所以凡取值不在受控集合里的键，必须显式
+# 归入 INFO_PROBES 或 SENTINELS；忘了分类就在这里当场失败，而不是产出假缺口。
+_TRISTATE_OK = {"Y", "N", "n/a", "nosrc", "PARTIAL", ""}
+_unclassified = {}
+for _k in allkeys:
+    if _k in INFO_PROBES or _k in SENTINELS or _k in EXCLUDED:
+        continue
+    _vals = {probes[c].get(_k, "") for c in probes}
+    _odd = _vals - _TRISTATE_OK
+    if _odd:
+        _unclassified[_k] = sorted(_odd)[:4]
+if _unclassified:
+    sys.exit("!! 以下探针项取值不是三态，却没归入 INFO_PROBES/SENTINELS：\n" +
+             "\n".join(f"   {k}: {v}" for k, v in _unclassified.items()) +
+             "\n   —— 归类后再跑；不归类会让它们各自变成一行假缺口。")
 keys = [k for k in allkeys if k not in INFO_PROBES and k not in SENTINELS and k not in EXCLUDED]
-order = [f"{d}:{t}" for d in ["kylin11", "kylin10", "uos25"] for t in ["micro", "base", "devel"]]
+order = [f"{d}:{t}" for d in DIDS for t in TIERS]   # 唯一真源：config/subjects.json
 
 def tri(col, key):
     tier = col.split(":")[1]
@@ -275,6 +300,11 @@ def tri(col, key):
     v = probes[col].get(key, "")
     if v in ("n/a", ""):
         return "NA"
+    # nosrc = 该档位有包管理器，但出厂时一个可用软件源都没有。归入缺口而不是
+    # 「不适用」：档位定位说 base/devel 应当能从源装包，做不到就是缺口。
+    # 也不能记成 Y —— 源清单为空时 `apt-get update` 会成功（没东西要取），
+    # 空集上的全称命题恒真。原始值 nosrc 留在 t05b 里，缺口的**原因**可追。
+    # PARTIAL 同理归入 N：装上了但没卸干净，不是完整的往返。
     return "Y" if v == "Y" else "N"
 
 csv("t05_capability_matrix.csv", ["capability"] + order,
@@ -292,6 +322,10 @@ csv("t10_environment_fingerprint.csv", ["fingerprint"] + order,
 S["capability_items"] = len(keys)
 S["info_probes"] = len(INFO_PROBES)
 S["capability_cells"] = len(keys) * len(order)
+# 「无源」缺口单独计数：它与「有源但更新失败」在矩阵上都是缺口，成因完全不同，
+# 前者是厂商没有公开在线仓库，后者是配置或网络问题。
+S["cells_nosrc"] = sum(1 for c in order for k in keys if probes[c].get(k) == "nosrc")
+S["nosrc_detail"] = sorted(f"{c}/{k}" for c in order for k in keys if probes[c].get(k) == "nosrc")
 S["probe_complete_all"] = all(v.get("_probe_complete") == "Y" for v in probes.values())
 # d3 的 provenance：探针输出必须不早于镜像。⚠️ 这条判据依赖 mtime，而 git 不保留 mtime
 # —— 新克隆里 caps 文件的 mtime 是签出时刻，必然晚于镜像，所以它只在「原地重采」这一种
@@ -388,9 +422,9 @@ def _cand(k, t):
         return "装不上"
     parts = [x.strip() for x in v.split("|")]
     return parts[1] if len(parts) > 1 else v
-rows = [[t] + [_cand(k, t) for k in ("kylin11", "kylin10", "uos25")] for t in d6["tools"]]
-csv("t11_tool_installability.csv", ["tool", "kylin11", "kylin10", "uos25"], rows)
-for k in ("kylin11", "kylin10", "uos25"):
+rows = [[t] + [_cand(k, t) for k in DIDS] for t in d6["tools"]]
+csv("t11_tool_installability.csv", ["tool", *DIDS], rows)
+for k in DIDS:
     S[f"installable_{k}"] = d6["images"][k]["installable"]
 S["installability_tools"] = len(d6["tools"])
 S["uos_iso_packages"] = (d6.get("uos_iso_inventory") or {}).get("package_count")
@@ -461,9 +495,22 @@ S["keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
 S["injected_keyrings_by_image"] = {f'{r["distro_id"]}:{r["tier"]}':
                                    sorted((r.get("keyrings_unowned") or "").split())
                                    for r in d2["ours"]}
-S["alien_keyring_images"] = sorted(
-    k for k, v in S["keyrings_by_image"].items()
-    if k.startswith("uos25") and any("kylin" in x for x in v))
+# 「跨厂商 keyring」的判据原先写死 `k.startswith("uos25")` 且只找 kylin ——
+# 那样只能抓 UOS 里混进麒麟 key 这一种，结构上抓不到别的组合。实测漏过一次：
+# 凝思三档各留一把麒麟 keyring（它 NO_CHECK_GPG=yes、出厂无源，那把 key 无任何
+# 消费方），这条判据全绿。现在改成通用：keyring 文件名里的厂商标识不属于本发行版
+# 即为跨厂商。
+_VENDOR_TAG = {"kylin11": "kylin", "kylin10": "kylin", "uos25": "uos",
+               "kylinsec6": "kylinsec", "linx6": "linx"}
+_alien = []
+for k, v in S["keyrings_by_image"].items():
+    _did = k.split(":")[0]
+    _own = _VENDOR_TAG.get(_did, _did)
+    for _f in v:
+        _tags = [t for t in _VENDOR_TAG.values() if t in _f]
+        if _tags and _own not in _tags:
+            _alien.append(k); break
+S["alien_keyring_images"] = sorted(set(_alien))
 # ⚠️ 不能写 `r.get(...) or 0` —— 字段不在落盘数据里时读成 0，断言就变成空转
 # （实测：collect_d2 改了但 d2 没重采，三档全 0 全绿）。缺键必须显式失败。
 _missing_adl = [f'{r["distro_id"]}:{r["tier"]}' for r in d2["ours"]
@@ -512,7 +559,11 @@ for k, v in _d2_tar.items():
         _badhex.append(k)
 for x in d6["images"].values():
     a = x.get("anchor_tar_sha256")
-    ref = _d2_tar.get(x["image"].split(":")[0].replace("kylin-desktop-v11", "kylin11")
+    # image 名 → did 的反查。先前是链式 .replace()，加被试就要再加一行；
+    # 改为从 config/subjects.json 现算。
+    _img2did = {v: k for k, v in IMAGES.items()}
+    _base = x["image"].split(":")[0]
+    ref = _d2_tar.get(_img2did.get(_base, _base)
                       .replace("kylin-desktop-v10", "kylin10")
                       .replace("uos-desktop-v25", "uos25") + ":base")
     if not a or not ref:

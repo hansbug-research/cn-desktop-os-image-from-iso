@@ -1,0 +1,56 @@
+{
+  "note": "被试清单的单一真源。先前这份清单散在 10 个脚本里各写一份，新增被试要改 10 处 —— 这正是本仓库反复出问题的形态（同一个量在多处出现、只有一处被门禁盯住）。现在所有采集脚本、测试脚本与分析脚本都从这里读。",
+  "revision": "2026-08-31",
+  "subjects": [
+    {
+      "did": "kylin11",
+      "image": "kylin-desktop-v11",
+      "display": "银河麒麟桌面 V11",
+      "family": "deb",
+      "method": "mmdebstrap",
+      "round": 1,
+      "short": "麒麟V11"
+    },
+    {
+      "did": "kylin10",
+      "image": "kylin-desktop-v10",
+      "display": "银河麒麟桌面 V10 SP1",
+      "family": "deb",
+      "method": "selfhost",
+      "round": 1,
+      "short": "麒麟V10"
+    },
+    {
+      "did": "uos25",
+      "image": "uos-desktop-v25",
+      "display": "统信 UOS 桌面专业版 V25",
+      "family": "deb",
+      "method": "slice",
+      "round": 1,
+      "short": "UOS25"
+    },
+    {
+      "did": "kylinsec6",
+      "image": "kylinsec-desktop-v6",
+      "display": "麒麟信安桌面版 V6",
+      "family": "rpm",
+      "method": "rpmmedia",
+      "round": 2,
+      "short": "麒麟信安"
+    },
+    {
+      "did": "linx6",
+      "image": "linx-os-v6",
+      "display": "凝思安全操作系统 V6.0.100",
+      "family": "deb",
+      "method": "selfhost",
+      "round": 2,
+      "short": "凝思"
+    }
+  ],
+  "tiers": [
+    "micro",
+    "base",
+    "devel"
+  ]
+}

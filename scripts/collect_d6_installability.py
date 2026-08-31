@@ -10,8 +10,10 @@
 被测工具清单显式写在这里，不许只在正文写个总数 —— 「14 个常见工具」不说是哪 14 个，
 等于没有清单。
 """
-import json, os, pathlib, shlex, subprocess, sys, time
+import json, sys, pathlib, os, pathlib, shlex, subprocess, sys, time
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import PAIRS, FAMILY
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 def _anchor(did, tier):
@@ -31,10 +33,24 @@ OUT = ROOT / "raw" / "d6_installability.json"
 # 都是 devel/base 档使用者会实际去装的东西。
 TOOLS = ["iproute2", "iputils-ping", "bind9-dnsutils", "lsof", "vim-tiny", "zstd",
          "unzip", "cmake", "autoconf", "automake", "git", "strace", "gdb", "python3-dev"]
-# UOS 的包名有出入，同义名一并试
+# 同义名一并试。deb 侧是 UOS 的包名出入，rpm 侧则是整族命名不同——
+# 拿 deb 的包名去 rpm 系查，14 项会全报「源里没有」，而那量的是命名不是能力。
 ALIASES = {"bind9-dnsutils": ["bind9-dnsutils", "dnsutils"], "vim-tiny": ["vim-tiny", "vim"]}
-IMAGES = [("kylin11", "kylin-desktop-v11:base"), ("kylin10", "kylin-desktop-v10:base"),
-          ("uos25", "uos-desktop-v25:base")]
+RPM_ALIASES = {
+    "iproute2":       ["iproute"],
+    "iputils-ping":   ["iputils"],
+    "bind9-dnsutils": ["bind-utils"],
+    "vim-tiny":       ["vim-minimal", "vim-enhanced"],
+    "python3-dev":    ["python3-devel"],
+    "autoconf":       ["autoconf"],
+    "automake":       ["automake"],
+}
+def aliases(tool, family):
+    """按包管理系给出候选包名。rpm 侧优先用 rpm 的命名，再回落到通名。"""
+    if family == "rpm":
+        return RPM_ALIASES.get(tool, [tool])
+    return ALIASES.get(tool, [tool])
+IMAGES = [(d, f"{i}:base") for d, i in PAIRS]   # 被试清单的唯一真源
 # C++ 构建环境的判据包
 CXX_TOOLS = ["g++", "gcc", "make", "cmake"]
 
@@ -56,16 +72,33 @@ def main():
         # policy 对**已安装但源里没有**的包同样会报 Candidate（值是已装版本），
         # 于是「已经装了」会被误计成「装得上」。UOS 上这个差别很关键 —— 我们主动切进去的
         # iproute2/lsof/zstd/unzip 就会把 0/14 虚报成 4/14。madison 只列源提供的版本。
-        names = " ".join(" ".join(ALIASES.get(t, [t])) for t in TOOLS)
-        script = (
-            "apt-get update -qq >/dev/null 2>&1\n"
-            f"for n in {names}; do\n"
-            "  m=$(apt-cache madison \"$n\" 2>/dev/null | head -1 | tr -s ' ')\n"
-            "  i=$(dpkg-query -W -f='${Status}' \"$n\" 2>/dev/null | grep -c 'install ok installed')\n"
-            # 分隔符不能用 |：madison 的输出本身就是 `pkg | version | origin` 形式，
-            # 用 | 分段会让每行都解析失败（三家全报 0/14，而实测麒麟是 14/14）。
-            "  echo \"$n@@${m:-NOREPO}@@installed=$i\"\n"
-            "done\n")
+        fam = FAMILY[did]
+        names = " ".join(" ".join(aliases(t, fam)) for t in TOOLS)
+        if fam == "rpm":
+            # ⚠️ 判据用 `dnf repoquery`，**不能**用 `dnf list --available`：后者会
+            # **排除已安装的包**，而 apt-cache madison 不管装没装、只看源提供什么。
+            # 两者不等价。实测代价：麒麟信安的 lsof/zstd/unzip 三个都在源里、也都已装，
+            # --available 一条不返回，把 14/14 少报成 11/14。
+            # 这与 §6.3 记的 `apt-cache policy` 那个错是同一族，方向相反：那次把
+            # 「已装但源里没有」误计成装得上（UOS 0/14 虚报成 6/14），这次把
+            # 「已装且源里有」误计成源里没有。**「等价命令」只能实测，不能靠语义推断。**
+            script = (
+                "dnf -q makecache >/dev/null 2>&1\n"
+                f"for n in {names}; do\n"
+                "  m=$(dnf -q repoquery \"$n\" 2>/dev/null | head -1)\n"
+                "  i=$(rpm -q \"$n\" >/dev/null 2>&1 && echo 1 || echo 0)\n"
+                "  echo \"$n@@${m:-NOREPO}@@installed=$i\"\n"
+                "done\n")
+        else:
+            script = (
+                "apt-get update -qq >/dev/null 2>&1\n"
+                f"for n in {names}; do\n"
+                "  m=$(apt-cache madison \"$n\" 2>/dev/null | head -1 | tr -s ' ')\n"
+                "  i=$(dpkg-query -W -f='${Status}' \"$n\" 2>/dev/null | grep -c 'install ok installed')\n"
+                # 分隔符不能用 |：madison 的输出本身就是 `pkg | version | origin` 形式，
+                # 用 | 分段会让每行都解析失败（三家全报 0/14，而实测麒麟是 14/14）。
+                "  echo \"$n@@${m:-NOREPO}@@installed=$i\"\n"
+                "done\n")
         out = dsh(img, script)
         raw = {}
         for line in out.splitlines():
@@ -76,7 +109,7 @@ def main():
         rec["raw"] = raw
         for t in TOOLS:
             hit = "NOREPO"
-            for n in ALIASES.get(t, [t]):
+            for n in aliases(t, fam):
                 v = raw.get(n, {})
                 if v.get("madison") and v["madison"] != "NOREPO":
                     hit = f"{n}: {v['madison']}"; break
@@ -86,18 +119,63 @@ def main():
         rec["preinstalled"] = sorted(n for n, v in raw.items() if v.get("installed"))
         data["images"][did] = rec
         # C++ 构建判据：present 用 command -v，可装性同样用 madison
-        cxx_script = ("apt-get update -qq >/dev/null 2>&1\n"
-                      f"for t in {' '.join(CXX_TOOLS)}; do\n"
-                      "  p=$(command -v \"$t\" >/dev/null 2>&1 && echo Y || echo N)\n"
-                      "  m=$(apt-cache madison \"$t\" 2>/dev/null | head -1 | tr -s ' ')\n"
-                      "  echo \"$t present=$p repo=${m:-NOREPO}\"\n"
-                      "done\n")
+        # g++ 在 rpm 系叫 gcc-c++；present 用 command -v 测的是二进制名（g++ 两族都叫 g++）
+        _cxx = " ".join("gcc-c++" if t == "g++" and fam == "rpm" else t for t in CXX_TOOLS)
+        if fam == "rpm":
+            cxx_script = ("dnf -q makecache >/dev/null 2>&1\n"
+                          f"for t in {_cxx}; do\n"
+                          "  b=$t; [ \"$t\" = gcc-c++ ] && b=g++\n"
+                          "  p=$(command -v \"$b\" >/dev/null 2>&1 && echo Y || echo N)\n"
+                          "  m=$(dnf -q repoquery \"$t\" 2>/dev/null | head -1)\n"
+                          "  echo \"$t present=$p repo=${m:-NOREPO}\"\n"
+                          "done\n")
+        else:
+            cxx_script = ("apt-get update -qq >/dev/null 2>&1\n"
+                          f"for t in {_cxx}; do\n"
+                          "  p=$(command -v \"$t\" >/dev/null 2>&1 && echo Y || echo N)\n"
+                          "  m=$(apt-cache madison \"$t\" 2>/dev/null | head -1 | tr -s ' ')\n"
+                          "  echo \"$t present=$p repo=${m:-NOREPO}\"\n"
+                          "done\n")
         data["cxx_probe"][did] = dsh(img, cxx_script)
 
     print("  UOS apt 源规模", file=sys.stderr)
     # ⚠️ 口径：`apt-cache stats` 的 Total package names 不是「源里有多少包」——
     # 它把本机已装的 OS 包和只在依赖里被引用过的名字也算进去了。真正该引用的是
     # 源索引里的条目数，用 apt-helper 解开压缩的 Packages 索引来数。
+    # 逐被试的阳性对照：测的是**查询机制本身**能不能工作，不是源里有什么。
+    # 靶子必须**从源自己的索引里取**，不能拿「已安装的包」当靶子——那隐含假设
+    # 「已装的包必然在源里」，对正常发行版成立，对 UOS 不成立（它的包来自 ISO，
+    # apt 源全是应用商店内容，连 bash 都查不到）。第一版就是这么写错的：UOS 会被
+    # 判成「判据故障」，而真相是已知结论「源里没有 OS 包」。仓库里原有的那条 UOS
+    # 专用对照本来就是从索引取靶子的，通用化时该照着它做（见 report §9.2）。
+    # 无源的被试（凝思）取不到靶子，如实记 NOSOURCE，与「判据故障」区分开。
+    data["query_control"] = {}
+    for did, img in IMAGES:
+        fam = FAMILY[did]
+        if fam == "rpm":
+            ctl = ("dnf -q makecache >/dev/null 2>&1\n"
+                   "ls /etc/yum.repos.d/*.repo >/dev/null 2>&1 || { echo 'NOSOURCE'; exit 0; }\n"
+                   # 靶子取自源索引本身
+                   "t=$(dnf -q repoquery --qf '%{name}' 2>/dev/null | sed '/^$/d' | head -1)\n"
+                   "[ -z \"$t\" ] && { echo 'NOSOURCE（repoquery 列不出任何包）'; exit 0; }\n"
+                   "q=$(dnf -q repoquery \"$t\" 2>/dev/null | head -1)\n"
+                   "echo \"target=$t from=repo-index query=${q:-MISS}\"\n")
+        else:
+            ctl = ("apt-get update -qq >/dev/null 2>&1\n"
+                   "hs=no\n"
+                   "{ [ -s /etc/apt/sources.list ] && grep -qE '^[[:space:]]*deb[[:space:]]' /etc/apt/sources.list; } && hs=yes\n"
+                   "ls /etc/apt/sources.list.d/*.list >/dev/null 2>&1 && hs=yes\n"
+                   "ls /etc/apt/sources.list.d/*.sources >/dev/null 2>&1 && hs=yes\n"
+                   "[ \"$hs\" = no ] && { echo 'NOSOURCE'; exit 0; }\n"
+                   # 靶子取自源索引本身
+                   "t=$(apt-get indextargets --format '$(FILENAME)' 2>/dev/null | grep binary-amd64 | "
+                   "while read f; do /usr/lib/apt/apt-helper cat-file \"$f\" 2>/dev/null; done | "
+                   "awk '/^Package: /{print $2; exit}')\n"
+                   "[ -z \"$t\" ] && { echo 'NOSOURCE（索引里列不出任何包）'; exit 0; }\n"
+                   "q=$(apt-cache madison \"$t\" 2>/dev/null | head -1 | tr -s ' ')\n"
+                   "echo \"target=$t from=repo-index query=${q:-MISS}\"\n")
+        data["query_control"][did] = dsh(img, ctl)
+
     # 另外补一条**阳性对照**：源里确实存在的某个包必须能被 madison 查到，
     # 否则「14 个工具都装不上」区分不了「源里没有」与「源根本没通」。
     data["uos_apt_scale"] = dsh("uos-desktop-v25:base",

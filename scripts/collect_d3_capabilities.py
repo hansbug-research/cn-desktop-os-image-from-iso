@@ -9,10 +9,12 @@ TLS 要真握手、apt 要真装真卸。不看包列表推断 —— 装了 gcc
   默认    从 --from 指定目录读已落盘的 caps-*.txt（用于在没有镜像的机器上重算）
 """
 import argparse, datetime, json, os, pathlib, re, subprocess, sys, time
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import PAIRS, DIDS, TIERS, IMAGES  # 被试清单的唯一真源：config/subjects.json
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "raw" / "d3_capabilities.json"
-DISTROS = ["kylin11", "kylin10", "uos25"]
+DISTROS = DIDS
 TIERS = ["micro", "base", "devel"]
 
 def parse_caps(text):
@@ -49,8 +51,7 @@ def main():
             # provenance：探针输出必须不早于镜像本身。UOS 补了 iputils-ping/vim-tiny
             # 重建之后探针没重跑，矩阵里 ping/editor 还是 N，头条数字因此错了 4 格 ——
             # 这类「数据比被测对象旧」的错误必须机器可发现。
-            img = {"kylin11": "kylin-desktop-v11", "kylin10": "kylin-desktop-v10",
-                   "uos25": "uos-desktop-v25"}[d] + ":" + t
+            img = IMAGES[d] + ":" + t
             created = subprocess.run(
                 f"docker image inspect {img} --format '{{{{.Created}}}}'",
                 shell=True, capture_output=True, text=True).stdout.strip()

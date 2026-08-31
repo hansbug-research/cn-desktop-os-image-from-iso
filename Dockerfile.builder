@@ -18,6 +18,7 @@ RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*.sources && \
     apt-get install -y --no-install-recommends \
       mmdebstrap debootstrap apt-utils ca-certificates curl wget \
       zstd xz-utils squashfs-tools \
+      rpm cpio \
       dpkg-dev perl file arch-test procps \
       gpgv gpg \
       python3-minimal \

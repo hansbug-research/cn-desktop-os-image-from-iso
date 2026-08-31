@@ -19,7 +19,10 @@ kv textutils   "$( { has grep && has sed && has awk; } && echo Y || echo N)"
 kv getent      "$(getent passwd root >/dev/null 2>&1; yn $?)"
 kv locale_zh   "$(locale -a 2>/dev/null | grep -qi 'zh_CN.utf8\|zh_CN.UTF-8' && echo Y || echo N)"
 kv localtime   "$( [ -e /etc/localtime ] && echo Y || echo N)"
-kv ca_bundle   "$( [ -s /etc/ssl/certs/ca-certificates.crt ] && echo Y || echo N)"
+# CA bundle 的路径按发行版族不同：Debian 系在 /etc/ssl/certs/ca-certificates.crt，
+# RH 系在 /etc/pki/tls/certs/ca-bundle.crt（且是指向 ca-trust extracted 的符号链接）。
+# 只查前者会让 rpm 系被试在「有证书且 TLS 握手成功」的情况下报没有证书。
+kv ca_bundle   "$( { [ -s /etc/ssl/certs/ca-certificates.crt ] || [ -s /etc/pki/tls/certs/ca-bundle.crt ]; } && echo Y || echo N)"
 kv dns         "$(getent hosts mirrors.aliyun.com >/dev/null 2>&1; yn $?)"
 # TLS 真握手（不只是有没有证书）
 tls=N
@@ -32,41 +35,87 @@ fi
 kv tls "$tls"
 
 # ── L2 包管理 ────────────────────────────────────────────────────
-kv dpkg_query  "$( [ "$(dpkg-query $A -f '${Package}\n' -W 2>/dev/null | wc -l)" -gt 20 ] && echo Y || echo N)"
-kv apt         "$(has apt-get && echo Y || echo N)"
-kv sources_list "$( { [ -s /etc/apt/sources.list ] || ls /etc/apt/sources.list.d/*.list >/dev/null 2>&1 || ls /etc/apt/sources.list.d/*.sources >/dev/null 2>&1; } && echo Y || echo N)"
-kv apt_keyring "$( { ls /etc/apt/trusted.gpg.d/* >/dev/null 2>&1 || [ -s /etc/apt/trusted.gpg ] || ls /usr/share/keyrings/* >/dev/null 2>&1; } && echo Y || echo N)"
-if has apt-get; then
-  T 90 apt-get update -qq >/dev/null 2>&1; kv apt_update "$(yn $?)"
-  # 装一个带 maintainer script 的包再卸掉（无脚本的包会掩盖厂商 dpkg 的问题）
+# 口径是**能力**而不是**某个工具**：同一项能力在 deb 侧用 dpkg/apt 测，rpm 侧用
+# rpm/dnf 测。早先这一段全是 dpkg 专用，rpm 系被试会在「dpkg 数据库可查」上一片
+# 不支持 —— 那不是缺口，是拿错了尺子。包管理系由镜像自己判定，不从外部传入。
+if has rpm && ! has dpkg; then PKGSYS=rpm; elif has dpkg; then PKGSYS=deb; else PKGSYS=none; fi
+kv pkgsys "$PKGSYS"
+
+case $PKGSYS in
+deb) PKGDB_N=$(dpkg-query $A -f '${Package}\n' -W 2>/dev/null | wc -l) ;;
+rpm) PKGDB_N=$(rpm -qa 2>/dev/null | wc -l) ;;
+*)   PKGDB_N=0 ;;
+esac
+kv pkgdb_query "$( [ "$PKGDB_N" -gt 20 ] && echo Y || echo N)"
+kv pkgdb_count "$PKGDB_N"
+
+if   has apt-get; then PKGMGR=apt-get
+elif has dnf;     then PKGMGR=dnf
+elif has yum;     then PKGMGR=yum
+else PKGMGR=""; fi
+kv pkgmgr "$( [ -n "$PKGMGR" ] && echo Y || echo N)"
+kv pkgmgr_name "${PKGMGR:-none}"
+
+if [ "$PKGSYS" = rpm ]; then
+  kv pkg_sources "$( ls /etc/yum.repos.d/*.repo >/dev/null 2>&1 && echo Y || echo N)"
+  kv pkg_keyring "$( ls /etc/pki/rpm-gpg/* >/dev/null 2>&1 && echo Y || echo N)"
+else
+  kv pkg_sources "$( { [ -s /etc/apt/sources.list ] || ls /etc/apt/sources.list.d/*.list >/dev/null 2>&1 || ls /etc/apt/sources.list.d/*.sources >/dev/null 2>&1; } && echo Y || echo N)"
+  kv pkg_keyring "$( { ls /etc/apt/trusted.gpg.d/* >/dev/null 2>&1 || [ -s /etc/apt/trusted.gpg ] || ls /usr/share/keyrings/* >/dev/null 2>&1; } && echo Y || echo N)"
+fi
+
+# 元数据刷新 + 装卸往返。都挑一个带 maintainer script / scriptlet 的包，
+# 无脚本的包会掩盖厂商包管理器自身的问题。
+# 源清单为空时 `apt-get update` 会**成功**——没东西要取，退出码自然是 0。
+# 记成「能更新」是错的：空集上的全称命题恒真，而能力一点没有。凝思出厂无源
+# （厂商没有公开的在线仓库），必须与「有源且能更新」分开报。
+if [ -z "$PKGMGR" ]; then
+  kv pkg_update n/a; kv pkg_roundtrip n/a; kv pkg_check n/a
+elif [ "$PKGSYS" = deb ] && ! { [ -s /etc/apt/sources.list ] && grep -qE '^[[:space:]]*deb[[:space:]]' /etc/apt/sources.list; } \
+     && ! ls /etc/apt/sources.list.d/*.list >/dev/null 2>&1 \
+     && ! ls /etc/apt/sources.list.d/*.sources >/dev/null 2>&1; then
+  kv pkg_update nosrc; kv pkg_roundtrip nosrc
+  T 30 apt-get check >/dev/null 2>&1; kv pkg_check "$(yn $?)"
+elif [ "$PKGSYS" = rpm ] && ! ls /etc/yum.repos.d/*.repo >/dev/null 2>&1; then
+  kv pkg_update nosrc; kv pkg_roundtrip nosrc
+  T 120 rpm -Va --nofiles --nodigest --noscripts >/dev/null 2>&1; kv pkg_check "$(yn $?)"
+elif [ "$PKGSYS" = rpm ]; then
+  T 120 $PKGMGR -q makecache >/dev/null 2>&1; kv pkg_update "$(yn $?)"
+  if T 180 $PKGMGR -y -q install nano >/dev/null 2>&1 && rpm -q nano >/dev/null 2>&1; then
+    T 120 $PKGMGR -y -q remove nano >/dev/null 2>&1
+    has nano && kv pkg_roundtrip PARTIAL || kv pkg_roundtrip Y
+  else kv pkg_roundtrip N; fi
+  # rpm 侧的「依赖自洽」对应 rpm -Va --nofiles --nodigest（只验依赖与元数据）
+  T 120 rpm -Va --nofiles --nodigest --noscripts >/dev/null 2>&1; kv pkg_check "$(yn $?)"
+else
+  T 90 apt-get update -qq >/dev/null 2>&1; kv pkg_update "$(yn $?)"
   DEBIAN_FRONTEND=noninteractive T 120 apt-get install -y -qq --no-install-recommends nano >/dev/null 2>&1
   st=$(dpkg-query $A -W -f='${Status}' nano 2>/dev/null)
   if [ "$st" = "install ok installed" ]; then
     DEBIAN_FRONTEND=noninteractive T 90 apt-get purge -y -qq nano >/dev/null 2>&1
-    has nano && kv apt_roundtrip PARTIAL || kv apt_roundtrip Y
-  else kv apt_roundtrip N; fi
-  # 本地 deb 直装（离线分发场景）
-  if has dpkg-deb; then
-    mkdir -p d/DEBIAN d/usr/share/doc/capprobe
-    printf 'Package: capprobe\nVersion: 1.0\nArchitecture: all\nMaintainer: t <t@t>\nDescription: probe\n' > d/DEBIAN/control
-    echo x > d/usr/share/doc/capprobe/README
-    dpkg-deb --build --root-owner-group d p.deb >/dev/null 2>&1 \
-      && T 40 dpkg $A -i p.deb >/dev/null 2>&1 && T 40 dpkg $A -P capprobe >/dev/null 2>&1
-    kv dpkg_local_deb "$(yn $?)"
-  else kv dpkg_local_deb N; fi
-  T 30 apt-get check >/dev/null 2>&1; kv apt_check "$(yn $?)"
-else
-  kv apt_update n/a; kv apt_roundtrip n/a; kv apt_check n/a
-  # micro 档没有 apt 但有 dpkg —— 离线分发场景就是直接 dpkg -i，必须真测而不是猜
-  if has dpkg && has dpkg-deb; then
-    mkdir -p d/DEBIAN d/usr/share/doc/capprobe
-    printf 'Package: capprobe\nVersion: 1.0\nArchitecture: all\nMaintainer: t <t@t>\nDescription: probe\n' > d/DEBIAN/control
-    echo x > d/usr/share/doc/capprobe/README
-    dpkg-deb --build --root-owner-group d p.deb >/dev/null 2>&1 \
-      && T 40 dpkg $A -i p.deb >/dev/null 2>&1 && T 40 dpkg $A -P capprobe >/dev/null 2>&1
-    kv dpkg_local_deb "$(yn $?)"
-  else kv dpkg_local_deb N; fi
+    has nano && kv pkg_roundtrip PARTIAL || kv pkg_roundtrip Y
+  else kv pkg_roundtrip N; fi
+  T 30 apt-get check >/dev/null 2>&1; kv pkg_check "$(yn $?)"
 fi
+
+# 本地包直装（离线分发场景）：装一个本机没有的包，再卸干净。
+# deb 侧在镜像内现造；rpm 侧造包要 rpm-build（只有 devel 档有），所以由 runner
+# 把一个最小 noarch 包只读挂到 /probe-fixtures，三档同样口径。
+if [ "$PKGSYS" = rpm ]; then
+  fx=$(ls /probe-fixtures/*.noarch.rpm 2>/dev/null | head -1)
+  if [ -n "$fx" ]; then
+    T 60 rpm -i --nodigest --nosignature "$fx" >/dev/null 2>&1 \
+      && rpm -q capprobe >/dev/null 2>&1 && T 60 rpm -e capprobe >/dev/null 2>&1
+    kv pkg_local_install "$(yn $?)"
+  else kv pkg_local_install n/a; fi
+elif has dpkg && has dpkg-deb; then
+  mkdir -p d/DEBIAN d/usr/share/doc/capprobe
+  printf 'Package: capprobe\nVersion: 1.0\nArchitecture: all\nMaintainer: t <t@t>\nDescription: probe\n' > d/DEBIAN/control
+  echo x > d/usr/share/doc/capprobe/README
+  dpkg-deb --build --root-owner-group d p.deb >/dev/null 2>&1 \
+    && T 40 dpkg $A -i p.deb >/dev/null 2>&1 && T 40 dpkg $A -P capprobe >/dev/null 2>&1
+  kv pkg_local_install "$(yn $?)"
+else kv pkg_local_install N; fi
 
 # ── L3 编译构建（真编真跑）──────────────────────────────────────
 printf '#include <stdio.h>\nint main(){printf("c-ok\\n");return 0;}\n' > a.c
@@ -152,9 +201,25 @@ kv signal_trap "$(sh -c 'trap "exit 0" TERM; (sleep 0.2; kill -TERM $$) & wait' 
 # ── L7 安全与合规相关 ───────────────────────────────────────────
 kv setuid_bins "$(find / -xdev -perm -4000 -type f 2>/dev/null | wc -l)"
 kv file_caps   "$(has getcap && getcap -r / 2>/dev/null | wc -l || echo n/a)"
-kv copyright   "$(ls /usr/share/doc/*/copyright >/dev/null 2>&1 && echo Y || echo N)"
+# rpm 系不装 copyright 到 /usr/share/doc/*/copyright，许可证在 /usr/share/licenses/。
+if [ "$PKGSYS" = rpm ]; then
+  kv copyright "$(ls -d /usr/share/licenses/*/ >/dev/null 2>&1 && echo Y || echo N)"
+else
+  kv copyright "$(ls /usr/share/doc/*/copyright >/dev/null 2>&1 && echo Y || echo N)"
+fi
 kv os_id       "$(. /etc/os-release 2>/dev/null; echo "${ID:-?}-${VERSION_ID:-?}")"
-kv glibc       "$(dpkg-query $A -W -f='${Version}' libc6 2>/dev/null | head -c 12)"
-kv arch        "$(dpkg-query $A -W -f='${Architecture}' libc6 2>/dev/null)"
+# glibc 版本与架构：包数据库问出来的更可信（ldd --version 会被包装脚本影响），
+# 但要按包管理系取 —— rpm 系没有 libc6 这个包名。
+if [ "$PKGSYS" = rpm ]; then
+  kv glibc "$(rpm -q --qf '%{VERSION}' glibc 2>/dev/null | head -c 12)"
+  kv arch  "$(rpm -q --qf '%{ARCH}' glibc 2>/dev/null)"
+else
+  kv glibc "$(dpkg-query $A -W -f='${Version}' libc6 2>/dev/null | head -c 12)"
+  kv arch  "$(dpkg-query $A -W -f='${Architecture}' libc6 2>/dev/null)"
+fi
 cd /; rm -rf "$W"
+# 探针自身的版本指纹。矩阵横向对比的前提是 15 份输出出自同一版探针；
+# 改了探针只重跑一部分镜像，混着的矩阵看不出任何异常。有了它，
+# verify.py 能断言 15 份指纹全同。
+kv probe_sha "$(sha256sum /cap.sh 2>/dev/null | cut -c1-12)"
 kv probe_complete Y

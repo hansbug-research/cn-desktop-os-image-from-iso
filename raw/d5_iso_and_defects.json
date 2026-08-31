@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T09:46:47Z",
+  "collected_at": "2026-08-31T22:20:56Z",
   "isos": [
     {
       "distro_id": "kylin10",
@@ -28,6 +28,34 @@
       "usrmerge": "yes",
       "immutable": null,
       "admindir": "var/lib/dpkg"
+    },
+    {
+      "distro_id": "kylinsec6",
+      "method": "rpmmedia",
+      "suite": null,
+      "mirror": null,
+      "expect_glibc": "2.38",
+      "expect_libstdcpp": "6.0.30",
+      "expect_glibcxx": "3.4.30",
+      "squashfs_sha256": null,
+      "source_date_epoch": "1700000000",
+      "usrmerge": "yes",
+      "immutable": "no",
+      "admindir": null
+    },
+    {
+      "distro_id": "linx6",
+      "method": "selfhost",
+      "suite": "buster",
+      "mirror": "file:///w/media/lx",
+      "expect_glibc": "2.28",
+      "expect_libstdcpp": "6.0.25",
+      "expect_glibcxx": "3.4.25",
+      "squashfs_sha256": null,
+      "source_date_epoch": "1700000000",
+      "usrmerge": "no",
+      "immutable": "no",
+      "admindir": null
     },
     {
       "distro_id": "uos25",
@@ -154,6 +182,98 @@
       "fix": "切片时一并拷 info/format 及 admindir 顶层元文件",
       "where": "tools/slice.py",
       "check": "dpkg --audit 输出 0 行且 dpkg -L 抽查有内容"
+    },
+    {
+      "id": "D13",
+      "distro": "kylinsec6",
+      "title": "rpm 数据库后端是 ndb，跨发行版 bootstrap 会写成 sqlite",
+      "symptom": "镜像内 `rpm -qa` 返回 0 行、退出码 0，与「空镜像」不可区分",
+      "root_cause": "麒麟信安自带的 rpm 4.18.2 编译时 %{_db_backend} 为 ndb，而 builder 的 rpm 4.20 默认写 sqlite；库文件在，格式不认",
+      "impact": "包数据库不可查，SBOM 与 CVE 扫描同时失效；且不报错",
+      "fix": "安装时 --define '_db_backend ndb'，装完用目标自己的 rpm 核对条数",
+      "where": "tools/rpmmedia.py、distros/kylinsec6.conf 的 RPM_DB_BACKEND",
+      "check": "镜像内 rpm -qa 条数等于闭包条数"
+    },
+    {
+      "id": "D14",
+      "distro": "kylinsec6",
+      "title": "CA bundle 由 %post 现生成，包内不直供",
+      "symptom": "/etc/pki/tls/certs/ca-bundle.crt 是悬空符号链接，镜像内所有 TLS 握手失败",
+      "root_cause": "ca-certificates 包里只有 p11-kit 源数据（ca-bundle.trust.p11-kit），bundle 由 %post 调 update-ca-trust extract 现生成 —— Debian 那边是把bundle 直接打进 deb 的。跨发行版 bootstrap 跑不了目标 scriptlet，于是链接指向一个从未生成的文件",
+      "impact": "证书验证与 HTTPS 全不可用，而包文件看上去都装齐了",
+      "fix": "装完在 chroot 内补跑 update-ca-trust extract，并断言 bundle 非空",
+      "where": "tools/rpmmedia.py",
+      "check": "镜像内 openssl/curl 能完成真握手"
+    },
+    {
+      "id": "D15",
+      "distro": "linx6",
+      "title": "目标 dpkg 在现代 builder 的 chroot 内配置会死锁",
+      "symptom": "CPU 归零、dpkg 变僵尸、卡在 pipe_read，不报错也不超时，三次复现",
+      "root_cause": "与 D06/D07 同族的工具链代差；凝思的表现比麒麟 V10 更靠前，不是读不懂状态而是直接挂住",
+      "impact": "mmdebstrap/debmedia 路径不可用，只能走两阶段自举",
+      "fix": "改用 build/build-selfhost.sh，用目标自带 dpkg 完成 configure",
+      "where": "build/build-selfhost.sh、distros/linx6.conf 的 METHOD=selfhost",
+      "check": "目标镜像内 dpkg --version 为 1.19.x，即 configure 由目标自带 dpkg 完成",
+      "note": "反证：同一介质换 --variant=extract（不在 chroot 内跑 dpkg）0.75 秒成功，把卡点定位在「chroot 内执行目标 dpkg」而非介质或包名"
+    },
+    {
+      "id": "D18",
+      "distro": "linx6",
+      "title": "删掉内核文件却不动 dpkg 登记，库里留下一个幽灵包",
+      "symptom": "dpkg 库登记 linux-image-4.19.0-11-linx-security-amd64-unsigned 为 install ok installed、Installed-Size 261829（256 MB），而 /boot 与 /lib/modules 下的文件全不在",
+      "root_cause": "lib/common.sh 的容器化改造删掉 /boot/* 与 /lib/modules/*（容器共享宿主内核，留着无意义），但不从包数据库移除对应的包。凝思的 debootstrap base 集带内核，另外三个被试的不带，所以只有它踩到",
+      "impact": "SBOM 报告一个不存在的 256 MB 包；trivy 因此凭空产出 373 条 HIGH+CRITICAL，占该镜像全部命中的 69%。错误的清单比没有清单更危险 —— 它会驱动下游得出错误结论",
+      "fix": "在 lib/common.sh 删 /boot 与 /lib/modules 的同一处，把**整条内核链**（linux-image*、linux-headers*、update-drivers*）从包数据库 purge 掉再删文件，并当场跑 apt-get check 验证没有制造新的依赖不一致。（两次弯路：① PIN_NEVER + debootstrap --exclude 对依赖拉进来的包无效；② 只 purge 叶子包会让 linux-image-amd64 与 update-drivers 悬空，把清单不一致换成依赖不一致）",
+      "where": "lib/common.sh::adapt_container 的内核残留清理段",
+      "check": "镜像内逐包抽查文件清单的非目录条目，无「清单非空而抽样全部缺失」的包（ghost_pkgs 为空）",
+      "note": "单看 no_kernel（文件不在）与 pkgs（包数够多）两项都通过，矛盾只在交叉核对时显形。这是本仓库此前完全没有的一类门禁：**包数据库声称已装的包，其文件必须真的存在**"
+    },
+    {
+      "id": "D19",
+      "distro": "kylinsec6",
+      "title": "glib2 的 %license 是指向不存在文件的符号链接",
+      "symptom": "/usr/share/licenses/glib2/COPYING 是符号链接，指向 LICENSES/LGPL-2.1-or-later.txt，而该文件不在 glib2 包里，也不在介质的任何包里（逐个 rpm -qlp 扫过 400 个包，零命中）",
+      "root_cause": "厂商打包时把许可证文本按 SPDX 目录组织，符号链接留下了，目标文件没打进任何包。glib2 包内只有 2 条 licenses 条目：目录本身与这个悬空链接",
+      "impact": "许可证文本不可得。GPL/LGPL 要求随二进制提供许可证副本，这一条在容器分发场景同样成立",
+      "fix": "不在本项目修复范围（改厂商包内容会越过等价环境的底线）。如实记录：判据区分「链接目标属于未包含的包」与「目标不存在于任何包」，前者是依赖闭包裁剪的已知代价，后者是厂商缺陷",
+      "where": "镜像内 /usr/share/licenses/glib2/COPYING",
+      "check": "rpm -q --licensefiles glib2 列出的路径逐个 test -e"
+    },
+    {
+      "id": "D20",
+      "distro": "linx6",
+      "title": "出厂镜像里留着一把跨厂商且无消费方的 keyring",
+      "symptom": "凝思三档（含 micro）各带一把 kylin-archive-keyring.gpg，而凝思 NO_CHECK_GPG=yes、出厂无源，这把 key 既非本厂的也无任何消费方",
+      "root_cause": "build/selfhost-inner.sh 无条件 cp 麒麟那把 keyring，不看 NO_CHECK_GPG。该路径原先只服务麒麟 V10，加入凝思后这行代码的隐含假设失效",
+      "impact": "与 §3.1 自己写的「多一把没用的 key 就是多一份可被滥用的授权」直接冲突",
+      "fix": "拷 keyring 前判 NO_CHECK_GPG；并把 analyze.py 的 alien_keyring_images 判据从写死「uos25 里混进 kylin」改成通用的「keyring 的厂商标识不属于本发行版」",
+      "where": "build/selfhost-inner.sh、scripts/analyze.py",
+      "check": "镜像内 keyrings_unowned 为空；alien_keyring_images 为空",
+      "note": "verify.py 的对应断言当时就在报失败，而它混在一批「断言过时」的失败里没被逐条读 —— 失败清单太长会淹没真问题。这一条是审稿复核抓出来的"
+    },
+    {
+      "id": "D16",
+      "distro": "共通",
+      "title": "/etc/ld.so.cache 不属于任何包，切片与 --noscripts 路径必漏",
+      "symptom": "非默认库目录里的二进制起不来；麒麟信安实测 64 个 systemd 二进制报 error while loading shared libraries，而构建期毫无报错",
+      "root_cause": "ld.so.cache 是 ldconfig 触发器的产物、不在任何包的文件清单里。slice 只搬包内文件；rpm 路径的 --noscripts 跳过了所有调 ldconfig 的 %post",
+      "impact": "后果按发行版布局而定：Debian 多架构目录在动态链接器内置默认路径里，缺 cache 只损性能（UOS 三档如此）；RH 系把 systemd 私有库放 /usr/lib64/systemd，该目录只写在 ld.so.conf.d 里，缺 cache 即等于二进制全断",
+      "fix": "装完在 chroot 内跑 ldconfig，并用**执行**而非 ldd 输出做断言",
+      "where": "tools/rpmmedia.py、build/build.sh 的 build_slice",
+      "check": "镜像内 /etc/ld.so.cache 非空，且 systemctl --version 退出码为 0",
+      "note": "这条最初被 elf_broken 检查里「私有库目录是已知误报」那句注释掩盖 —— 症状形状一样，真相却是二进制起不来。已归档的误报解释会掩盖同形状的真故障"
+    },
+    {
+      "id": "D17",
+      "distro": "linx6",
+      "title": "PIN_NEVER 只覆盖 apt 路径，dpkg 回落路径绕过它",
+      "symptom": "linx-noroot-conf 进了库且停在 half-configured，dpkg --audit 多一条",
+      "root_cause": "第二阶段后 apt 尚未就位时，用 `dpkg -i /var/cache/apt/archives/*.deb` 补装，一律装上；而 PIN_NEVER 只写进 apt 的 preferences",
+      "impact": "被明确排除的厂商包进了产物，且状态不干净",
+      "fix": "回落路径按 PIN_NEVER 过滤缓存文件名，装完再断言被 pin 的包不在库里",
+      "where": "build/selfhost-inner.sh",
+      "check": "镜像内 dpkg --audit 输出 0 行；dpkg-query 查 PIN_NEVER 各包均未安装"
     },
     {
       "id": "D11",

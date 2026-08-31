@@ -1,0 +1,17 @@
+  ⚠ kylin-desktop-v11:micro 无覆盖：trivy 未识别该 OS（真实 ID=kylin）→ 结果不构成安全结论
+  ⚠ kylin-desktop-v11:base 无覆盖：trivy 未识别该 OS（真实 ID=kylin）→ 结果不构成安全结论
+  ⚠ kylin-desktop-v11:devel 无覆盖：trivy 未识别该 OS（真实 ID=kylin）→ 结果不构成安全结论
+  ⚠ kylin-desktop-v10:micro 无有效覆盖：真实 ID=kylin 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ kylin-desktop-v10:base 无有效覆盖：真实 ID=kylin 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ kylin-desktop-v10:devel 无有效覆盖：真实 ID=kylin 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ uos-desktop-v25:micro 无有效覆盖：真实 ID=uos 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ uos-desktop-v25:base 无有效覆盖：真实 ID=uos 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ uos-desktop-v25:devel 无有效覆盖：真实 ID=uos 却被判成 debian（误判）→ 报出的 0 个漏洞数不可信
+  ⚠ kylinsec-desktop-v6:micro 无覆盖：trivy 未识别该 OS（真实 ID=kylinsecos）→ 结果不构成安全结论
+  ⚠ kylinsec-desktop-v6:base 无覆盖：trivy 未识别该 OS（真实 ID=kylinsecos）→ 结果不构成安全结论
+  ⚠ kylinsec-desktop-v6:devel 无覆盖：trivy 未识别该 OS（真实 ID=kylinsecos）→ 结果不构成安全结论
+  ✗ linx-os-v6:micro HIGH+CRITICAL=538 超过阈值 0（真命中，需处理）
+  ✗ linx-os-v6:base HIGH+CRITICAL=791 超过阈值 0（真命中，需处理）
+  ✗ linx-os-v6:devel HIGH+CRITICAL=1204 超过阈值 0（真命中，需处理）
+══ CVE: 有效覆盖 0 / 无有效覆盖 12 / 真命中或异常 3
+❌ 有真实命中或扫描异常

@@ -1,7 +1,11 @@
-fingerprint,kylin11:micro,kylin11:base,kylin11:devel,kylin10:micro,kylin10:base,kylin10:devel,uos25:micro,uos25:base,uos25:devel
-arch,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64
-default_target,,multi-user.target,multi-user.target,multi-user.target,multi-user.target,multi-user.target,,multi-user.target,multi-user.target
-file_caps,n/a,1,1,1,2,2,n/a,0,0
-glibc,2.38-1ok6.9k,2.38-1ok6.9k,2.38-1ok6.9k,2.31-0kylin9,2.31-0kylin9,2.31-0kylin9,2.38-6deepin,2.38-6deepin,2.38-6deepin
-os_id_version（ID-VERSION_ID，裸 ID 见 t01/t03）,kylin-v11,kylin-v11,kylin-v11,kylin-v10,kylin-v10,kylin-v10,uos-25,uos-25,uos-25
-setuid_bins,2,9,9,10,10,10,2,9,9
+fingerprint,kylin11:micro,kylin11:base,kylin11:devel,kylin10:micro,kylin10:base,kylin10:devel,uos25:micro,uos25:base,uos25:devel,kylinsec6:micro,kylinsec6:base,kylinsec6:devel,linx6:micro,linx6:base,linx6:devel
+arch,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64,amd64,x86_64,x86_64,x86_64,amd64,amd64,amd64
+default_target,,multi-user.target,multi-user.target,multi-user.target,multi-user.target,multi-user.target,,multi-user.target,multi-user.target,,multi-user.target,multi-user.target,multi-user.target,multi-user.target,multi-user.target
+file_caps,n/a,1,1,1,2,2,n/a,0,0,0,3,3,47,47,47
+glibc,2.38-1ok6.9k,2.38-1ok6.9k,2.38-1ok6.9k,2.31-0kylin9,2.31-0kylin9,2.31-0kylin9,2.38-6deepin,2.38-6deepin,2.38-6deepin,2.38,2.38,2.38,2.28-10-linx,2.28-10-linx,2.28-10-linx
+os_id_version（ID-VERSION_ID，裸 ID 见 t01/t03）,kylin-v11,kylin-v11,kylin-v11,kylin-v10,kylin-v10,kylin-v10,uos-25,uos-25,uos-25,kylinsecos-6,kylinsecos-6,kylinsecos-6,Linx-10,Linx-10,Linx-10
+pkgdb_count,71,206,255,154,221,263,67,164,208,112,165,194,176,211,249
+pkgmgr_name,none,apt-get,apt-get,none,apt-get,apt-get,none,apt-get,apt-get,none,dnf,dnf,none,apt-get,apt-get
+pkgsys,deb,deb,deb,deb,deb,deb,deb,deb,deb,rpm,rpm,rpm,deb,deb,deb
+probe_sha,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd,b7048929c0fd
+setuid_bins,2,9,9,10,10,10,2,9,9,11,12,12,5,6,6

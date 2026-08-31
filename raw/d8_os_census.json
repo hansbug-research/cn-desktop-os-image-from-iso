@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T15:52:45Z",
+  "collected_at": "2026-08-31T21:55:26Z",
   "vantage_note": "采集主机出口在中国大陆，境外站点经本地代理。registry 探测失败需区分网络位置与策略拒绝；厂商命名空间为空只能证明「该处未公开」，不能证明厂商没有私有 registry。",
   "census_revision": "2026-08-30",
   "entries": [
@@ -331,7 +331,8 @@
       "s_iso_access": "直接下载",
       "iso_access_note": "下载页 UI 是「网盘 + 提取码 + 表单」，但真实 URL 明文写在 `<a>` 的 `file_id` 属性里、提取码全填「无」或「N/A」；`mirrorlists.kylinsec.com.cn/iso/` 是匿名可列 autoindex，含 9 个版本目录。无 cookie 无 referer 直取 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 得 HTTP 200 / **4508876800 B（4.51 GB）**。",
       "s_customers": "电力·航天测发控（1 万余套）·党政·金融·交通·医疗（厂商自述）｜**桌面版不在安可桌面附表**",
-      "customers_note": "官网「党政、能源、交通、航天、电信、金融、邮政、教育」；能源电力是核心盘。航天测发控案例页原文「已在航天测发控体系各场所的后台服务器、前端桌面得到大面积应用，已成功部署 10000 余套」；累计「在电力、航天等重要领域部署 30 余万套」。场景：桌面版官方定位「面向 PC、笔记本及业务终端的通用型桌面系统，可支持办公、应用开发、云桌面等多种场景」；电力调度安全云工作站（替代传统 KVM 矩阵人机方案）、电力生产控制终端、涉密/高安全内网终端。⚠️ 安可 2024 年第 1 号入围的是麒麟信安**服务器**操作系统 V3，桌面版不在桌面附表内。⚠️ 等保四级次数官网两页口径不一致（「连续 8 次」vs「连续七次」），均无证书编号。"
+      "customers_note": "官网「党政、能源、交通、航天、电信、金融、邮政、教育」；能源电力是核心盘。航天测发控案例页原文「已在航天测发控体系各场所的后台服务器、前端桌面得到大面积应用，已成功部署 10000 余套」；累计「在电力、航天等重要领域部署 30 余万套」。场景：桌面版官方定位「面向 PC、笔记本及业务终端的通用型桌面系统，可支持办公、应用开发、云桌面等多种场景」；电力调度安全云工作站（替代传统 KVM 矩阵人机方案）、电力生产控制终端、涉密/高安全内网终端。⚠️ 安可 2024 年第 1 号入围的是麒麟信安**服务器**操作系统 V3，桌面版不在桌面附表内。⚠️ 等保四级次数官网两页口径不一致（「连续 8 次」vs「连续七次」），均无证书编号。",
+      "subject": true
     },
     {
       "name": "方德桌面操作系统 V5.0",
@@ -520,7 +521,8 @@
       "s_iso_access": "直接下载",
       "iso_access_note": "官网 `download/` 是完全开放的 Apache autoindex，22 个 ISO 匿名可下：最新欧拉版 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` HTTP 200 / **7138705408 B（7.14 GB）** / `application/x-iso9660-image`。最新 V8 与 6.0-g2 目录返回 401 Basic auth，同级 6.0.99 是 200。",
       "s_customers": "电力调度（国网/南网/发电集团）·涉密内网·运营商·军队列装（厂商自述）｜**桌面身份从未入安可**",
-      "customers_note": "官网原文「国家电网、南方电网、中国铁路总公司、三大电信运营商、中央办公厅等党和国家政府机构大量采用」，累计部署数十万套。电力是绝对主力：国网调度中心、南网总调、六大分中心、20 余省调及地市调度中心，电力系统总装机超二十万套。⚠️ 关键区分：其「桌面」场景是**电力调度终端与变电站综自后台的图形工作站席位**（调度台/监控席），不是通用办公 PC——官网四大场景为服务器/图形工作站/装置专用/工业互联网。第三方核实（深交所公开问询回复）：国网调度与配电招标要求供应商取得公安部等保四级，「截至本回复出具之日，仅包括公司在内的 6 家操作系统达到等级保护第四级」；2021 年在中国电力行业服务器 OS 市占 26.9%、国产厂商第一。⚠️ 安可 2024 年第 1 号入围的是「凝思安全操作系统欧拉版 V6.0.99」，归在**服务器**类；凝思从未以桌面 OS 身份进入任何一期安可公告。"
+      "customers_note": "官网原文「国家电网、南方电网、中国铁路总公司、三大电信运营商、中央办公厅等党和国家政府机构大量采用」，累计部署数十万套。电力是绝对主力：国网调度中心、南网总调、六大分中心、20 余省调及地市调度中心，电力系统总装机超二十万套。⚠️ 关键区分：其「桌面」场景是**电力调度终端与变电站综自后台的图形工作站席位**（调度台/监控席），不是通用办公 PC——官网四大场景为服务器/图形工作站/装置专用/工业互联网。第三方核实（深交所公开问询回复）：国网调度与配电招标要求供应商取得公安部等保四级，「截至本回复出具之日，仅包括公司在内的 6 家操作系统达到等级保护第四级」；2021 年在中国电力行业服务器 OS 市占 26.9%、国产厂商第一。⚠️ 安可 2024 年第 1 号入围的是「凝思安全操作系统欧拉版 V6.0.99」，归在**服务器**类；凝思从未以桌面 OS 身份进入任何一期安可公告。",
+      "subject": true
     },
     {
       "name": "Anolis OS（龙蜥）",
@@ -1059,49 +1061,44 @@
   ],
   "probes": [
     {
-      "ref": "docker.io/openeuler/openeuler:24.03-lts",
+      "ref": "cr.kylinos.cn/kylin/kylin-server-v10sp3-x86_64:20230324",
       "exists": true,
       "probe_method": "docker manifest inspect",
       "rc": 0,
       "stderr_tail": "",
-      "pull_rc": 0,
-      "os_release": "NAME=\"openEuler\"\nVERSION=\"24.03 (LTS)\"\nID=\"openEuler\"\nVERSION_ID=\"24.03\"\nPRETTY_NAME=\"openEuler 24.03 (LTS)\"\nANSI_COLOR=\"0;31\"",
-      "pkg_format": "rpm",
-      "glibc": "ldd (GNU libc) 2.38",
-      "size_bytes": "65241489",
-      "for_os": "openEuler"
+      "for_os": "银河麒麟桌面操作系统"
     },
     {
-      "ref": "docker.io/openeuler/desktop:latest",
+      "ref": "cr.kylinos.cn/kylin/kylin-desktop-v11:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unknown: repository kylin/kylin-desktop-v11 not found",
+      "for_os": "银河麒麟桌面操作系统"
+    },
+    {
+      "ref": "cr.kylinos.cn/kylin/kylin-desktop-v10sp1-x86_64:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unknown: repository kylin/kylin-desktop-v10sp1-x86_64 not found",
+      "for_os": "银河麒麟桌面操作系统"
+    },
+    {
+      "ref": "docker.io/uniontech/uos:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
       "rc": 1,
       "stderr_tail": "unauthorized: authentication required",
-      "for_os": "openEuler"
+      "for_os": "统信桌面操作系统 V25（UOS）"
     },
     {
-      "ref": "docker.io/openeuler/devstation:latest",
+      "ref": "registry.uniontech.com/uos-server-base/uos-server-20-1070a:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
       "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "openEuler"
-    },
-    {
-      "ref": "docker.io/openeuler/ukui:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "openEuler"
-    },
-    {
-      "ref": "docker.io/openeuler/dde:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "openEuler"
+      "stderr_tail": "failed to configure transport: error pinging v2 registry: Get \"https://registry.uniontech.com/v2/\": net/http: TLS handshake timeout",
+      "for_os": "统信桌面操作系统 V25（UOS）"
     },
     {
       "ref": "docker.io/openkylin/openkylin:3.0",
@@ -1194,12 +1191,102 @@
       "for_os": "deepin（深度）"
     },
     {
+      "ref": "docker.io/openeuler/openeuler:24.03-lts",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "NAME=\"openEuler\"\nVERSION=\"24.03 (LTS)\"\nID=\"openEuler\"\nVERSION_ID=\"24.03\"\nPRETTY_NAME=\"openEuler 24.03 (LTS)\"\nANSI_COLOR=\"0;31\"",
+      "pkg_format": "rpm",
+      "glibc": "ldd (GNU libc) 2.38",
+      "size_bytes": "65241489",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/desktop:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/devstation:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/ukui:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/openeuler/dde:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "openEuler"
+    },
+    {
+      "ref": "docker.io/kylinsec/kylinsec:latest",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "麒麟信安操作系统（KylinSec）"
+    },
+    {
       "ref": "docker.io/ubuntukylin/ubuntukylin:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
       "rc": 1,
       "stderr_tail": "unauthorized: authentication required",
       "for_os": "Ubuntu Kylin（优麒麟）"
+    },
+    {
+      "ref": "cr.loongnix.cn/loongson/loongnix:20.7",
+      "exists": true,
+      "probe_method": "docker manifest inspect",
+      "rc": 0,
+      "stderr_tail": "",
+      "pull_rc": 0,
+      "os_release": "",
+      "pkg_format": "",
+      "glibc": "",
+      "size_bytes": "68291295",
+      "for_os": "Loongnix（龙芯）"
+    },
+    {
+      "ref": "cr.loongnix.cn/loongson/loongnix:25.1",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix:25.1",
+      "for_os": "Loongnix（龙芯）"
+    },
+    {
+      "ref": "cr.loongnix.cn/loongson/loongnix:25",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix:25",
+      "for_os": "Loongnix（龙芯）"
+    },
+    {
+      "ref": "cr.loongnix.cn/loongson/loongnix-desktop:25.1",
+      "exists": false,
+      "probe_method": "docker manifest inspect",
+      "rc": 1,
+      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix-desktop:25.1",
+      "for_os": "Loongnix（龙芯）"
     },
     {
       "ref": "docker.io/openanolis/anolisos:8.6",
@@ -1292,59 +1379,6 @@
       "for_os": "AOSC OS（安同 OS）"
     },
     {
-      "ref": "docker.io/kylinsec/kylinsec:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "麒麟信安操作系统（KylinSec）"
-    },
-    {
-      "ref": "docker.io/euleros/euleros:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "EulerOS（华为）"
-    },
-    {
-      "ref": "cr.loongnix.cn/loongson/loongnix:20.7",
-      "exists": true,
-      "probe_method": "docker manifest inspect",
-      "rc": 0,
-      "stderr_tail": "",
-      "pull_rc": 0,
-      "os_release": "",
-      "pkg_format": "",
-      "glibc": "",
-      "size_bytes": "68291295",
-      "for_os": "Loongnix（龙芯）"
-    },
-    {
-      "ref": "cr.loongnix.cn/loongson/loongnix:25.1",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix:25.1",
-      "for_os": "Loongnix（龙芯）"
-    },
-    {
-      "ref": "cr.loongnix.cn/loongson/loongnix:25",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix:25",
-      "for_os": "Loongnix（龙芯）"
-    },
-    {
-      "ref": "cr.loongnix.cn/loongson/loongnix-desktop:25.1",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "no such manifest: cr.loongnix.cn/loongson/loongnix-desktop:25.1",
-      "for_os": "Loongnix（龙芯）"
-    },
-    {
       "ref": "docker.io/revyos/revyos:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
@@ -1361,28 +1395,12 @@
       "for_os": "Bianbu OS"
     },
     {
-      "ref": "cr.kylinos.cn/kylin/kylin-server-v10sp3-x86_64:20230324",
-      "exists": true,
-      "probe_method": "docker manifest inspect",
-      "rc": 0,
-      "stderr_tail": "",
-      "for_os": "银河麒麟桌面操作系统"
-    },
-    {
-      "ref": "cr.kylinos.cn/kylin/kylin-desktop-v11:latest",
+      "ref": "docker.io/openfyde/openfyde:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
       "rc": 1,
-      "stderr_tail": "unknown: repository kylin/kylin-desktop-v11 not found",
-      "for_os": "银河麒麟桌面操作系统"
-    },
-    {
-      "ref": "cr.kylinos.cn/kylin/kylin-desktop-v10sp1-x86_64:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unknown: repository kylin/kylin-desktop-v10sp1-x86_64 not found",
-      "for_os": "银河麒麟桌面操作系统"
+      "stderr_tail": "unauthorized: authentication required",
+      "for_os": "FydeOS"
     },
     {
       "ref": "docker.io/cs2cneokylin/ns76-base-x86_64:latest",
@@ -1401,28 +1419,12 @@
       "for_os": "中标麒麟桌面操作系统（NeoKylin）"
     },
     {
-      "ref": "docker.io/uniontech/uos:latest",
+      "ref": "docker.io/euleros/euleros:latest",
       "exists": false,
       "probe_method": "docker manifest inspect",
       "rc": 1,
       "stderr_tail": "unauthorized: authentication required",
-      "for_os": "统信桌面操作系统 V25（UOS）"
-    },
-    {
-      "ref": "registry.uniontech.com/uos-server-base/uos-server-20-1070a:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "failed to configure transport: error pinging v2 registry: Get \"https://registry.uniontech.com/v2/\": net/http: TLS handshake timeout",
-      "for_os": "统信桌面操作系统 V25（UOS）"
-    },
-    {
-      "ref": "docker.io/openfyde/openfyde:latest",
-      "exists": false,
-      "probe_method": "docker manifest inspect",
-      "rc": 1,
-      "stderr_tail": "unauthorized: authentication required",
-      "for_os": "FydeOS"
+      "for_os": "EulerOS（华为）"
     }
   ]
 }

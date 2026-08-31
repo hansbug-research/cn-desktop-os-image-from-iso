@@ -1,6 +1,6 @@
 # 从 ISO 为国产桌面操作系统构建分档容器镜像
 
-> 基准日 **2026-08-30** ｜ 构建镜像 **9** 个（3 发行版 × 3 档位）｜ 构建路径 **3** 条 ｜ 能力矩阵 **648** 格 ｜ 验收断言 **365** 条（镜像层，`make verify`）｜ 机器核对断言 **504** 条（文档层，`scripts/verify.py`） ｜ 变异用例 **12**（镜像层）+ **15**（分析层）条 ｜ 厂商缺陷留档 **12** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条
+> 基准日 **2026-08-30** ｜ 构建镜像 **15** 个（5 发行版 × 3 档位）｜ 构建路径 **4** 条 ｜ 能力矩阵 **1080** 格 ｜ 验收断言 **652** 条（镜像层，`make verify`）｜ 机器核对断言 **566** 条（文档层，`scripts/verify.py`） ｜ 变异用例 **13**（镜像层）+ **15**（分析层）条 ｜ 厂商缺陷留档 **20** 条 ｜ 一手数据集 **8** 组 ｜ 图 **6** 张 ｜ 可复算表 **18** 张 ｜ 参考来源 **125** 条
 
 ## 1. 问题
 
@@ -8,7 +8,11 @@
 
 问题在于，能直接拿来用的镜像并不存在。厂商发布的是 ISO 安装介质，容器镜像要么没有，要么不是同一个东西。本项目要回答的是：能不能从厂商的桌面版发行物出发，自己构建出与真机高度一致的分档镜像，让它同时承担三类用途——验证编译产物能否运行、为需要现场编译的场景提供工具链、以及作为一个包管理可用的平台基座。
 
-仓库名与标题里的「从 ISO」需要一处校正，否则会误导复核者：**三个被试的内容来源并不相同**。统信 UOS V25 确实是从 ISO 出发——它的 rootfs 逐文件切自 ISO 内的 squashfs。银河麒麟 V10 SP1 与 V11 的内容取自厂商**在线 apt 源**（`archive.kylinos.cn`），ISO 在这两条路上只用来取 ABI 期望基线（见 `distros/kylin11.conf` 的顶部注释），并不提供 rootfs 内容。所以一个手里只有 ISO、没有源访问的复核者，能复现的是 UOS 那一条，麒麟两条跑不动；反之只有源访问、没有 UOS ISO 的人，能复现麒麟两条。§4 每条路径的第一句都写明了它实际从哪里取内容。
+仓库名与标题里的「从 ISO」需要一处校正，否则会误导复核者：**五个被试的内容来源并不相同，分成两类。**
+
+真正从 ISO 出发的是三个：统信 UOS V25 的 rootfs 逐文件切自 ISO 内的 squashfs；麒麟信安 V6 的包全部取自 ISO 自带的介质仓库（2935 个 rpm + 完整 `repodata`）；凝思 V6.0.100 同样只用 ISO 里的 apt 仓库，不碰任何在线源。银河麒麟 V10 SP1 与 V11 是另一类——内容取自厂商**在线 apt 源**（`archive.kylinos.cn`），ISO 在这两条路上只用来取 ABI 期望基线（见 `distros/kylin11.conf` 的顶部注释），并不提供 rootfs 内容。
+
+这个区别直接决定谁能复现什么：手里只有 ISO、没有源访问的复核者，能复现 UOS、麒麟信安、凝思三条；只有源访问、没有 ISO 的人，能复现麒麟两条。§4 每条路径的第一句都写明了它实际从哪里取内容。
 
 这里的「一致」有明确边界。容器共享宿主内核，所以内核态的东西（LSM、驱动、initramfs）一律不在一致性范围内；我们要的一致是用户态的一致：同一套 libc 与 libstdc++ 版本、同一套厂商补丁过的系统库、同一套软件源与包数据库、同一套 locale 与证书。这个边界决定了后面所有取舍。
 
@@ -23,7 +27,7 @@
 
 ### 2.1 名录：主要的国产桌面 OS
 
-名录含 **21 个** OS：商业 **12 个**、社区开源 **9 个**。**★ 标记的两个是本项目的被试**（下面 §2.4 说明为什么选它们）。可核对的源文件是 [`config/os_census.json`](config/os_census.json)，采集脚本拒收任何缺 `sources` 的条目，`verify.py` 另有一条断言要求「缺出处的条目集合为空」。表里为可读性用了紧凑措辞，每格的完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。**每个单元格末尾的上标编号是支撑该格的引用**（GitHub 原生脚注 `[^Rn]`，点击跳到文末 Footnotes 区，共 125 条，定义见附录 C，可复算副本见表 [`t16`](derived/tables/t16_references.csv)）；名录里共 159 处字段级引用，`verify.py` 断言其中没有一处悬空。
+名录含 **21 个** OS：商业 **12 个**、社区开源 **9 个**。**★ 标记的四个条目是本项目被试的来源**——名录按产品线列，而被试按具体 ISO 算，银河麒麟这一条覆盖 V10 SP1 与 V11 两个被试，合计五个（下面 §2.4 说明它们怎么选出来的）。可核对的源文件是 [`config/os_census.json`](config/os_census.json)，采集脚本拒收任何缺 `sources` 的条目，`verify.py` 另有一条断言要求「缺出处的条目集合为空」。表里为可读性用了紧凑措辞，每格的完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。**每个单元格末尾的上标编号是支撑该格的引用**（GitHub 原生脚注 `[^Rn]`，点击跳到文末 Footnotes 区，共 125 条，定义见附录 C，可复算副本见表 [`t16`](derived/tables/t16_references.csv)）；名录里共 159 处字段级引用，`verify.py` 断言其中没有一处悬空。
 
 | | OS | 类型 | 厂商/主导方 | 技术血统 | 最新版本 | 桌面环境 | ISO 获取 | 常见客户与使用场景 | 维护 | 官方容器镜像 | 其他 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -32,11 +36,11 @@
 |  | **openKylin（开放麒麟）** | 社区开源 | openKylin 社区 | Debian 系[^R40] | 3.0「黄河」（2026-08-28）[^R73] | UKUI 4.24（桌面 ISO 仅三架构，注 4）[^R73] | 直接下载[^R120] | 共建方与衍生方·高校科研·个人开发者·芯片生态（社区自述）[^R107] | 活跃 | 未公开[^R74][^R16][^R30] | — |
 |  | **deepin（深度）** | 社区开源 | 深度科技 / deepin 社区 | Debian 系[^R4] | 25.2.1（2026-08-04，仅在线更新）[^R57][^R4] | DDE 7.0 + Treeland[^R57] | 直接下载[^R4] | 开发者·爱好者·高校学生（统信官方定义：社区版）[^R108][^R14] | 活跃 | 未公开[^R31] | [^R14] |
 |  | **openEuler** | 社区开源 | openEuler 社区 | 独立选型，rpm/dnf[^R71] | 24.03 LTS SP4（2026-06-30）[^R71] | 无桌面 ISO；桌面以包提供 / DevStation = GNOME（注 5）[^R13][^R49] | 直接下载[^R49] | 服务器/云/边缘/嵌入式为主；桌面仅 DevStation 面向开发者（社区自述）[^R106][^R92] | 活跃 | 未公开[^R32][^R17][^R48] | — |
-|  | **麒麟信安操作系统（KylinSec）** | 商业 | 湖南麒麟信安科技 | openEuler 系[^R72] | V6 SP1（2026-06）[^R72] | 自研 Kiran / KiranUI[^R66] | 直接下载[^R119] | 电力·航天测发控（1 万余套）·党政·金融·交通·医疗（厂商自述）｜**桌面版不在安可桌面附表**[^R104][^R93] | 活跃 | 未公开 | — |
-|  | **方德桌面操作系统 V5.0** | 商业 | 中科方德软件有限公司 | deb 系（官方未声明，注 6）[^R50] | V5.0（2022-06）；Pro 版 2025-09 过评[^R63][^R70] | 未公开（疑 MATE 衍生）[^R50] | 未查到公开下载（服务器版 ISO 匿名可下，桌面版查不到）[^R125][^R124] | 党政·医疗（500+ 医院）·电信·教育·金融·军工院所（厂商自述）｜**安可桌面 3 批在列**[^R99][^R91] | 活跃 | 未公开 | — |
+| ★ | **麒麟信安操作系统（KylinSec）** | 商业 | 湖南麒麟信安科技 | openEuler 系[^R72] | V6 SP1（2026-06）[^R72] | 自研 Kiran / KiranUI[^R66] | 直接下载[^R119] | 电力·航天测发控（1 万余套）·党政·金融·交通·医疗（厂商自述）｜**桌面版不在安可桌面附表**[^R104][^R93] | 活跃 | 未公开 | — |
+|  | **方德桌面操作系统 V5.0** | 商业 | 中科方德软件有限公司 | deb 系（官方未声明，注 6）[^R50] | V5.0（2022-06）；Pro 版 2025-09 过评[^R91][^R70] | 未公开（疑 MATE 衍生）[^R50] | 未查到公开下载（服务器版 ISO 匿名可下，桌面版查不到）[^R125][^R124] | 党政·医疗（500+ 医院）·电信·教育·金融·军工院所（厂商自述）｜**安可桌面 3 批在列**[^R99][^R91] | 活跃 | 未公开 | — |
 |  | **Ubuntu Kylin（优麒麟）** | 社区开源 | Canonical / 麒麟软件 CCN 联合实验室 | Ubuntu 直系[^R5] | 26.04.1 LTS（2026-08-27，支持 3 年）[^R6][^R79] | UKUI[^R78] | 直接下载[^R6] | **全部个人向**：普通用户·开发者·科研人员·艺术工作者（官方文档）[^R109] | 活跃 | 未公开 | — |
 |  | **Loongnix（龙芯）** | 社区开源 | 龙芯中科 / Loongnix 社区 | Debian 系（25 线推断 trixie，注 7）[^R69] | 25.1（2026-08-20）/ 20.7（2026-07-17）[^R69] | KDE[^R69] | 直接下载[^R69] | 芯片适配基准与生态展示·合作厂商·科研机构·爱好者·终端用户（官方自述）[^R113][^R92] | 活跃 | 未公开[^R9] | — |
-|  | **凝思安全操作系统** | 商业 | 北京凝思软件股份有限公司 | Debian 系（证据最硬，注 8）[^R67] | V6.0.80-20250816；并行 V6.0.100[^R67] | 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE[^R67] | 直接下载[^R118] | 电力调度（国网/南网/发电集团）·涉密内网·运营商·军队列装（厂商自述）｜**桌面身份从未入安可**[^R101][^R93] | 活跃 | 未公开 | [^R68] |
+| ★ | **凝思安全操作系统** | 商业 | 北京凝思软件股份有限公司 | Debian 10 buster（一手实测，注 8）[^R67] | V6.0.80-20250816；并行 V6.0.100[^R67] | 无桌面版产品名，可选 GNOME/KDE/MATE/XFCE[^R67] | 直接下载[^R118] | 电力调度（国网/南网/发电集团）·涉密内网·运营商·军队列装（厂商自述）｜**桌面身份从未入安可**[^R101][^R93] | 活跃 | 未公开 | [^R68] |
 |  | **Anolis OS（龙蜥）** | 社区开源 | OpenAnolis 龙蜥社区 | RHEL 兼容系[^R44] | 23.5（官方公告未同步）[^R41] | 无桌面 ISO；有独立 DDE 仓库[^R42][^R41] | 直接下载[^R41] | **服务器端定位**：金融·运营商核心系统（社区自述）；桌面靠衍生版[^R110][^R92] | 活跃 | 未公开[^R18][^R33] | — |
 |  | **OpenCloudOS** | 社区开源 | OpenCloudOS 社区 | 自主演进，RHEL 系包管理[^R11] | 9.6（2026-07-13）[^R43][^R11] | 无桌面 ISO；文档有 GNOME 43 装法 / EX-NDE[^R12][^R19] | 直接下载[^R43] | **服务器端定位**：腾讯内部全量业务·腾讯云客户·12 大行业（社区自述）[^R111][^R92] | 活跃 | 未公开[^R34] | — |
 |  | **新支点桌面操作系统（NewStart NSDL）** | 商业 | 广东中兴新支点技术有限公司（中兴通讯全资子公司） | 未查到官方结论[^R83] | V4.5.2（官方未标日期）[^R59] | EX-NDE 超凡桌面（Qt 自研）[^R60][^R19] | 网盘分发（桌面版本体走网盘；同厂服务器版是 HTTP 直链）[^R123] | 政务办公·电力·金融·通信·教育（厂商自述）｜**桌面版从未入安可**[^R102][^R92] | 品牌活跃 | 未公开 | — |
@@ -58,10 +62,12 @@
 5. openEuler 主线无桌面 ISO，UKUI/DDE/Kiran 以软件包提供（早期还有 GNOME 与 Xfce，文档已相继下架）；官方开发者桌面形态 DevStation 的桌面环境是 GNOME（依据 25.09 版 ISO 的 `.rpmlist`）。
 6. 方德官方只说「基于核高基重大专项安全加固内核成果持续优化发展」；旁证是官方源 `repos.os.nfschina.com/debian-sign/` 内含 `mate-desktop-environment` 等 deb 包。
 7. Loongnix 两条产品线的 `dists/*/Release` **都误写** `Origin: Debian` / `Version: 10.4`，照着读会把 25 线判成 Debian 10；按 pool 里 `bash 5.2.37-2`、`libc-bin 2.41-13` 推断实为 Debian 13 trixie（官方无声明）。
-8. 凝思是本名录里血统证据最硬的一条：官方 V6.0.80 发布说明写 `grub2` 升级到 `2.06-3~deb10u4linx5`（`deb10` 即 Debian 10 buster），官方文档另有 `iceweasel`（Debian 独有的 Firefox 改名）+ glibc 2.28 组合。
+8. 凝思的血统在本轮由旁证升为一手证据。旁证是官方 V6.0.80 发布说明里 `grub2` 升级到 `2.06-3~deb10u4linx5`（`deb10` 即 Debian 10 buster），加上官方文档中的 `iceweasel`（Debian 独有的 Firefox 改名）与 glibc 2.28 组合。本轮从主线 V6.0.100 的 ISO 造出镜像后直接读到 `Codename: buster`、dpkg 1.19.7、glibc 2.28（§4.5）——这是名录里唯一一条从「厂商未声明」推进到镜像内实测的血统。
 9. 普华官网产品详情页写 V4.0（4.4 内核，V4.0 系列发布于 2016 年），而 Wayback 于 2026-06-08 抓取的官网通用产品页写 V5.0；V5.0 的发布日期、内核、桌面环境全部未查到。
 
 **「常见客户与使用场景」这一列问的是操作系统本体（装在客户机器上的桌面系统），不是它的官方 docker 镜像**——两者的客群完全不同，混在一起会得出荒谬结论。这一列的每条都区分了**厂商自述**与**第三方核实**，因为二者证据强度差一个量级：厂商官网的客户清单与部署套数无法独立验证，而《安全可靠测评结果公告》、央采成交公告、深交所问询回复这类是可核对的第三方文件。完整原文在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)。
+
+9. 凝思这一格的字节数换过一次，原因值得记。名录这一列的判据是「能不能直连 HEAD 到真实字节」，当时凝思还不是被试，取主线还是欧拉版无所谓，抓到的第一个可下文件是欧拉版。它成为被试之后，取材要求随之升级——§2.5 自己就警告过欧拉版是 rpm 系、要取对产品线——于是这一格改引主线 `6.0.100`（4691312640 B，官方 md5 与本地实测逐位匹配，记在 `distros/linx6.conf`）。同一份文档里两处判据都没错，是证据要支撑的结论变了：**一条记录从「名录一行」升级成「被试的取材依据」时，对它的精度要求也跟着升级。**
 
 **这一列里最硬的一格是安可（安全可靠测评）桌面附表。** 逐批核对 2023 年第 1 号至 2026 年第 2 号共 8 批公告，桌面附表**只出现过 4 家送测单位**：麒麟软件、中科方德、统信软件、华为终端[^R94]。名录里在列的是 **3 家——银河麒麟桌面、统信 UOS、方德桌面**；另有 7 家明确不在（其中凝思、新支点、麒麟信安是以**服务器**身份入列而非桌面，中标麒麟、普华、一铭、FydeOS 从未在列）。
 
@@ -84,7 +90,7 @@
 
 有几处客群定位容易被误读，逐一点明：**凝思**的「桌面」是电力调度终端与变电站综自后台的**图形工作站席位**（调度台/监控席），不是通用办公 PC；**新支点**近两年所有公开落地与中标都在服务器/嵌入式侧，桌面线无新案例；**优麒麟**官方文档的「适用用户」四类**全部是个人向**，未查到任何机构客户或预装案例；**AOSC OS** 官网明确声明**不适合商业部署或任何要求高可靠性的场合**，属结构性不适用；**RevyOS 与 Bianbu** 几乎纯粹是芯片适配 + 开发板发行版，无装机/采购意义上的客户。FydeOS 的中文企业材料里引用的 Arcadia 联合学区等案例是 **Google Chromebook 的海外案例，不是 FydeOS 客户**。
 
-**「ISO 获取」这一列的判据是直连能不能 HEAD 到真实字节，不是厂商说法。** 分类为受控取值，实测分布：**直接下载 15 家**、公开列出但直链未解引用 1 家、网盘分发 1 家、需申请授权或登录 **0 家**、未查到公开下载 2 家、未实测 2 家。字节数逐条记在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)：deepin 的 `deepin-desktop-community-25.2.0-amd64.iso` 6976131072 B、优麒麟的 `ubuntukylin-26.04.1-desktop-amd64.iso` 5694060544 B（托管在 Canonical 自有基础设施）、凝思的 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` 7138705408 B、openKylin 的 `openKylin-Desktop-V3.0-20260827-x86_64.iso` 8068329472 B[^R85]、统信的 `uos-desktop-25-professional-2500-amd64-202604.iso` 7282405376 B[^R84]、麒麟信安的 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 4508876800 B、中标麒麟的 `NeoKylin-Linux-Desktop-6.0-x86_64-B045-20141201.iso` 3482347520 B、Loongnix 25.1 的 KDE livecd 5858738176 B、openEuler 25.09 DevStation 的 dvd 5627537408 B、AOSC 的 desktop tarball 4864387556 B、FydeOS 的 `FydeOS_for_PC_iris_v23.0-com.bin.zip` 2581036906 B。
+**「ISO 获取」这一列的判据是直连能不能 HEAD 到真实字节，不是厂商说法。** 分类为受控取值，实测分布：**直接下载 15 家**、公开列出但直链未解引用 1 家、网盘分发 1 家、需申请授权或登录 **0 家**、未查到公开下载 2 家、未实测 2 家。字节数逐条记在表 [`t14b`](derived/tables/t14b_os_census_detail.csv)：deepin 的 `deepin-desktop-community-25.2.0-amd64.iso` 6976131072 B、优麒麟的 `ubuntukylin-26.04.1-desktop-amd64.iso` 5694060544 B（托管在 Canonical 自有基础设施）、凝思的 `linxos-6.0.100-20230822-x86_64-DVD.iso` 4691312640 B（主线；同目录下的 `linxos-v6.0.99-el20.03-20260605-x86_64.iso` 7138705408 B 是**欧拉版**，rpm 系，见注 9）、openKylin 的 `openKylin-Desktop-V3.0-20260827-x86_64.iso` 8068329472 B[^R85]、统信的 `uos-desktop-25-professional-2500-amd64-202604.iso` 7282405376 B[^R84]、麒麟信安的 `KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 4508876800 B、中标麒麟的 `NeoKylin-Linux-Desktop-6.0-x86_64-B045-20141201.iso` 3482347520 B、Loongnix 25.1 的 KDE livecd 5858738176 B、openEuler 25.09 DevStation 的 dvd 5627537408 B、AOSC 的 desktop tarball 4864387556 B、FydeOS 的 `FydeOS_for_PC_iris_v23.0-com.bin.zip` 2581036906 B。
 
 **「未查到公开下载」与「需申请授权」是两类，不合并。** 前者指没有看到任何门槛、也找不到条目（方德桌面、EulerOS），后者指确实撞上门槛。EulerOS 归入前者靠一个正对照：同一个华为企业支持 API 上，TaiShan 节点匿名可取到 98 个版本，而 EulerOS 三个节点的版本数组全为空，排除了匿名 ACL 的可能；该体系的下载端点本身是登录墙，对任意 nid 都返回同一个 Uniportal 跳转头，三个 nid 含一个刻意乱填的，采集记录见 [`artifacts/euleros-loginwall.txt`](artifacts/euleros-loginwall.txt)。普华与一铭归入「未实测」而非「不可下载」：普华官网全路径返回 502，属**未能访问而非站点下线**，其名录内容取自 Wayback 2026 年快照；一铭的域名直连与经代理均为 000 且 `emindos.org` 整域 NXDOMAIN。
 
@@ -96,7 +102,7 @@
 
 **口径**（完整定义在 `config/os_census.json` 的 `scope` 字段）：收面向桌面使用、Linux 内核、当前仍在维护的国产发行版；「维护中」的依据是可核对的时间点（最近发布日、镜像站目录时间戳、代码仓最近提交），逐条写在名录里。
 
-剔除 7 项，每项都有理由，不是漏掉：鸿蒙 PC（非 Linux 内核，不在容器化前提内）、ZimaOS（Buildroot 构建、RAUC OTA 分发的 NAS/个人云 OS）[^R22]、Circle Linux（RHEL 下游服务器发行版，实测 10.2 的 x86_64 目录只有 `boot.iso` 与 `dvd1.iso`，无桌面 spin；DistroWatch 标的 `Desktop=GNOME` 源自 DVD 内软件组，是误读）、UbuntuDDE Remix（非中国项目，主导者为尼泊尔 Debian Developer，且已停滞）、openthos（已停，主体停在 2020；顺带纠一处误传——主导方是清华大学 + 同方股份 + 一铭软件，「上海交大」之说源自镜像站 `ftp.sjtu.edu.cn` 的域名误读）、万里红桌面操作系统 V3.0（曾有，现已淡出：官网实测 200 在线但产品列表已无任何操作系统条目[^R75]）[^R77]、CutefishOS。
+剔除 7 项，每项都有理由，不是漏掉：鸿蒙 PC（非 Linux 内核，不在容器化前提内）、ZimaOS（Buildroot 构建、RAUC OTA 分发的 NAS/个人云 OS）[^R22]、Circle Linux（RHEL 下游服务器发行版，实测 10.2 的 x86_64 目录只有 `boot.iso` 与 `dvd1.iso`，无桌面 spin；DistroWatch 标的 `Desktop=GNOME` 源自 DVD 内软件组，是误读）、UbuntuDDE Remix（非中国项目，主导者为尼泊尔 Debian Developer，且已停滞）、openthos（已停，主体停在 2020；顺带纠一处误传——主导方是清华大学 + 同方股份 + 一铭软件，「上海交大」之说源自镜像站 `ftp.sjtu.edu.cn` 的域名误读）、万里红桌面操作系统 V3.0（曾有，现已淡出：官网实测 200 在线但产品列表已无任何操作系统条目[^R77]，公司已被东方中科收购[^R75]）、CutefishOS。
 
 **CutefishOS 要分两层说**，一层化会说错：作为**发行版**它事实停摆两年多（SourceForge 最后是 `cutefishos-debian-12-beta-amd64-2023.08.iso`，2023-08-07，官方下载页只写 "The new iso is coming soon."）；但它的**桌面环境 Cutefish DE** 仍由原作者高频提交 Qt6/KF6 迁移。停摆的是发行版，不是 DE。
 
@@ -108,7 +114,9 @@
 
 存在的那些是什么：openEuler 有 `openeuler/openeuler`（rpm 系，实测 `NAME=openEuler`）；openKylin 的 2.0 与 3.0 都拉得到（dpkg 系）；deepin 有 `linuxdeepin/deepin:25` 与旧代号 `beige`(23)、`apricot`(20)；Anolis OS 有 `openanolis/anolisos`（rpm 系）；OpenCloudOS 有四档；AOSC OS 有 `aosc/aosc-os`（实测是六架构 manifest：`amd64/arm64/loong64/mips64le/ppc64le/riscv64`，名录里架构覆盖最广的一个）；Loongnix 有 `cr.loongnix.cn/loongson/loongnix:20.7`；中标麒麟有 `cs2cneokylin/ns76-base-x86_64`。
 
-**关键的是不存在的那些。名录里带 `desktop`、`ukui`、`dde` 字样的引用共 13 条，跨 5 家 registry、跨商业与社区两类，一条都不存在。** 官方容器镜像在国产阵营并不稀缺，稀缺的是**桌面版**的官方容器镜像；所有拉得到的都是服务器/基础/应用镜像。
+**关键的是拉不到的那些。名录里带 `desktop`、`ukui`、`dde` 字样的引用共 13 条，跨 3 家 registry、跨商业与社区两类，一条都不能匿名获取。** 官方容器镜像在国产阵营并不稀缺，稀缺的是**桌面版**的官方容器镜像；所有拉得到的都是服务器/基础/应用镜像。
+
+**「拉不到」要拆成三种，它们的证据强度不同。** 24 条负判里，真正返回 `not found` / `no such manifest` 的只有 **5 条**；**18 条**返回的是 `unauthorized: authentication required`——Docker Hub 对私有仓库与不存在的仓库返回同一句话，这只能支撑「匿名不可见」，不能支撑「不存在」；还有 **1 条**是 TLS 握手超时，属网络故障而非仓库状态，而它指向的 `registry.uniontech.com` 恰恰在下一节被成功枚举出 18 个公开项目，说明那条负判走的仍是代理（本节其余对国产域名的探测都以直连结果为准）。所以本节能支撑的结论是「这些引用匿名拉不到」，比「它们不存在」弱一档；更强的证据来自下一节直接枚举厂商自有 registry。
 
 #### 从「我们拉不到」到「厂商 registry 里就没有」
 
@@ -129,6 +137,8 @@ kylin-server-v10sp{1,2,3}-{,init-,minimal-,micro-}{x86_64,aarch64,loongarch64}
 **统信软件的 `registry.uniontech.com`**（统信容器镜像平台 UOS Container Registry，门户 `uoscr.chinauos.com`）同样可枚举[^R46][^R47]：**18 个公开项目，含 `desktop`/`dde`/`ukui` 的 0 个**。基础镜像项目的名字本身就写着 server——`uos-server-base`，8 个仓库全是 `uos-server-20-*`（含 loongarch 与 sw64 分支）。官方产品页[^R80]也写明适用范围是「统信服务器操作系统 V20 及统信云原生操作系统 V20，暂不支持其他操作系统」，全文未提 desktop。
 
 统信这两个域名从本机经代理访问时**都返回 000**，看起来完全不可达——按这个结果只能写「无法验证」。但 `curl --noproxy '*'` 直连，两个都是 **200**。原因是本机走 v2ray 代理，代理把中国大陆站点绕到境外出口，于是造出了假的「不可达」。**探测国产厂商基础设施时，代理会系统性地把「可达」误报成「不可达」，进而把「查不到」误当成「没有」。** 本节所有对国产域名的探测都以直连结果为准。
+
+**第二轮两个被试也做了枚举，强度低一档。** 麒麟与统信有可匿名枚举的自有 Harbor，麒麟信安与凝思没有：`hub.docker.com` 上 `kylinsec` 命名空间 0 个仓库，`linx` 命名空间仅 1 个且是无关的 `apache`；凝思的三个候选自有 registry（`registry.` / `cr.` / `hub.linx-info.com`）全部连接失败（凭据 [`artifacts/registry-probe-round2.txt`](artifacts/registry-probe-round2.txt)）。连接失败与「枚举出来是空的」不是同一强度的证据——前者不能排除「registry 存在但不对匿名开放」，这一点记在 §9.1。
 
 **厂商自己也在用分档。** `kylin` 项目那 27 个仓库里，`-micro` / `-minimal` / `-init` 三个后缀成体系地出现在 v10sp1/sp2/sp3 三个版本 × 三种架构上；OpenCloudOS 则提供 `opencloudos9-busybox`（无包管理器）/`-microdnf`/`-minimal`（官方推荐默认）/`-init`（带 systemd），四档我们逐个实测存在。这与 Red Hat UBI 的 `micro/minimal/standard/init` 是同一思路：§3 那两条分档轴（装不装包管理器、装不装工具链）在国产厂商这里已是既成实践。但两家的分档**全部只覆盖服务器线，没有桌面档**。
 
@@ -186,22 +196,26 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 误读的根源在一个具体的技术细节上：**两者 `os-release` 的 `ID` 字段都是 `kylin`**（`os_id_collision=True`）。按 `ID` 判断发行版是常见做法，各类工具链和 CI 脚本也大多这么做，而这个字段在这里恰好不具备区分力，得看 `NAME` 或包格式才能分辨。
 
+**本轮多了一个可用的对照。** 上表把「包格式 rpm 对 dpkg」列为产品线不同的证据之一，而第二轮加入的麒麟信安是真正的 rpm 系被试（§4.4），可以看清这个差异有多实：麒麟信安的 `rpm -qa` 读得出 112/165/194 个包，包名遵循 openEuler 惯例而非 RHEL，数据库后端是 ndb；`kylin-server-minimal:v10sp1` 的软件源在 `update.cs2c.com.cn`（中标软件血统）。两者同属 rpm 系却不是同一条线，而桌面版麒麟连包格式都不同。所以「都是麒麟、都能拉到镜像」这个印象里，实际隔着三层：不同厂商血统、不同包格式、不同软件源。
+
 强度边界：以上是对 8 条探测的观察，证明的是「匿名不可获得」，不能证明厂商内部或授权渠道没有桌面镜像。同一 org 的前序研究 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study)[^R26] 结论 7 指出厂商 server 镜像可以作为对应桌面版的 **ABI 预检代理**（因为同厂同版本的 server 镜像 ABI 地板不高于桌面版）。引用时要连它自己的限定一起带上：该结论原文注明「支撑它的只有 2 个数据点且都来自麒麟，不可外推」。
 
 这与本节结论不冲突：符号地板的单向预检，和用户态环境的一致复现，是两个不同强度的需求。前者只要地板够低就行，后者要求包格式、系统库、软件源都对得上。本节的存在性探测还能反过来给那条结论补一个边界——`kylin-server-minimal:v11` **不存在**，所以麒麟 V11 若要找「同厂 server 预检代理」，厂商 server 镜像这条路走不通，只剩社区线的 openKylin 可考虑——但 openKylin 既不是「同厂 server」（`ID=openkylin`、glibc 2.38/2.43），它对麒麟 V11 桌面的 ABI 地板关系本仓库也没有实测，所以这只是一个候选方向而非结论。
 
-### 2.4 为什么被试是银河麒麟与统信 UOS，以及这套做法对其他 OS 意味着什么
+### 2.4 被试怎么选出来的，以及这套做法对其他 OS 意味着什么
 
 名录摆出来之后，选被试的理由就能讲清楚了，而不是「手头正好有这两个 ISO」。
 
 **四条筛选条件，是名录里的列直接筛出来的：**
 
-1. **交付端真实存在需求。** 我们要解决的是「编译好的软件交付到客户桌面上，先验证跑不跑得起来」。这个需求集中在政企采购的商业桌面线——央采桌面操作系统三家、《安全可靠测评》名单里的那几款。名录里符合的是银河麒麟桌面、统信 UOS、方德三家（其中方德 Pro 版 V5.0 与银河麒麟桌面 V11 是首批基于 Linux 6.6 LTS 过评的两款[^R63]）。社区线（openKylin、deepin、优麒麟）虽然活跃，但客户机装的通常不是它们。
+1. **交付端真实存在需求。** 我们要解决的是「编译好的软件交付到客户桌面上，先验证跑不跑得起来」。这个需求集中在政企采购的商业桌面线——央采桌面操作系统三家、《安全可靠测评》名单里的那几款。名录里符合的是银河麒麟桌面、统信 UOS、方德三家（其中方德 Pro 版 V5.0 与银河麒麟桌面 V11 是首批基于 Linux 6.6 LTS 过评的两款[^R91]）。社区线（openKylin、deepin、优麒麟）虽然活跃，但客户机装的通常不是它们。
 2. **没有可用的官方桌面镜像**，否则本项目不必存在。§2.2 对全部 21 个 OS 逐条查过这一条，其中麒麟与统信两家是直接枚举厂商自有 registry 得到的（强度最高），其余是按候选引用探测与官方渠道核对；因此「商业桌面线没有官方镜像」这个更宽的品类判断不应外推（见 §9.1）。
 3. **血统能确证。** §2.1 那一列显示 8 家的血统「官方未声明」或只能靠推断。选被试必须能确证到「用 `mmdebstrap` 还是 `debootstrap`、包数据库长什么样」的程度——银河麒麟 V10 SP1 实测 deb/apt/`ID_LIKE=debian`，统信 UOS 实测 dpkg + OSTree，都够。方德只有「官方源里有 deb 包」这一层旁证，桌面环境连官方名字都没有，血统细节不足以支撑构建路径设计。
-4. **拿得到 ISO。** 商业发行版的 ISO 需要授权。这一条把方德、普华、凝思、新支点排除在本轮之外——**不是技术判断，是材料可得性**，如实记在这里而不是包装成技术理由。
+4. **拿得到 ISO。** 这一条把方德与新支点排除在外——**不是技术判断，是材料可得性**，如实记在这里而不是包装成技术理由。（早先这里还写着凝思与普华，是错的：§2.1 逐条实测下来需申请授权的是 0 家，凝思的 `download/` 是开放 autoindex。凝思因此在第二轮进了被试。）
 
-所以本轮被试是**银河麒麟桌面 V10 SP1、银河麒麟桌面 V11、统信 UOS V25** 三个 ISO。两家覆盖了三条互不相同的构建路径（§4），这也是选它们的技术收益：V11 能直接 `mmdebstrap`、V10 SP1 因工具链代差只能两阶段自举、UOS 因 OSTree 不可变只能切片——一次实验拿到三种典型难度，而不是三个同质样本。
+首轮被试是**银河麒麟桌面 V10 SP1、银河麒麟桌面 V11、统信 UOS V25**，覆盖三条互不相同的构建路径（§4）：V11 能直接 `mmdebstrap`、V10 SP1 因工具链代差只能两阶段自举、UOS 因 OSTree 不可变只能切片——一次实验拿到三种典型难度，而不是三个同质样本。
+
+第二轮按 §2.5 的候选梯度补了**麒麟信安桌面 V6** 与**凝思安全操作系统 V6.0.100**，各扩一个新维度：前者把包格式从 deb 扩到 rpm（§4.4），后者把对标场景从办公终端扩到电力调度席位（§4.5）。五个被试、四条构建路径、15 个镜像。
 
 **对其他 OS 的借鉴意义，要按血统分开说，不能一概而论。**
 
@@ -209,13 +223,13 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 |---|---|---|
 | 方德、新支点等 deb 系商业桌面 | **高，可直接套用** | 若确证为 deb 系，§4.1 的 `mmdebstrap` 路径与 §4.2 的两阶段自举路径可直接复用，`lib/common.sh` 的容器化改造（`policy-rc.d`、`default.target`、mask 单元、影子文件补齐）与发行版无关 |
 | 其他 OSTree/不可变系统 | **高** | §4.3 的 squashfs 依赖闭包切片是针对「包管理器被接管」这一类问题的通解，`info/format`、admindir 搬迁这两个坑（缺陷 D09/D10）会同样出现 |
-| 中标麒麟等 RHEL 系（⚠️ 凝思主线是 deb 系，只有它的欧拉版分支属 rpm） | **中，方法通但工具要换** | 分档轴、能力矩阵测法、五道门禁、变异测试这些与包格式无关；但 bootstrap 要换成 `dnf --installroot`，依赖闭包解析要换 rpm 的那一套 |
+| 中标麒麟等 RHEL 系 | **高，已有实测支撑** | 原先这一格写的是「方法通但工具要换」，属推断。§4.4 做完麒麟信安之后可以说得更实：分档轴、五道门禁与变异测试确实与包格式无关，直接复用；但**能力探针本体不是**——它原先是 dpkg 专用的，量 rpm 系会把「不是 deb」误报成「缺能力」，已改为按包管理系分支（§6.1）。bootstrap 也不必换成 `dnf --installroot`：介质自带 repodata 时直接解析闭包 + `rpm --root` 更少一层不确定 |
 | openEuler 系 | **中** | openEuler 自身有官方基础镜像，缺的是桌面档，可走「官方基础镜像 + 按包组装桌面」而不必从 ISO 切；但这条不适用于麒麟信安——它的 Docker Hub 命名空间 0 个仓库，**没有官方基础镜像**可依，只能从 ISO 出发（见 §2.5，它是首选候选） |
-| FydeOS | **低** | Chromium OS + Gentoo Portage 体系，与本项目三条路径没有交集 |
+| FydeOS | **低** | Chromium OS + Gentoo Portage 体系，与本项目四条路径没有交集 |
 
-### 2.5 后续候选：哪些还值得做，哪些不必做
+### 2.5 候选梯度：哪些还值得做，哪些不必做
 
-对名录里除两个被试条目之外的 19 个 OS 逐条套三条排除标准，再过一道「交付端是否真有验证需求」。
+这份梯度是首轮三个被试做完之后排的，对名录里除两个被试条目之外的 19 个 OS 逐条套三条排除标准，再过一道「交付端是否真有验证需求」。梯度里排在最前的麒麟信安与凝思已在第二轮做完（§4.4、§4.5），下面保留当时的判据与依据，并标注实际结果——判对了哪些、判偏了哪些，比只留结论有用。
 
 **三条排除标准各筛掉了谁**
 
@@ -229,11 +243,19 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 **值得做，且优先级最高（各扩一个新维度）**
 
+下表前两行已在第二轮做完，「实测依据」一列保留当时的判断，做完之后的实际情况另起一段说明。
+
 | 候选 | 扩的是什么 | 实测依据 |
 |---|---|---|
 | **麒麟信安 KylinSec** | **包格式**：openEuler 系，rpm | 现有三条路径全是 deb 系。做它要把 bootstrap 换成 `dnf --installroot`、依赖闭包解析换 rpm 那一套——等于回答「这套做法能不能跨包格式」。交付场景硬：电力与航天测发控（自述部署 1 万余套）、党政金融交通医疗。ISO 匿名可下：`KylinSec-Desktop-6-release-250704-1154-x86_64.iso` 4508876800 B |
 | **凝思安全操作系统** | **场景类型**：调度席位而非办公终端 | 血统证据是全名录最硬的一条（`grub2 2.06-3~deb10u4linx5` + `iceweasel`），deb 系可直接套 §4.1／§4.2。取材也省事：`download/` 是开放 autoindex，22 个 ISO 匿名可下。⚠️ 但要取对产品线——`linxos-v6.0.99-el20.03-20260605-x86_64.iso`（7138705408 B）是**欧拉版**（rpm），上面那条 deb 血统证据出自主线 V6.0.80 的发布说明，两者不是一条线；要扩「场景类型」这个维度应取主线版本（如 `linxos-6.0.97-an7-x86_64-BD.iso`，9200742400 B）。另注最新的 V8 与 6.0-g2 目录返回 401 Basic auth，同级 6.0.99 是 200，即最新版拿不到。⚠️ 但它**没有独立命名的「桌面版」产品**，官网四大场景里的「图形工作站」指的是电力调度台与变电站监控席。做出来的镜像对标的是那类席位环境，不是办公终端——若交付验证对象是办公软件，其意义会明显下降 |
 | **Loongnix（龙芯）** | **架构与 ABI 世代**：loong64 新世界 | 最新桌面 25.1（2026-08-20，KDE）**没有对应容器镜像**，而 `cr.loongnix.cn` 上能拉到的 `20.7` 是上一代——Debian 10 buster 血统、`loongarch64` **旧世界 ABI**。跨 ABI 世代拿它验证新版交付根本不成立，而且两者名字完全一样、只差一个 tag，比 §2.3 那个「官方镜像是另一条产品线」更隐蔽。有 LoongArch 交付的话这条近乎必做 |
+
+**两个候选做完之后，当时的判断哪些成立、哪些偏了**
+
+麒麟信安那一格写「做它要把 bootstrap 换成 `dnf --installroot`」——这一步实际不必要。介质自带 2935 个 rpm 与完整 repodata，直接解析闭包再 `rpm --root` 装更少一层不确定（§4.4）。「等于回答这套做法能不能跨包格式」这个判断成立，但答案比预期细：五道门禁与分档轴确实与包格式无关，**能力探针本体不是**——它原先是 dpkg 专用的，跨过来会把「不是 deb」误报成「缺能力」（§6.1）。
+
+凝思那一格的两处提醒都兑现了。「要取对产品线」是对的：主线与欧拉版名字只差一段，取错就变成 rpm 系。「血统证据是全名录最硬的一条」也站住了，而且本轮由旁证升为一手实测（`Codename: buster`，§2.1 注 8）。「没有独立命名的桌面版产品，对标的是调度席位而非办公终端」这一条写进了 `distros/linx6.conf` 的头部与 §4.5。当时没预见到的是取材之外的一堵墙：`mmdebstrap` 在这套介质上直接死锁而非报错（缺陷 D15），最后与麒麟 V10 共用了两阶段自举。
 
 **视需求做**
 
@@ -245,26 +267,26 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 - **优麒麟**：官方文档的「适用用户」四类**全部个人向**，未查到任何机构客户或预装案例；Ubuntu 直系，上游镜像就是最好的近似。
 - **AOSC OS**：官网明确声明**不适合商业部署或任何要求高可靠性的场合**，属结构性不适用。
-- **FydeOS**：Chromium OS + Gentoo Portage，与三条路径零交集；且它不发 `.iso` 而发 raw disk image，要做等于另起一套方法。
+- **FydeOS**：Chromium OS + Gentoo Portage，与四条路径零交集；且它不发 `.iso` 而发 raw disk image，要做等于另起一套方法。
 
 **一处尴尬值得记下来。** 按《安全可靠测评》桌面附表，**名录里**在列的只有银河麒麟、统信、方德三家（§2.1；附表另有华为终端的 HarmonyOS，不在本名录范围内），而 2026 年度央采桌面框架协议初审过的也正是这三家。⚠️ 安可在列不等于采购资格——HarmonyOS 是唯一拿到 Ⅱ 级的桌面 OS 却在央采初审落选（§2.1）。前两家是本项目的被试，而**第三家方德恰好是 ISO 拿不到的那家**——它的 Pro 版 V5.0 与银河麒麟桌面 V11 是同批（2025 年第 3 号公告）过评的两款桌面，交付场景与被试重叠，技术上最该做。也就是说：按采购目录该做的第三个，恰恰卡在材料可得性上，而不是技术上。上面推荐的三个候选中，凝思与麒麟信安都**不在**桌面附表里（凝思与麒麟信安入列的都是各自的服务器版）。若交付验证要对标「进了党政采购目录的桌面」，这一点必须先说清。
 
-**方法而不只是三个镜像。** 名录里 21 个 OS 里，有 10 个是 deb 系或 deb 系旁证明确，三条路径对它们大体可套；真正的门槛不在技术，而在 ISO 授权与「厂商血统不公开」这两件事上——但要精确说：③筛掉的三家不是「撞上授权门槛」——§2.1 实测需申请授权是 0 家，方德与 EulerOS 属「没有公开渠道、也找不到条目」，新支点属「有渠道但不可脚本化」。
+**方法而不只是三个镜像。** 名录里 21 个 OS 里，有 10 个是 deb 系或 deb 系旁证明确，deb 侧那三条路径对它们大体可套，rpm 系另有 §4.4 一条；真正的门槛不在技术，而在 ISO 授权与「厂商血统不公开」这两件事上——但要精确说：③筛掉的三家不是「撞上授权门槛」——§2.1 实测需申请授权是 0 家，方德与 EulerOS 属「没有公开渠道、也找不到条目」，新支点属「有渠道但不可脚本化」。
 
 ### 2.6 后续 TODO
 
-优先级按上一节的判据排定。**麒麟信安与凝思先做，Loongnix 待定**——后者的必要性取决于是否真有 LoongArch 交付需求。
+上一节点名的三个候选里，麒麟信安与凝思已在本轮做完并进入被试（§4.4、§4.5），Loongnix 仍待定——它的必要性取决于是否真有 LoongArch 交付需求。
 
 | # | 事项 | 状态 |
 |---|---|---|
-| 1 | **麒麟信安 KylinSec**：取 `KylinSec-Desktop-6` ISO，验证 rpm 系 bootstrap（`dnf --installroot`）与 rpm 依赖闭包切片 | 优先 |
-| 2 | 为 rpm 系新增一条构建路径，与现有三条并列进 §4；能力矩阵与五道门禁按包格式无关的部分应可直接复用 | 优先，随 1 |
-| 3 | 先确认凝思镜像的对标对象是调度席位而非办公终端，并在档位定位里写明 | 优先 |
-| 4 | **凝思安全操作系统**：取**主线**（deb 系）ISO 而非欧拉版，套 §4.1／§4.2 的路径 | 优先，随 3 |
+| 1 | **麒麟信安 KylinSec**：取 `KylinSec-Desktop-6` ISO，做 rpm 系 bootstrap 与依赖闭包 | 已完成（§4.4）。实际走的是解析介质 `repodata` 求闭包再 `rpm --root` 安装，而非原计划的 `dnf --installroot`——介质自带 2935 个 rpm 与完整 repodata，多一层 dnf 只是多一层不确定 |
+| 2 | 为 rpm 系新增一条构建路径，与原有三条并列进 §4 | 已完成（§4.4 `rpmmedia`）。能力矩阵与五道门禁中与包格式无关的部分确实直接复用了，但探针本体不能——原先它是 dpkg 专用的，量 rpm 系会把「不是 deb」误报成「缺能力」，已改为按包管理系分支测同一项能力（§6.1） |
+| 3 | 先确认凝思镜像的对标对象是调度席位而非办公终端，并在档位定位里写明 | 已完成，写在 `distros/linx6.conf` 头部与 §4.5 |
+| 4 | **凝思安全操作系统**：取**主线**（deb 系）ISO 而非欧拉版 | 已完成（§4.5）。取的是主线 V6.0.100，实测 `Codename: buster`、dpkg 1.19.7、glibc 2.28——Debian 10 血统由推断升为一手证据 |
 | 5 | **Loongnix 25.1**：从 ISO 构建 `loong64` 新世界 ABI 的分档镜像 | 待定（取决于是否有 LoongArch 交付） |
 | 6 | 若做 5，需同时给出「新旧世界 ABI 不可互换」的实测证据，并说明为何 `cr.loongnix.cn/loongson/loongnix:20.7` 不能用作 25.1 的验证环境 | 待定，随 5 |
 | 7 | 方德桌面 V5.0：按采购目录本应是第三家，但 ISO 无公开渠道。若日后取得授权即列入优先 | 阻塞（材料可得性） |
-| 8 | `test/capabilities.sh` 至今没有变异用例（§9.1），而 648 格全出自它。补这一层的变异测试 | 与被试无关，独立事项 |
+| 8 | `test/capabilities.sh` 至今没有变异用例（§9.1），而全部矩阵格出自它 | 未做。本轮矩阵从 648 格扩到 1080 格，且探针本体因按包管理系分支而代码分支翻倍，这一层缺口的影响面随之变大 |
 
 ## 3. 分档：为什么是 micro / base / devel
 
@@ -280,17 +302,23 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 档位定位直接决定了能力矩阵里「不适用」格的判据（见 §6）。这一点必须先说定，否则「micro 档没有 gcc」到底算缺口还是算设计，会变成一笔糊涂账。
 
-九个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（九个镜像实测 37.9%–46.9%，分母用 tar 的精确字节、分子取 `docker images` 报的 MB，故上下界本身带 ±0.5 MB 的舍入，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
+15 个镜像的规模落在下表（表 [`t04`](derived/tables/t04_built_images.csv)）。尺寸一律以 rootfs tar 的字节流为准——只有它既可复现又有 sha256 锚点；`docker images` 显示的是解包后按块占用，比它大四成上下（15 个镜像实测 36.3%–48.6%，分母用 tar 的精确字节、分子取 `docker images` 报的 MB，故上下界本身带 ±0.5 MB 的舍入，见表 [`t04`](derived/tables/t04_built_images.csv)），两个口径不能混用。
 
 ![三档镜像的体积与包数](figures/fig04_tier_size.png)
 
 ### 3.1 信任根：GPG keyring 的来源与指纹
 
-两条走在线源的路径（mmdebstrap、selfhost）在拉包前强制验签，`build/build-selfhost.sh` 的阶段 0 会独立跑一次 `gpgv` 核 `InRelease`，失败即中止。构建实际使用的 keyring 是 `keys/kylin-archive-keyring.gpg`，随仓库提交，来源与指纹如下，可独立核对：
+走在线源的路径（麒麟 V11 的 mmdebstrap、麒麟 V10 SP1 的 selfhost）在拉包前强制验签，`build/build-selfhost.sh` 的阶段 0 会独立跑一次 `gpgv` 核 `InRelease`，失败即中止。构建实际使用的 keyring 是 `keys/kylin-archive-keyring.gpg`，随仓库提交，来源与指纹如下，可独立核对：
 
 | 文件 | 来源 | 指纹 | 谁在用 |
 |---|---|---|---|
 | `keys/kylin-archive-keyring.gpg` | 麒麟软件源 `pool/main/k/kylin-keyring/` 里 `kylin-keyring` 包内的 `/usr/share/keyrings/kylin-archive-keyring.gpg` | `33104E0C 61AEB527 90AB3010 F49EC40D DCE76770`<br>uid: `Kylin Archive Automatic Signing Key (For Kylin Arm64 Repo.)` | `lib/common.sh` 的 `KEYRING`、`build-selfhost.sh` 的 `--keyring`、以及四处 `signed-by=`：`build/build.sh:40`（bootstrap 期间喂给 mmdebstrap 的宿主侧源，真正拿这把 key 验 `InRelease` 的就是这处）、`build/customize.sh:55` 与 `build/selfhost-inner.sh:30,90`（写进镜像的 `sources.list`） |
+
+**另外三个被试不走在线源，信任根形态因此不同，逐条说明。**
+
+UOS V25 的内容来自 ISO 内的 squashfs，锚点是 `distros/uos25.conf` 里的 `SQUASHFS_SHA256`，构建前强制核对（不符即中止）。麒麟信安的包全部取自 ISO 自带的介质仓库，锚点是 ISO 的官方 sha256。
+
+凝思是唯一一处**有意偏差**：它的介质仓库没有签名，所以 `distros/linx6.conf` 写了 `NO_CHECK_GPG=yes`，第三阶段的 apt 源用 `trusted=yes`。介质本身的完整性由 ISO 的官方 md5 与 sha256 兜（两个值都在 conf 里，本地实测逐位匹配）。代价要说清：**签名验证保护的是「这份内容确实出自厂商」，校验和只保护「这份文件没被改动」** —— 后者依赖你拿到校验和的那个渠道本身可信。凝思的校验和取自官网同目录的 `md5sum.txt`，与 ISO 同源，所以这条链的强度低于麒麟两版的 GPG 验签。这是材料条件决定的，不是选择。
 
 实测该 keyring 单独即可验通麒麟 V11（`dists/11.0`）与 V10 SP1（`dists/10.1`）的 `InRelease`：
 
@@ -310,13 +338,15 @@ $ gpgv --keyring keys/kylin-archive-keyring.gpg InRelease   # 11.0 与 10.1 皆�
 
 有一处刻意不动：麒麟 V10 的 micro 档 `/usr/share/keyrings/kylin-archive-keyring.gpg` 属厂商 `kylin-keyring` 包（`dpkg -S` 查得到属主，md5 与包的 `.md5sums` 一致），我们的 `cp` 只是覆盖了同内容的同一路径。删它会破坏 dpkg 的文件清单，也越过了「等价环境」的底线。**判据是属主而不是路径**：`dpkg -S` 查得到的属发行版内容，查不到的才是我们注入的。落盘证据里 `keyrings`（全部）与 `keyrings_unowned`（注入的）分开记，断言只约束后者。
 
+还有一处曾经漏掉，现已修好，值得记：凝思三档一度带着 `/usr/share/keyrings/kylin-archive-keyring.gpg`——`build/selfhost-inner.sh` 里那句 `cp /keys/kylin-archive-keyring.gpg` 是无条件执行的，而那条路原本只服务麒麟 V10。凝思的介质仓库没有签名、出厂源写 `trusted=yes`（§4.5），所以那把 key 既非本厂的、也没有任何路径会去读它——正是本节开头「多一把没用的 key 就是多一份可被滥用的授权」要杜绝的情形，出现在最新加入的被试上。现在拷 keyring 之前先判 `NO_CHECK_GPG`，凝思三档重建后镜像内已无任何非本发行版的 keyring（缺陷 D20）。判据也一并通用化：`alien_keyring_images` 原先写死「UOS 里混进麒麟 key」，结构上抓不到这种组合，现在按「keyring 的厂商标识是否属于本发行版」判。
+
 UOS 走切片路径，不从在线源拉包，改为核对 squashfs 的 sha256（`distros/uos25.conf` 的 `SQUASHFS_SHA256`），信任根是 ISO 本身。
 
-## 4. 三条构建路径
+## 4. 四条构建路径
 
 造 rootfs 的教科书做法是 `mmdebstrap`[^R29] 或 `debootstrap` 从软件源拉起一个 chroot。
 
-三个被试里只有一个能这么走，另外两个各自撞上不同的墙，最后形成三条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。
+五个被试里只有一个能这么走，其余各自撞上不同的墙，最后形成四条路径（表 [`t09`](derived/tables/t09_build_paths.csv)）。其中 `selfhost` 被两个被试共用——银河麒麟 V10 SP1 与凝思 V6.0.100 撞的是同一堵墙的两种表现。
 
 ### 4.1 mmdebstrap：银河麒麟桌面 V11
 
@@ -336,15 +366,59 @@ UOS V25 是 OSTree 不可变系统，`apt` 和 `dpkg` 被 `deepin-immutable-ctl`
 
 切片路径踩的坑最深，两条值得单列：`info/format`（内容为 `1`）决定了 `Multi-Arch: same` 的包用 `pkg:arch.list` 命名，漏拷这一个文件会让 dpkg 对一大片包报 "missing the list control file"（缺陷 D10）；`dpkg` 的 admindir 在 UOS 上被搬到了 `/usr/lib/dpkg/var`，而 SBOM 扫描器从镜像层 tar 里找 `/var/lib/dpkg/status` 且**不跨归档跟随符号链接**，放符号链接会让扫描结果静默变成空的（缺陷 D09）。
 
+### 4.4 rpmmedia：麒麟信安桌面 V6
+
+前三条路径全在 deb 系内，这一条回答的是「这套做法能不能跨包格式」。
+
+麒麟信安的安装介质自带 2935 个 rpm 与完整 `repodata`，所以不需要 `dnf --installroot`：直接解析 `repodata/*-primary.xml.zst` 里的 provides 与 requires 求依赖闭包（2934 个包提供 19146 个能力），再用 `rpm --root` 装进目标目录。少一层 dnf 就少一层网络与解析器的不确定。rpm 的 requires 常写成能力名而非包名，所以闭包求解要走 `--whatprovides` 那一套，不能按包名直接匹配。
+
+三个坑：
+
+**安装顺序。** 一次性 `-Uvh` 全量交给 rpm 自己排序，它不保证 `filesystem` 在前，于是 `/lib64` 已被建成真实目录时报 `File from package already exists as a directory`。改成两批——`filesystem`、`setup`、`basesystem` 先建骨架，其余随后。这与 deb 侧 usr-merge 那个坑（缺陷 D01）是同一类问题在另一个包格式里的表现。
+
+**数据库后端。** 装完之后镜像内 `rpm -qa` 返回 0 行，退出码却是 0——与「空镜像」不可区分。真因不是版本代差：麒麟信安自带的 rpm 4.18.2 编译时把 `%{_db_backend}` 设成了 **ndb**，而 builder 的 rpm 4.20 默认写 sqlite。库文件都在，格式不认（缺陷 D13）。安装时 `--define '_db_backend ndb'` 即可，`RPM_DB_BACKEND` 记在 `distros/kylinsec6.conf` 里。这一处的连带面比看上去大：包数据库不可查会让 SBOM 与 CVE 扫描一起失效。
+
+**CA bundle。** 跨发行版 bootstrap 跑不了目标的 scriptlet，只能 `--noscripts`，而 RH 系的 `ca-certificates` 包里只有 p11-kit 源数据，bundle 是靠 `%post` 调 `update-ca-trust extract` 现生成的——Debian 那边是直接把 bundle 打进 deb 的。结果 `/etc/pki/tls/certs/ca-bundle.crt` 指向一个从未生成的文件，镜像内所有 TLS 握手失败，而包文件看上去装得齐齐整整（缺陷 D14）。装完在 chroot 内补跑 `update-ca-trust extract` 即可，生成的 bundle 为 240349 字节。
+
+**动态链接器缓存。** `--noscripts` 还跳过了所有调 `ldconfig` 的 `%post`，`/etc/ld.so.cache` 从未生成。后果按发行版布局而定：Debian 的多架构目录在动态链接器的内置默认搜索路径里，缺 cache 只损性能；RH 系把 systemd 的私有库放 `/usr/lib64/systemd`，那个目录**不在**默认路径、只写在 `/etc/ld.so.conf.d/systemd-x86_64.conf` 里——于是 `systemctl` 等 64 个二进制全部起不来，实测 `systemctl --version` 报 `error while loading shared libraries`（缺陷 D16）。装完在 chroot 内跑一次 `ldconfig` 即解。
+
+这一条差点被漏掉，原因值得单说：`elf_broken` 检查早就报了 `libsystemd-shared-255.so => not found`，但它旁边有一句注释写着「私有库目录不在 ld.so.conf 里，单独 `ldd` 会报 not found，是已知误报」——症状形状完全一样。**一条已归档的「已知误报」解释会掩盖同形状的真故障。** 分辨方法只有实际执行那个二进制。所以这道断言的判据是跑 `systemctl --version` 看退出码，不是读 `ldd` 的输出。
+
+四个坑现在都有装完即验的断言：核对镜像内 `rpm -qa` 的条数等于闭包条数、核对 CA bundle 存在且非空、核对 `ld.so.cache` 非空且 `systemctl` 真能跑、用目标自己的 rpm 反查依赖自洽。配置写错时构建当场失败，不会再产出「文件都在、能力却缺」的镜像。
+
+### 4.5 selfhost 自举：凝思安全操作系统 V6.0.100
+
+取材要点先说清楚：凝思有主线与欧拉版两条线，名字只差一段（`linxos-6.0.97-an7-x86_64-BD.iso` 对 `linxos-v6.0.99-el20.03-...`），欧拉版是 rpm 系。本被试取的是**主线** V6.0.100。Debian 10 血统原先只是从发布说明里的 `grub2 2.06-3~deb10u4linx5` 推断，现在是一手证据：镜像内 `Codename: buster`、dpkg 1.19.7、glibc 2.28。
+
+这条路径与 §4.2 同名同法，但撞墙的表现更靠前。`mmdebstrap` 在「installing essential packages」阶段**直接挂住**：CPU 归零、dpkg 变僵尸、卡在 `pipe_read`，不报错也不超时，三次复现（缺陷 D15）。麒麟 V10 那边至少还会因为读不懂状态标记而失败，这边连失败都不给。
+
+定位靠一个反证实验：同一份介质换 `--variant=extract`（只解包、不在 chroot 内跑目标 dpkg）0.75 秒成功。卡点因此锁定在「chroot 内执行目标 dpkg」，而不是介质损坏或包名写错。解法与 V10 相同——`debootstrap --foreign` 只解包，导入容器后用凝思自带的 dpkg 完成 `--second-stage`。
+
+与 V10 那条路的差别在信任根：凝思的介质仓库没有签名，所以 `NO_CHECK_GPG=yes`、apt 源写 `trusted=yes`，介质本身的完整性由 ISO 的官方 md5 与 sha256 兜底（记在 `distros/linx6.conf`）。这是与 §3.1 信任根做法的一处**有意偏差**，代价是介质到手前的链路要靠官方校验和而非签名验证。
+
+凝思还带出两个别的被试没有的问题，都出在 base 集的内容上。
+
+其一，`linx-noroot-conf` 被 `debootstrap` 的 base 集带进来、停在 `half-configured`，`dpkg --audit` 因此多一条。`PIN_NEVER` 原先只写进 apt 的 preferences，而阶段 3 在 apt 就位前用 `dpkg -i` 从 stage 缓存补装，一律装上——同一条策略在 apt 路径被遵守、在 dpkg 回落路径被静默忽略（缺陷 D17）。真正的拦截点是 `debootstrap --exclude`，也就是包进来之前。
+
+其二，base 集还带一个内核包。容器共享宿主内核，`lib/common.sh` 会删掉 `/boot` 与 `/lib/modules`，但原先不动包数据库，于是库里留着一个 `Installed-Size 261829`（256 MB）而文件全不在的登记。这不只是冗余：SBOM 会报告一个不存在的包，trivy 因此凭空产出 373 条 HIGH+CRITICAL，占该镜像全部命中的 69%（缺陷 D18，判据与两次弯路见 §9.2）。现在删文件的同一处会把整条内核链从库里 purge 掉，并当场跑 `apt-get check` 确认没有制造新的依赖不一致。
+
+另有两处与本被试无关但值得记的施工细节：第二阶段容器需要 `--privileged`，否则报 `Cannot install into target '/' mounted with noexec`；第三阶段装档位包的容器必须挂上介质，否则 apt 取不到包，而当时的报错只说「以下档位包没装上」，不说取不到源。
+
 ## 5. 精简与容器化改造
 
-三条路径共用一套容器化改造（`lib/common.sh::adapt_container`），改造项分两类。
+四条路径共用一套容器化改造（`lib/common.sh::adapt_container`），改造项分两类。
 
 一类是标准的容器精简：`policy-rc.d` 返回 101 阻止装包时起服务、apt 配置去掉缓存与翻译文件、`/usr/share/doc` 按 `path-exclude` + `path-include copyright` 只保留版权声明（GPL 要求）、清空 `machine-id`、删除 ssh host key 与 `resolv.conf`、去掉内核与固件。
 
-另一类是桌面 ISO 特有的、必须改的语义。三个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个；这两家的 micro 档是 0 个——不是「没有单元目录」（`/lib/systemd/system` 里其实还有个别包丢进去的几个单元），而是**没有 `multi-user.target`**：改造的守卫先判 `multi-user.target` 是否存在，判空就整段不进；而那 14 条候选单元在 micro 档里一条都不在，本来也无从 mask。`default.target` 也因此为空（缺陷 D12）。
+另一类是桌面 ISO 特有的、必须改的语义。五个发行版带 systemd 的档位里，`default.target` 都是 `graphical.target`——它们本来就是桌面系统，真机上这么设是对的，但 server 用途下会去拉 display-manager，而且一个 masked 单元都没有，容器里跑不了的单元会一路报错。改造把默认目标改为 `multi-user.target`，并按候选表 mask 掉容器内确证不可用的单元。
 
-还有一类是补齐，理由是「缺了会让语义不自洽」。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；九个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是「今天」，否则可复现性当场报废。
+数量随发行版**与档位**而变（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V10 三档均为 11 个——它的镜像里还有 udev 那一组单元（`systemd-udevd` 及其两个 socket、`systemd-udev-trigger`），另两家根本没有这些单元文件、无从 mask，所以麒麟 V11 与 UOS 的 base/devel 各 7 个。第二轮两个被试分列两端。**麒麟信安 base 与 devel 各 6 个、micro 为 0**——它的 micro 档没有 systemd，没有单元可 mask。**凝思三档均为 34 个**，是五家里 mask 面最大的：Debian 10 那一代的单元数最多，udev、审计、内核挂载几组都在，而且它的 micro 档也带 systemd（`default.target` 非空），所以三档一致而不是 micro 为 0。micro 档为 0 的是麒麟 V11、UOS 与麒麟信安三家——不是「没有单元目录」（`/lib/systemd/system` 里其实还有个别包丢进去的几个单元），而是**没有 `multi-user.target`**：改造的守卫先判 `multi-user.target` 是否存在，判空就整段不进；而那 14 条候选单元在 micro 档里一条都不在，本来也无从 mask。`default.target` 也因此为空（缺陷 D12）。
+
+还有一类是补齐，理由是「缺了会让语义不自洽」。麒麟 V11 的 micro 档原本没有 `/etc/shadow` 和 `/etc/gshadow`，却带着 setuid 的 `su` 和 `newgrp`——setuid 二进制拿不到影子文件，既不可用又是白送的攻击面；15 个镜像里只有它这样。补齐时最后改动日期用 `SOURCE_DATE_EPOCH` 折算而不是「今天」，否则可复现性当场报废。
+
+**跨包格式暴露了两处「改造项本身是 deb 本位」的地方。** 第一处是影子文件补齐：那段代码按 Debian 惯例写死 `root:shadow 0640`，而 RH 系的 `/etc/shadow` 是 `000 root:root`（更严），凝思自带的 shadow 套件产出 `0660`（多一个组写位）。守卫因此改成按发行版取期望值，写在 `distros/*.conf` 的 `EXPECT_SHADOW`——写死一个值会把发行版惯例差异报成缺陷，而真正该守的是「与该发行版的基线一致」。
+
+第二处是 `/etc/ld.so.cache`。它不属于任何包（是 `ldconfig` 触发器的产物），所以切片路径与 `--noscripts` 的 rpm 路径都会漏。漏掉的后果按布局而定：Debian 的多架构目录在动态链接器的内置默认搜索路径里，缺 cache 只损性能；RH 系把 systemd 私有库放 `/usr/lib64/systemd`，那个目录只写在 `ld.so.conf.d` 里，缺 cache 等于 64 个 systemd 二进制全部起不来（缺陷 D16）。两条路径现在都补跑 `ldconfig`，判据是**执行那个二进制**而不是读 `ldd` 的输出。
 
 setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_surface.csv)）：麒麟 V11 与 UOS 的 micro 档各只有 2 个 setuid 二进制，麒麟 V10 micro 档有 10 个，其中包括 `/usr/sbin/kysec-wlinit`——一个 KYSEC 相关的程序，而容器里根本不加载 KYSEC LSM（见 §9.1）。V10 的 micro 档之所以这么「厚」，是因为它的 `Priority: required` 集本来就大（连 systemd 都在里面），这条路径没有更细的裁剪余地。用作纯运行时档时，这 10 个 setuid 属于需要知情的攻击面。
 
@@ -359,7 +433,9 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 这张表是回退前后的一次性对照，用的是 `docker images` 解包占用口径（因为当时就是这么读的），与本文其余处的 rootfs tar 口径不同。回退后的构型已经覆盖了那次实验的产物，所以**四个数里只有两个起点有现存锚点**——345 MB 与 281 MB 都在表 [`t04`](derived/tables/t04_built_images.csv) 的 `unpacked_size` 列里（分别是 kylin11:base 与 uos25:base），两个终点值 407 MB 与 420 MB 是当时的观察记录、没有落盘凭据；UOS base 的起点当前实测是 281 MB。正文其余所有尺寸一律为 tar 口径。
 
-唯一的实测点是麒麟 V11 base 的 345 MB → 407 MB，即一个 `dig` 要 **62 MB**。这与「小镜像」的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里九个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有；UOS 是 `apt` 装不上（原因见 §6.2），但 `bind9-dnsutils` 本身在它的 ISO 里，要就得改切片种子重切——这里说的是「装不上」，不是「没有」。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，六个包自身的 `Installed-Size` 合计约 7.2 MiB（`apt-cache show` 实测：2981 + 121 + 474 + 1746 + 362 + 1719 KB，不含依赖）。这六个在 UOS 的 ISO 里都有，补齐后三家齐平（`ping` 与 `vi` 是最后补上的两个，此前矩阵里它们在 UOS 侧还是缺口）；`wget` 则三家都没装——`curl` 已覆盖同类需求，不重复占体积。
+唯一的实测点是麒麟 V11 base 的 345 MB → 407 MB，即一个 `dig` 要 **62 MB**。这与「小镜像」的目标直接冲突，两项都回退了。基础 DNS 解析用 `getent hosts` 就够（矩阵里 15 个镜像全部支持）；真要 `dig`，麒麟两版一条 `apt install` 就有；UOS 是 `apt` 装不上（原因见 §6.2），但 `bind9-dnsutils` 本身在它的 ISO 里，要就得改切片种子重切——这里说的是「装不上」，不是「没有」。保留下来的运维集是 `iproute2` / `iputils-ping` / `lsof` / `zstd` / `unzip` / `vim-tiny`，六个包自身的 `Installed-Size` 合计约 7.2 MiB（`apt-cache show` 实测：2981 + 121 + 474 + 1746 + 362 + 1719 KB，不含依赖）。这六个在 UOS 的 ISO 里都有，补齐后首轮三家齐平（`ping` 与 `vi` 是最后补上的两个，此前矩阵里它们在 UOS 侧还是缺口）；`wget` 五家都没装——`curl` 已覆盖同类需求，不重复占体积。
+
+第二轮两个被试各有一处不对称，都是发行版属性而非疏漏。麒麟信安 base 六项齐备，包名按 rpm 族取（`iproute`、`iputils`、`vim-minimal`）。凝思 base 只有五项，缺 `zstd`：Debian 10 buster 的年代还没有独立的 `zstd` 命令行包，介质里也没有，补不进来。所以「六个运维工具」这个口径在凝思上是 5/6，原因是包在那个年代不存在，不是切片种子漏了。
 
 ## 6. 能力矩阵：测什么、怎么测、测出什么
 
@@ -367,11 +443,21 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 能力不能按包列表推断——装了 gcc 不等于能编出可跑的二进制。探针（`test/capabilities.sh`）在每个镜像内**真跑**每一项：编译要真编译真执行，TLS 要真握手（连 `mirrors.aliyun.com:443` 并校验证书链），apt 要真装真卸（用带 maintainer script 的包，无脚本的包会掩盖厂商 dpkg 的问题），本地 `.deb` 直装要真造一个 deb 装上再卸掉。
 
+**阳性对照的靶子要从源自己的索引里取，不能拿「已装的包」当靶子。** 可装性判据（§6.3）需要一条对照，用来区分「源里没有这个包」与「查询根本没通」。第一版用了一个必然已安装的包（`bash`）作靶子，理由是「已装的包必然在源里」——这对正常发行版成立，对 UOS 不成立：它的包来自 ISO，apt 源全是应用商店内容，连 `bash` 都查不到。于是 UOS 会被判成「判据故障」，而真相是已知结论「源里没有 OS 包」。
+
+正确做法是从源的索引里取第一个包名当靶子，测的是查询机制本身。仓库里原有的那条 UOS 专用对照本来就是这么做的，通用化时该照着它做——**补通用机制之前，先看现有的特例是怎么做的**，特例往往已经把边界情况想清楚了。无源的被试（凝思）取不到靶子，如实记 `NOSOURCE`，与「判据故障」分开。
+
+**同一把尺子要能量两种包格式。** 探针原先是 dpkg 专用的：包数据库查询写死 `dpkg-query`，本地装包写死 `dpkg-deb`，连 glibc 版本与架构都从 `libc6` 这个包名问出来。麒麟信安进被试后，这套写法会让它在「包数据库可查」「包管理器存在」「本地包直装」上一片不支持——量到的不是被试缺能力，是尺子刻度不对。现在探针在镜像内自己判定包管理系（`pkgsys`），同一项能力在 deb 侧用 dpkg/apt 测、rpm 侧用 rpm/dnf 测：数据库查询对应 `dpkg-query -W` 与 `rpm -qa`，依赖自洽对应 `apt-get check` 与 `rpm -Va --nofiles`，CA bundle 两族的路径都认。
+
+本地包直装这一项的两侧不完全对称，要说明白。deb 侧在镜像内现造一个 deb 装上再卸掉，三档都能造；rpm 侧造包要 `rpmbuild`，只有 devel 档预置了。若因此把 micro 与 base 判成不支持，量的就是探针的构造手段而不是被试的能力。所以由 `test/run-capabilities.sh` 把一个最小 noarch 包（`test/fixtures/`，出处与 sha256 见同目录 README）只读挂进 `/probe-fixtures`，三档同一口径。这个包不写进镜像，只在测量期间存在。
+
 探针输出与被测镜像的**新鲜度**也要能被机器发现。第五轮踩过一次：给 UOS 补了 `iputils-ping`/`vim-tiny` 重建镜像之后探针没重跑，矩阵里那两项还是「不支持」，头条数字因此错了 4 格。现在 `collect_d3_capabilities.py` 记下每份探针输出的 mtime 与对应镜像的 `Created`，前者早于后者即 `exit 1` 不写盘，`verify.py` 也有对应断言（`probe_stale_vs_image`、`probe_provenance_recorded`）。
+
+另一个方向的风险是**探针自身的版本**：改了探针只重跑一部分镜像，混着的矩阵横向对比就不成立，而输出本身看不出任何异常。现在探针把自己的 sha256 前 12 位写进输出（`probe_sha`），`verify.py` 断言全部输出出自同一版。
 
 这条判据依赖文件 mtime，而 git 不保留 mtime——新克隆里 `caps-*.txt` 的 mtime 是签出时刻，必然晚于镜像，所以它只在「原地重采」这一种场景下有鉴别力，**不构成提交物的 provenance 保证**。真正的内容锚点应由探针在运行时把该档 tarball 的 sha256 写进输出（d6/d7 已经用 `anchor_tar_sha256` 做到了，d3 因为探针与采集解耦而尚未做）。这是本仓库已知的一处可审计性缺口，不是事实错误。
 
-72 项 × 9 个镜像 = 648 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=648`）。严格说其中 15 格是「前置条件不存在」而非「跑过了」：9 格是 micro 档的 apt 三项（没有 apt，`apt_update`/`apt_roundtrip`/`apt_check` 无从执行），6 格是 `cc_clean_stderr`（没有编译器就无所谓 stderr 干净不干净，micro 与 base 各三家）。探针对这两类如实输出 `n/a`，拆分见下。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
+72 项 × 15 个镜像 = 1080 格，全部由镜像内探针逐格判定（`capability_items=72`、`capability_cells=1080`）。其中 25 格是「前置条件不存在」而非「跑过了」，拆开是两批：**15 格是包管理三项**（`pkg_update`/`pkg_roundtrip`/`pkg_check` 各 5 格，对应 5 个 micro 档没有包管理器），**10 格是 `cc_clean_stderr`**（micro 与 base 两档各 5 家，没有编译器就无所谓 stderr 干净不干净）。探针对这类如实输出 `n/a`，拆分见下。另有 4 格取值为 `nosrc`：该档位有包管理器，但出厂时一个可用软件源都没有（凝思 base/devel 的元数据刷新与装卸往返），归入缺口而不是不适用，理由见 §6.2。探针最后一行输出 `probe_complete=Y` 哨兵，采集脚本硬断言它——探针中途挂掉时缺失的 key 会被读成空值而不是失败，这类静默截断本项目踩过（见 §9.2）。
 
 三态判据写死在 `scripts/analyze.py` 的 `NA_POLICY` 里，是矩阵表和热力图的唯一真源（两处各写一份必然漂移）：
 
@@ -379,13 +465,13 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 - **不支持**：该档位确实存在这一需求却不满足，是缺口
 - **不适用**：该档位定位下这一需求不存在（依据 §3 的档位定位，不拿它掩盖缺口）
 
-79 项探针输出里，进三态矩阵的是 72 项，另外 7 项的去向必须交代清楚：6 项是环境指纹（架构、glibc 版本、`os-release` ID、setuid 数量、file capabilities 数量、`default.target`），值是版本号或计数而非布尔，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；1 项是探针完成哨兵 `probe_complete`，用于判断探针有没有跑完，本身不是能力。
+探针输出里进三态矩阵的是 72 项，其余的去向必须交代清楚：环境指纹 10 项（架构、glibc 版本、`os-release` ID、setuid 数量、file capabilities 数量、`default.target`，加本轮新增的包管理系、具体包管理器、包数据库条数、探针版本指纹），值是版本号或计数而非布尔，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；1 项是探针完成哨兵 `probe_complete`，用于判断探针有没有跑完，本身不是能力。这个分类现在有结构门禁守着，见 §6.4。
 
-72 项里有一项需要单列：**`sudo` 在九档全部判为「不适用」，而探针实测九档全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。按档位定位归入 NA 集而不是从矩阵里删除该项：这 9 格归入 NA 而非计入缺口，使缺口数由 61 变为 52；但该项仍留在矩阵里，不像删除那样把它从分母里抹掉——删除会让不适用从 198 降到 189、总格数从 648 降到 639，把这 9 格连同它们记录的事实一起从视野里去掉。
+72 项里有一项需要单列：**`sudo` 在 15 档全部判为「不适用」，而探针实测全部是 `N`**（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)）。判为不适用的依据是 §3 的档位定位——容器内默认就是 root，非 root 场景用 `USER` 指令而不是提权，所以「没有 sudo」不构成缺口。按档位定位归入 NA 集而不是从矩阵里删除该项：这 15 格归入 NA 而非计入缺口，使缺口数由 112 变为 97；但该项仍留在矩阵里，不像删除那样把它从分母里抹掉——删除会把这些格连同它们记录的事实一起从视野里去掉。按删除处理的话，总格数从 1080 降到 1065、不适用从 330 降到 315，而缺口数 97 一格不变——分母缩了，唯一的效果是把这 15 格记录的事实从视野里去掉。
 
-198 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)，三个数由 `analyze.py` 算出、落在 `stats.json` 并有断言守）：**173 格**探针实测为 `N`、按档位定位改判为不适用；**15 格**探针本身输出 `n/a`，即前置条件不存在——其中 9 格是三个 micro 档的 apt 三项、6 格是 `cc_clean_stderr`（micro 与 base 各三家，没有编译器就无所谓 stderr 干净）；**10 格**探针实测为 `Y`，也就是该档位实际具备、但按定位不计入的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 173+15+10=198。所以这个矩阵两个方向都要提醒：只看「缺口 52」会低估未满足面（173 格实测不通过被归入不适用），只看「支持 398」也会低估已具备的能力（另有 10 格实测通过但没计入）。
+330 格「不适用」的组成也要拆开说，它不是一类东西（原始值可查 [`t05b`](derived/tables/t05b_capability_raw.csv)，三个数由 `analyze.py` 算出、落在 `stats.json` 并有断言守）：**277 格**探针实测为 `N`、按档位定位改判为不适用；**25 格**探针本身输出 `n/a`，即前置条件不存在；**28 格**探针实测为 `Y`，也就是该档位实际具备、但按定位不计入的能力（micro 档的 `pager`、`perl`、`su_to_user`、`systemd`、`useradd` 等）。三类合计 277+25+28=330。所以这个矩阵两个方向都要提醒：只看「缺口 97」会低估未满足面（277 格实测不通过被归入不适用），只看「支持 653」也会低估已具备的能力（另有 28 格实测通过但没计入）。
 
-648 格的分布是支持 398、缺口 52、不适用 198。信息型探针（架构、glibc 版本、setuid 计数等 6 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
+1080 格的分布是支持 653、缺口 97、不适用 330。信息型探针（架构、glibc 版本、setuid 计数、包管理系等 10 项）是环境指纹不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)；探针完成哨兵也不算能力项，两者都不进三态矩阵。
 
 ![能力矩阵热力图](figures/fig03_capability_matrix.png)
 
@@ -393,15 +479,21 @@ setuid 面本身也值得看一眼（表 [`t12`](derived/tables/t12_hardening_su
 
 ### 6.2 结果
 
-**基础运行时零缺口。** shell、coreutils、`getent`、影子文件、`zh_CN.UTF-8` locale、时区、CA 根证书、DNS 解析、TLS 真握手、`nsswitch.conf`、`/tmp` 与 `/var` 可写、信号 trap——九个镜像全部通过。这一层对应本项目的首要用途，即验证编译产物能否运行。
+**基础运行时零缺口。** shell、coreutils、`getent`、影子文件、`zh_CN.UTF-8` locale、时区、CA 根证书、DNS 解析、TLS 真握手、`nsswitch.conf`、`/tmp` 与 `/var` 可写、信号 trap——15 个镜像全部通过。麒麟信安的 CA 与 TLS 一度是缺口，真因是我的构建跳过了 `ca-certificates` 的 `%post`（缺陷 D14），补跑 `update-ca-trust extract` 之后齐平。这一层对应本项目的首要用途，即验证编译产物能否运行。
 
-编译能力逐项见表 [`t06`](derived/tables/t06_build_capability.csv)。**C 三家齐备，C++ 缺一家。** 三个 devel 档 C 全部真编真跑通过（`devel_c_ok=3`），C++ 只有两家（`devel_cxx_ok=2`）。缺的是 UOS V25——它的 ISO 里没有 g++。麒麟 V10 的 GCC 9 不支持 `-std=c++20`（`c++17` 可用）。
+编译能力逐项见表 [`t06`](derived/tables/t06_build_capability.csv)。**C 五家齐备，C++ 缺一家，C++20 只有两家。** 五个 devel 档 C 全部真编真跑通过、静态链接也全通过（`devel_c_ok=5`）；C++ 四家通过（`devel_cxx_ok=4`），缺的是 UOS V25——它的 ISO 里没有 g++。
+
+C++ 标准版本这一层的差异来自编译器年代，与包格式无关：麒麟 V11（GCC 12 代）与麒麟信安（GCC 12.3.1）`c++17` 与 `c++20` 都过；麒麟 V10 的 GCC 9 与凝思的 GCC 8 只到 `c++17`。凝思那一档是本轮加入的最老工具链（Debian 10 buster 血统），对交付端的含义直接：**要在凝思镜像里编 C++20 代码，得自带工具链。**
 
 **麒麟 V11 的 gcc 会污染 stderr。** 每次编译往 stderr 吐 `grep: /CurrentlyBuilding: No such file or directory`，编译本身成功。这是厂商包装脚本的缺陷（D05），我们没改——改厂商脚本就越过了「等价环境」的底线。影响是：在这个镜像里判断编译是否失败，必须用退出码，不能用 stderr 非空。
 
-**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源索引只有 2496 个条目、全部来自应用商店仓库，其中不含任何 OS 基础包——连 `nano` 这样的基础编辑器在整个 apt 源里都查不到候选（`apt-cache policy nano` 返回 `Candidate: (none)`；同一次探测里对照组 `1000-notepad` 能查到 5.14.0，证明探测本身有效，见 `raw/d6_installability.json` 的 `uos_apt_scale`），OS 分发走 OSTree 加玲珑。
+**包管理：UOS 装不了 OS 包，但那是产品设计不是缺陷。** 麒麟两版 base/devel 的 `apt update` / `install` / `purge` 往返全部通过。UOS 的 `apt` 二进制在、源可达、`apt check` 干净，但装不了 OS 包——它的 apt 源索引只有 2500 个条目、全部来自应用商店仓库，其中不含任何 OS 基础包——连 `nano` 这样的基础编辑器在整个 apt 源里都查不到候选（`apt-cache policy nano` 返回 `Candidate: (none)`；同一次探测里对照组 `1000-notepad` 能查到 5.14.0，证明探测本身有效，见 `raw/d6_installability.json` 的 `uos_apt_scale`），OS 分发走 OSTree 加玲珑。
 
-这个数字的口径是**源索引里的条目数**（用 `apt-helper cat-file` 解开压缩的 `Packages` 索引数出来的）。不要用 `apt-cache stats` 的 `Total package names`——那个数（4758）把本机已装的 OS 包和只在依赖里被引用过的名字也算了进去，不是「源里有多少包」。另外采集时带了一条**阳性对照**：从源索引里取一个真实存在的包名，确认 `apt-cache madison` 查得到它。没有这条对照，「14 个工具全都装不上」就区分不了「源里没有」与「源根本没通」。
+这个数字的口径是**源索引里的条目数**（用 `apt-helper cat-file` 解开压缩的 `Packages` 索引数出来的）。不要用 `apt-cache stats` 的 `Total package names`——那个数（4754）把本机已装的 OS 包和只在依赖里被引用过的名字也算了进去，不是「源里有多少包」。另外采集时带了一条**阳性对照**：从源索引里取一个真实存在的包名，确认 `apt-cache madison` 查得到它。没有这条对照，「14 个工具全都装不上」就区分不了「源里没有」与「源根本没通」。
+
+**第二轮两个被试的包管理结果分列两端。** 麒麟信安 base/devel 有 `dnf`、`/etc/yum.repos.d/` 有源、元数据可刷新、装卸往返通过，是五家里除麒麟两版之外唯一能从源装包的。凝思相反：`apt-get` 在、已装包依赖自洽，但一个可用源都没有——厂商未提供公开在线仓库，构建期用的是 ISO 自带的介质仓库，出厂时无源可写（§4.5）。
+
+这里有一处判据必须说清。出厂 `sources.list` 为空时 `apt-get update` 会**成功**——没东西要取，退出码自然是 0。把它记成「能更新」是错的：空集上的全称命题恒真，而能力一点没有。探针因此对这种情形输出 `nosrc` 而不是 `Y`，矩阵里归入缺口，原始值留在表 [`t05b`](derived/tables/t05b_capability_raw.csv) 里让缺口的**原因**可追。修好泄漏之后指标反而变好看、能力却毫无变化，这类陷阱值得单记（§9.2）。
 
 UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权的专业源（`professional-security.chinauos.com`、`pro-driver-packages.uniontech.com`），未授权返回 401，会让整个 `apt-get update` 退出非零，哪怕 appstore 源本身是通的。镜像里带一个必然失败的源清单没有意义，现在默认注释掉并留了重新启用说明（缺陷 D08）。
 
@@ -409,13 +501,19 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 矩阵里 `cmake`、`autoconf/automake`、`git`、`python3-dev`、`gdb`、`dig`、`strace` 这七项在 devel 档标着不支持，但性质完全不同。先说清它们在 base 档的判定：`cmake`、`autoconf/automake`、`git`、`python3-dev`、`gdb` 五项在 base 档按 §3 的档位定位判为**不适用**（它们属工具链或依赖工具链生态），只有 `dig` 与 `strace` 在 base 档**如实记为缺口**——§3 给 base 的定位含「线上排查」，这两个是纯排查工具，不装就是缺口。我们逐个测了这 14 个工具在各自软件源里的可装性：
 
-| | 麒麟 V11 | 麒麟 V10 | UOS V25 |
-|---|---|---|---|
-| 源里可 `apt install` | **14 / 14** | **14 / 14** | **0 / 14** |
+| | 麒麟 V11 | 麒麟 V10 | UOS V25 | 麒麟信安 V6 | 凝思 V6.0.100 |
+|---|---|---|---|---|---|
+| 源里可装 | **14 / 14** | **14 / 14** | **0 / 14** | **14 / 14** | **0 / 14** |
 
-逐工具明细见表 [`t11`](derived/tables/t11_tool_installability.csv)，14 个工具是 `iproute2`、`iputils-ping`、`bind9-dnsutils`、`lsof`、`vim-tiny`、`zstd`、`unzip`、`cmake`、`autoconf`、`automake`、`git`、`strace`、`gdb`、`python3-dev`。判据用 `apt-cache madison` 而不是 `apt-cache policy` 的 Candidate——后者对**已安装但源里没有**的包同样报候选版本，会把「已经装了」误计成「装得上」，在 UOS 上恰好会把 0/14 虚报成 6/14。
+逐工具明细见表 [`t11`](derived/tables/t11_tool_installability.csv)，14 个工具是 `iproute2`、`iputils-ping`、`bind9-dnsutils`、`lsof`、`vim-tiny`、`zstd`、`unzip`、`cmake`、`autoconf`、`automake`、`git`、`strace`、`gdb`、`python3-dev`。
 
-麒麟两版是「没预装」，一条命令就有，不预装是档位设计（保持 server 小镜像）。UOS 是「装不上」：它没有 apt 形式的 OS 软件源，能力面由 ISO 内容封顶。
+判据按包管理系分支：deb 侧用 `apt-cache madison`，rpm 侧用 `dnf list --available`，两者语义相同——**只看源提供什么，不含本机已装**。deb 侧不能用 `apt-cache policy` 的 Candidate，它对已安装但源里没有的包同样报候选版本，在 UOS 上会把 0/14 虚报成 6/14。包名也按族取：拿 deb 的名字（`iproute2`、`bind9-dnsutils`、`python3-dev`）去 rpm 系查会 14 项全报「源里没有」，而那量的是命名不是能力，对应的 rpm 名是 `iproute`、`bind-utils`、`python3-devel`。
+
+**14/14 有两家、0/14 有两家，而两个「0」的成因完全不同。** 麒麟 V11、麒麟 V10 与麒麟信安都是 14/14——「没预装」而非「装不上」，一条命令就有，不预装是档位设计（保持小镜像）。麒麟信安这一格值得单说：它是唯一跨包格式的被试，14 项全部在厂商在线源里查得到，说明「没预装」这个结论与包格式无关。
+
+两个 0 的性质不同。UOS 是「源里没有 OS 包」：apt 源可连通、`apt check` 干净，但 OS 分发走 OSTree 与玲珑，能力面由 ISO 内容封顶（缺陷 D08）。凝思是「根本没有源」：厂商未提供公开在线仓库——`download.linx-info.com` 直连不可达，`mirrors.linx-info.com` 返回 200 但是个 JS 单页站、`dists/` 各常见路径全部 404；构建期用的是 ISO 自带的介质仓库，出厂时无源可写（§4.5）。
+
+对使用方的含义因此相反：**UOS 上装不到的东西换个源也装不到**（产品设计如此），**凝思上只要拿到厂商内部源就能装**（渠道缺位而非能力缺失）。把两者都记成「0/14」而不拆开，会把一个可解的问题和一个不可解的问题混成一句结论。
 
 我们进一步查了 UOS ISO（`uos_iso_packages=1636` 个包，清单落在 `raw/d6_installability.json`）里到底有什么：`ip`、`lsof`、`zstd`、`unzip`、`perl`、`dig`、`curl`、`iputils-ping`、`vim-tiny` 在里面（其中 `iputils-ping` 与 `vim-tiny` 是后来补进 base 的，`ip`/`lsof`/`zstd`/`unzip` 更早一轮已补）；`g++`、`cmake`、`git`、`strace`、`gdb`、`autoconf`、python3 开发头文件**不在里面**（表 [`t11`](derived/tables/t11_tool_installability.csv) 与 `raw/d6_installability.json` 的 ISO 清单）。
 
@@ -423,27 +521,39 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 ### 6.4 环境指纹
 
-除能力外，探针还记录了 6 项环境指纹（架构、glibc 版本、`os-release` ID、setuid 数量、file capabilities 数量、`default.target`），它们是事实不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)，不进三态矩阵——把版本号塞进「支持/不支持」的判据里只会凭空造出假缺口。
+除能力外，探针还记录了一批环境指纹：架构、glibc 版本、`os-release` ID、setuid 数量、file capabilities 数量、`default.target`，本轮又加了四项——包管理系（`pkgsys`）、具体包管理器（`pkgmgr_name`）、包数据库条数（`pkgdb_count`）、探针自身的版本指纹（`probe_sha`）。它们是事实不是能力，单列在表 [`t10`](derived/tables/t10_environment_fingerprint.csv)，不进三态矩阵。
+
+这个分类现在有门禁守着，因为分错的后果不显眼：三态判据的兜底分支是「不是 `Y` 就算 `N`」，对布尔项没问题，对非布尔项就是灾难——`pkgsys=rpm` 会被读成「不支持 pkgsys」，凭空多一行缺口，而它看起来完全像一条正常的缺口，不报任何错。`analyze.py` 因此在算矩阵之前先扫一遍：凡取值不在受控集合（`Y`/`N`/`n/a`/`nosrc`/`PARTIAL`）里的键，必须显式归入指纹或哨兵，否则当场失败。这一条做了变异测试——故意注掉 `pkgsys` 的分类，门禁如期报出 `pkgsys: ['deb', 'rpm']`。
 
 ## 7. 验收：五道门禁与变异测试
 
-九个镜像要能拿出去用，得先证明它们是对的。五道门禁各自防不同一类事故（表 [`t07`](derived/tables/t07_gates.csv)）。
+15 个镜像要能拿出去用，得先证明它们是对的。五道门禁各自防不同一类事故（表 [`t07`](derived/tables/t07_gates.csv)）。
 
 | 门禁 | 结果 | 防的是什么 |
 |---|---|---|
-| `verify` | **365 通过 / 0 失败**（基线 360） | 逐镜像的结构、完整性、基线对账、能力、ABI gate、元数据 |
-| `digest-chain` | **9 / 9** | manifest 记的 sha256 = `out/*.tar` 实际字节 = 本地镜像，三者脱钩 |
-| `sbom` | **9 / 9** | SBOM 静默失效（扫出来是空的却报成功） |
-| `mutation` | **12 抓到 / 0 漏 / 1 跳过** | 检查集本身失效（「检查永远为真」的假通过） |
-| `repro` | **6 / 6 逐位一致** | 构建不可复现 |
+| `verify` | **652 通过 / 0 失败**（基线 620） | 逐镜像的结构、完整性、基线对账、能力、ABI gate、元数据 |
+| `digest-chain` | **15 / 15** | manifest 记的 sha256 = `out/*.tar` 实际字节 = 本地镜像，三者脱钩 |
+| `sbom` | **15 / 15** | SBOM 静默失效（扫出来是空的却报成功） |
+| `mutation` | **13 抓到 / 0 漏 / 1 跳过** | 检查集本身失效（「检查永远为真」的假通过） |
+| `repro` | **9 / 9 逐位一致** | 构建不可复现（覆盖归一时间戳的三条路径；selfhost 那六档由 manifest 承担包集可复现性，见 §8） |
 
 ![五道门禁与能力矩阵格分布](figures/fig05_gates.png)
 
 `digest-chain` 的最后一环有个细节：`docker import` 会把 tar 重新归一化，layer 的 `diff_id` 与源 tar 的 sha256 天然不同，所以不能直接比哈希。但归一化是确定的，把同一个 tar 再导一次比 `diff_id` 是等价且严格的做法。
 
-变异测试故意破坏镜像，确认检查集**真的会失败**。12 个用例覆盖删 `nsswitch.conf`、植入 ssh host key、删 CA 证书、删 `zh_CN` locale、把 `/var/lib/dpkg/status` 换成断链、删 copyright（全部与单包两种）、删 `policy-rc.d`、植入依赖缺失的 `.so`、改时区、往 `machine-id` 写内容、植入清单外悬空软链。全部被抓到。本项目靠这一环发现了三次假通过（见 §9.2）。另有 1 条 `mtab` 用例被**跳过**：容器运行时（runc）会自动建 `/etc/mtab → /proc/mounts`，镜像里删掉在运行时观测不到，所以它的检查改到 tarball 层做（`test/verify.sh` 的 `tar_mtab`），不在运行时变异集内。跳过项留在这里而不是抹掉，因为「静默跳过」正是本项目 §9.2 批判的东西。
+变异测试故意破坏镜像，确认检查集**真的会失败**。13 个用例覆盖删 `nsswitch.conf`、植入 ssh host key、删 CA 证书、删 `zh_CN` locale、把 `/var/lib/dpkg/status` 换成断链、删 copyright（全部与单包两种）、删 `policy-rc.d`、删 `/etc/ld.so.cache`、植入依赖缺失的 `.so`、改时区、往 `machine-id` 写内容、植入清单外悬空软链。全部被抓到。本项目靠这一环发现了三次假通过（见 §9.2）。另有 1 条 `mtab` 用例被**跳过**：容器运行时（runc）会自动建 `/etc/mtab → /proc/mounts`，镜像里删掉在运行时观测不到，所以它的检查改到 tarball 层做（`test/verify.sh` 的 `tar_mtab`），不在运行时变异集内。跳过项留在这里而不是抹掉，因为「静默跳过」正是本项目 §9.2 批判的东西。
 
-变异测试分两层，上面那 12 例打的是镜像内检查集（`test/inner-checks.sh`）。另一层是 **15 例分析层变异**（`test/mutation-docs.sh`），打的是 `scripts/verify.py` 自己——故意改坏统计量、凭据、正文数字与结构，确认这些断言真的会报警；其中 5 例专门覆盖段落/表头/表格行/脚注的重复检测，因为那类事故真实发生过（见 §9.2 首条）。两层都在 CI 里跑。
+变异测试分两层，上面那 13 例打的是镜像内检查集（`test/inner-checks.sh`）。另一层是 **15 例分析层变异**（`test/mutation-docs.sh`），打的是 `scripts/verify.py` 自己——故意改坏统计量、凭据、正文数字与结构，确认这些断言真的会报警；其中 5 例专门覆盖段落/表头/表格行/脚注的重复检测，因为那类事故真实发生过（见 §9.2 首条）。两层都在 CI 里跑。
+
+**门禁之间的执行顺序也是前置条件。** `repro` 会覆写 `out/*.tar`，所以它必须跑在 `import` 与 `manifest` 之前，或者跑完后重新执行这两步——否则 `digest-chain` 校验的三端（manifest、tar、本地镜像）里只有 tar 是新的，必然断裂。这条依赖在被试较少时不显形，见 §9.2。
+
+**门禁的位置也要选。** 五道门禁都在构建之后跑，`rpmmedia` 路径这一轮补了三道**构建期**断言：装完核对镜像内 `rpm -qa` 的条数等于闭包条数、核对 CA bundle 存在且非空、用目标自己的 rpm 反查依赖自洽。前两道对应缺陷 D13/D14——配置写错时构建当场失败，而不是产出一批「文件都在、能力却缺」的镜像。
+
+第三道的来历值得说：`p11-kit-trust` 要求 `/usr/sbin/update-alternatives`，这是**路径型依赖**，只登记在 repodata 的 `filelists.xml` 里，而闭包只解析 `primary.xml`，于是求不出提供者（`chkconfig`）而静默漏包。安装时带了 `--nodeps`，rpm 自己也不校验。这个缺口最初是被能力矩阵的「已装包依赖自洽」那一项抓到的——链条是「构建成功 → 打包 → 导入 → 跑探针 → 发现不自洽 → 回头改配置」，五步之后才知道错了。补上构建期断言之后，同类错误在第一步就暴露。**判断一个修复到不到位，可以看同类错误下次会在第几步暴露。**
+
+这三道断言随后各自兑现了一次。第一道（`rpm -qa` 条数）在一次误覆盖配置文件的事故里当场报出 `读出 0 个包，闭包是 108 个`——没有它，产物会是一批「文件都在、包数据库空、SBOM 与 CVE 扫描同时失效」的镜像，而构建日志全是正常的（§9.2）。第二道（CA bundle）先报了一次**误报**：断言用宿主侧的 `os.path.exists` 去查一个绝对路径的符号链接，解析到了 builder 自己的 `/etc/pki`，把正确的构建判死。第三道之后又加了一道同族的：`--noscripts` 同样跳过了所有调 `ldconfig` 的 `%post`，`/etc/ld.so.cache` 从未生成，麒麟信安的 64 个 systemd 二进制因此全部起不来（缺陷 D16）。
+
+D16 那一条的判据设计值得单说。`elf_broken` 检查早就会报 `libsystemd-shared-255.so => not found`，但它旁边有一句注释写着「私有库目录不在 ld.so.conf 里，单独 ldd 会报 not found，是已知误报」——症状形状完全一样，于是差点被当成误报放过。实际执行 `systemctl --version` 才看清是 `error while loading shared libraries`。**一条已归档的「已知误报」解释会掩盖同形状的真故障**，所以这道断言的判据是**执行那个二进制**，不是读 `ldd` 的输出。
 
 厂商缺陷的分布见下图，逐条明细（现象、根因、影响、处理、落点）在表 [`t08`](derived/tables/t08_vendor_defects.csv)。
 
@@ -451,28 +561,38 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 ## 8. 可复现性
 
-`mmdebstrap` 与 `slice` 两条路径逐位可复现：同一 builder 内连构两次，六个产物 sha256 完全一致（`repro_identical=6`，凭据在 [`artifacts/repro-evidence.txt`](artifacts/repro-evidence.txt)）。做到这一点靠三件事：`SOURCE_DATE_EPOCH` 由 `lib/common.sh::derive_epoch` 在构建与本地源两处共用（两边各算一次会让哈希漂，实际踩过），取值按路径而定——mmdebstrap 路径取自仓库 `Release` 的 `Date`，slice 路径没有在线源可取，由 `distros/uos25.conf` 钉死为 `1775779200`（squashfs 的 mkfs 时间）；`tar --sort=name --mtime=@epoch --numeric-owner`；以及把 SONAME 修复的候选限定为真实文件而非符号链接，避免选取顺序依赖目录遍历。
+归一时间戳的三条路径（`mmdebstrap`、`slice`、`rpmmedia`）纳入逐位复现实测：同一 builder 内连构两次，比对产物 tar 的 sha256，**9 个产物全部一致**（`repro_identical=9`，凭据在 [`artifacts/repro-evidence.txt`](artifacts/repro-evidence.txt)）。`rpmmedia` 是本轮首次纳入，一次通过——**逐位可复现这件事与包格式无关**，取决于时间戳是否归一、打包顺序是否确定。覆盖范围现在从 `config/subjects.json` 按 `METHOD` 推导，不再是手写清单——手写清单在新增被试后会静默不测，而凭据文件看着照样完整。
 
-这份凭据与交付物是对得上的：`artifacts/repro-evidence.txt` 里六个 sha256 与对应 manifest 的 `tarball sha256` 逐条相等，`scripts/verify.py` 对此有一条交叉断言——没有它的话，`digest-chain`（manifest = tar = 镜像）与 `repro`（连构两次一致）两条链可能锚在不同构建上，看着都绿其实接不起来（§9.2 记了这类锚点脱钩的实际情况）。
+做到逐位一致靠三件事：`SOURCE_DATE_EPOCH` 由 `lib/common.sh::derive_epoch` 在构建与本地源两处共用（两边各算一次会让哈希漂，实际踩过），取值按路径而定——mmdebstrap 路径取自仓库 `Release` 的 `Date`，slice 路径没有在线源可取、由 `distros/uos25.conf` 钉死为 `1775779200`（squashfs 的 mkfs 时间），rpmmedia 与凝思那条也不走在线源，各自在 conf 里钉死为 `1700000000`——这个值原先是 `derive_epoch` 在「非 http 源」那一支的静默回落值，逐位复现照样成立，但复核者读被试自己的 conf 找不到时间锚点从哪来，而 §9.1 正批评那个静默回落，所以改成显式写明；`tar --sort=name --mtime=@epoch --numeric-owner`；以及把 SONAME 修复的候选限定为真实文件而非符号链接，避免选取顺序依赖目录遍历。
 
-`selfhost` 路径（麒麟 V10）**不逐位可复现**：它用 `docker export | docker import` 产出镜像，容器层的时间戳与 layer id 每次不同。包集与版本仍然可复现，凭据在九份 manifest 里（`manifests=9`）。九份都记了每个包的精确版本、tarball 的 sha256 与字节数；另外两项按路径而定，不是九份都有：`SOURCE_DATE_EPOCH` 只有 mmdebstrap 与 slice 两条路径有（selfhost 不归一时间戳，那三份记的是 `n/a`），`InRelease` sha256 只有走在线源的两条路径有（slice 路径不从在线源拉包，没有这一项）。
+这份凭据与交付物是对得上的：`artifacts/repro-evidence.txt` 里每个 sha256 与对应 manifest 的 `tarball sha256` 逐条相等，`scripts/verify.py` 对此有一条交叉断言——没有它的话，`digest-chain`（manifest = tar = 镜像）与 `repro`（连构两次一致）两条链可能锚在不同构建上，看着都绿其实接不起来（§9.2 记了这类锚点脱钩的实际情况）。
 
-换一台 Linux 机器复现的完整路径写在 [`README.md`](README.md#5-复现) 里。前提是能访问三个发行版的官方软件源，以及持有 UOS 的 ISO（切片路径需要 squashfs，仓库不含 ISO 与镜像）。
+`selfhost` 路径的两个被试（麒麟 V10 SP1 与凝思）**不逐位可复现**：它用 `docker export | docker import` 产出镜像，容器层的时间戳与 layer id 每次不同。包集与版本仍然可复现，凭据在 15 份 manifest 里（`manifests=15`）。15 份都记了每个包的精确版本、tarball 的 sha256 与字节数；另外两项按路径而定，不是每份都有：`SOURCE_DATE_EPOCH` 只有归一时间戳的三条路径有（selfhost 那六份记的是 `n/a`），`InRelease` sha256 只有走在线源的路径有（slice、rpmmedia 与凝思都不从在线源拉包，没有这一项）。
+
+换一台 Linux 机器复现的完整路径写在 [`README.md`](README.md#5-复现) 里。前提按被试而定：麒麟两版需要能访问 `archive.kylinos.cn`；UOS、麒麟信安、凝思三条需要各自的 ISO（仓库不含 ISO 与镜像），其中 UOS 那条要 squashfs、另两条要介质里的仓库。
 
 ## 9. 局限与过程记录
 
 ### 9.1 局限
 
-- **仅 amd64。** 三条路径都只在 x86_64 上执行过，arm64 与 loongarch64 未验证。
+- **仅 amd64。** 四条路径都只在 x86_64 上执行过，arm64 与 loongarch64 未验证。
 - **不覆盖内核态。** 容器共享宿主内核，厂商的 KYSEC、IMA/EVM 完整性度量、驱动都不在一致性范围内。麒麟的 `kysec2-package-plugins` 我们是直接不装的（见 D02）。
 - **UOS 的 `security.*` 扩展属性未保留。** rootless docker 无 `CAP_SYS_ADMIN`，`unsquashfs -xattrs` 会 FATAL。其中 IMA/EVM 那部分丢了没有实际影响（容器不加载相关 LSM），但 `security.capability`（file capabilities）在容器里是真会用的——如果业务二进制依赖 file capability 才能跑，在 UOS 三档里会表现成权限不足。
-- **漏洞跟踪没有做，因为通用扫描器对这三个发行版没有有效覆盖。** 这一条有一手数据（表 [`t13`](derived/tables/t13_cve_coverage.csv)，原始输出 `raw/d7_cve.json`）：用 trivy 0.70.0 扫九个镜像，**有效覆盖 0 个**——未识别的 3 个是麒麟 V11 三档（trivy 判为 `none`，根本没扫），误判成 Debian 的 6 个是麒麟 V10 与 UOS 各三档，九个镜像报出的 HIGH/CRITICAL 合计为 0。误判那六个最危险：拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0，而一个一百多个包的 bookworm 代镜像报 0 是不可信的——那是「比不出来」，不是「没有漏洞」。`make cve` 因此强制区分这两种情况，把无有效覆盖的镜像明确标出、不计入通过。真实的漏洞跟踪需要接厂商安全公告（麒麟 KYSA、UOS 安全通告）比对包版本，不在本仓库范围内。
-- **九个镜像里有三个不逐位可复现。** `repro` 门禁只覆盖 6/9：麒麟 V10 SP1 三档走 selfhost 路径，用 `docker export | docker import` 产出镜像，容器层时间戳与 layer id 每次不同（详见 §8）。这一条写在可复现性一节，但它本身就是一条局限，故在此列明。
+- **漏洞跟踪没有做，因为通用扫描器对这几家没有有效覆盖，也不构成可用的覆盖。** 一手数据在表 [`t13`](derived/tables/t13_cve_coverage.csv)，原始输出 `raw/d7_cve.json`（15 条记录，每条带 `anchor_tar_sha256` 锚到具体产物）。用 trivy 0.70.0 扫全部 15 个镜像，**有效覆盖 0 个**，失效分两种。**未识别 6 个**：麒麟 V11 三档与麒麟信安三档，`Metadata.OS` 都是 `{Family: none}`，一个 `os-pkgs` 结果都没有。麒麟信安那一种与 SBOM 的结论相反——同一个工具、同一个镜像，SBOM 读得出 ndb 数据库里的包（§7 的 sbom 门禁 15/15 通过），而 OS 识别环节判不出发行版族，于是没有任何包进入版本比对：**「SBOM 完整」与「漏洞扫描有效」是两件事，前者成立不能推出后者。** **误判 9 个**：麒麟 V10、UOS、凝思各三档被判成 Debian。前六档报出 0 个 HIGH+CRITICAL——拿厂商改过的版本号去比 Debian 的公告区间，比不出来就报 0，而一个一百多个包的镜像报 0 不可信，那是「比不出来」不是「没有漏洞」。凝思三档是唯一给出非零结果的：被识别成 `debian 10.6` 并标 `EOSL`（已过服务期），报出 165 / 418 / 831 个 HIGH+CRITICAL；这个数同样不能当作安全结论，因为凝思的包版本号带 `linx` 后缀，拿厂商补丁版本比 Debian 公告区间与前一种同族。**Debian 10 已过服务期这件事本身是有效信息**，但落到具体条目要逐条区分「厂商已修而扫描器不知道」与「确实未修」，那需要接厂商公告，不在本仓库范围内。
+
+- **上面那批数字换过一轮，换的过程本身是 D18 影响面的度量。** 幽灵内核包修复前，凝思 micro 档报 538 个 HIGH+CRITICAL，其中 373 条命中一个 `Installed-Size 261829`（256 MB）而文件全不在的内核包登记。清掉那条登记后重扫，micro 档降到 165 个——差额 373 正是那批假命中。**一份错误的包清单会驱动扫描器产出看似具体的结论**，而它在扫描器输出里与真命中长得完全一样。
+
+- **15 个镜像里有六个不逐位可复现。** `repro` 门禁覆盖 9/15：走 selfhost 路径的两个被试（麒麟 V10 SP1 与凝思，各三档）用 `docker export | docker import` 产出镜像，容器层时间戳与 layer id 每次不同（详见 §8）。覆盖范围现在从 `config/subjects.json` 按 `METHOD` 推导而非手写清单——手写清单在新增被试后会静默不测，而凭据文件看着照样完整。
 - **麒麟 V11 的 `SOURCE_DATE_EPOCH` 没有钉死。** UOS 那条在 `distros/uos25.conf` 里写死为 `1775779200`，麒麟 V11 却是构建时在线拉 `dists/11.0/Release` 的 `Date` 现算（`lib/common.sh::derive_epoch`）。厂商任何一次重发 `Release` 都会让 V11 三档的 tar 时间戳变化，`digest-chain` 与 `artifacts/repro-evidence.txt` 里那三个哈希随之失效，而不会有任何东西提示「是 epoch 漂了」。当前记录值 `1756113384` 与厂商现值一致，但这是当下的巧合而非锚定。另外 `derive_epoch` 在 curl 失败时静默回落到硬编码值，离线复现者会拿到一个看起来正常的 epoch 与全不一致的产物。
-- **d3 探针输出没有内容锚点。** d6/d7 的每条记录都带 `anchor_tar_sha256`，d3 没有——它只有 mtime 与镜像 `Created` 的先后关系，而 git 不保留 mtime（§6.1 已详述）。这是本仓库已知的一处可审计性缺口。
-- **`test/capabilities.sh` 自己没有被变异测试打过。** 变异测试覆盖的是 `inner-checks.sh`（镜像层 12 例）与 `verify.py`（分析层 15 例），而全文最常引用的 648 格恰恰出自 `capabilities.sh`。§9.2 里那两次探针错误（`elf_broken` 的恒为 0 与随后的误报）出在 `inner-checks.sh`，它属于已被 12 例覆盖的那一层；`capabilities.sh` 这一层至今没有变异用例。
-- **官方镜像的探测只在单一网络位置做过。** `raw/d1_official_images.json` 的 `vantage_note` 记着：采集主机出口在中国大陆、境外站点经本地代理，探测失败需区分「网络位置」与「策略拒绝」。§2 的核心结论建立在这批探测上，所以「拉不到」严格说是「从这个网络位置匿名拉不到」。UOS 那两条探测的 stderr 原文也带着 `or may require 'docker login'`。
-- **「商业桌面线没有官方镜像」只探了两家。** 麒麟与统信之外，中科方德、普华、凝思、红旗等均未探测，这条结论不应外推到整个品类。
+- **d3 探针输出没有内容锚点。** d6/d7 的记录带 `anchor_tar_sha256`（有两条例外，见下一条），d3 没有——它只有 mtime 与镜像 `Created` 的先后关系，而 git 不保留 mtime（§6.1 已详述）。这是本仓库已知的一处可审计性缺口。
+- **d6/d7 的锚点有六处对不上当前产物。** 这两组数据靠 `anchor_tar_sha256` 与 `raw/d2_our_images.json` 的 tar 哈希对账，本轮对账不是全绿。`raw/d7_cve.json` 采于 2026-08-30，`uos-desktop-v25:micro`、`uos-desktop-v25:base`、`uos-desktop-v25:devel` 三条的锚点指向 UOS 那次出厂源清单与 keyring 修正之前的产物；`raw/d6_installability.json` 采于 2026-08-31，`uos-desktop-v25:base` 同样锚在旧产物上，`kylinsec-desktop-v6:base` 与 `linx-os-v6:base` 两条没有锚点字段。所以 §6.3 的可装性数字与本节的 trivy 判定，对这几个镜像而言锚的是上一版而不是当前交付的那一版。这六处逐条写进了 `scripts/verify.py` 的已披露清单，多一处少一处都会让门禁失败；要清掉它们得重采 d6 与 d7。
+- **`test/capabilities.sh` 自己没有被变异测试打过。** 变异测试覆盖的是 `inner-checks.sh`（镜像层 13 例）与 `verify.py`（分析层 15 例），而全文最常引用的矩阵格恰恰出自 `capabilities.sh`。这一轮把它改成按包管理系分支，代码分支翻了一倍，这个缺口的影响面随之变大。§9.2 里那两次探针错误（`elf_broken` 的恒为 0 与随后的误报）出在 `inner-checks.sh`，它属于已被 13 例覆盖的那一层；`capabilities.sh` 这一层至今没有变异用例。
+- **`ghost_pkgs` 门禁只覆盖三个目录，不是通用的包清单核对。** 它的候选集限定在 `/boot`、`/lib/modules`、`/lib/firmware` 下有文件的包——这三处是容器化改造会清空的目录，也是幽灵包最可能出现的地方。这一层过滤是为控制开销加的（逐包查文件清单会把检查脚本拖到超时），代价是这三处之外若有「登记还在、文件已删」的包，它抓不到。真正通用的做法是对全部已装包抽查，需要先解决开销问题。
+
+- **rpm 依赖闭包只解析 `primary.xml`，不解析 `filelists.xml`。** 于是**路径型依赖**（`Requires: /usr/sbin/update-alternatives` 这种）求不出提供者。当前的处理是装完用目标自己的 rpm 反查一遍（`rpm -Va --nofiles`），不自洽就构建失败并打印缺哪一条，由人把提供者加进 `distros/*.conf`——`chkconfig` 就是这么加进去的。这是「能发现、但不能自动解决」：换一份介质或换一组种子包，可能又冒出新的路径型依赖需要人工补。彻底的做法是把 `filelists.xml` 也解析进 provides 索引，本轮没有做。
+
+- **官方镜像的探测只在单一网络位置做过。** `raw/d1_official_images.json` 的 `vantage_note` 记着：采集主机出口在中国大陆、境外站点经本地代理，探测失败需区分「网络位置」与「策略拒绝」。§2 的核心结论建立在这批探测上，所以「拉不到」严格说是「从这个网络位置匿名拉不到」。这一点的范围比早先写的大：24 条负判里有 **18 条**返回的是 `unauthorized: authentication required`，Docker Hub 对私有仓库与不存在的仓库返回同一句话，所以那 18 条只能支撑「匿名不可见」；真正返回 `not found` 的只有 5 条，另有 1 条是 TLS 握手超时（网络故障，非仓库状态）。§2.2 的措辞已相应改为「匿名拉不到」。
+- **「商业桌面线没有官方镜像」的枚举强度只有四家。** 麒麟与统信是枚举厂商自有 registry 得到的（§2.2）；第二轮两个被试补了枚举，强度低一档——`hub.docker.com` 上 `kylinsec` 命名空间 0 个仓库，`linx` 命名空间仅 1 个且是无关的 `apache`，凝思的三个候选自有 registry（`registry.` / `cr.` / `hub.linx-info.com`）全部连接失败（凭据 [`artifacts/registry-probe-round2.txt`](artifacts/registry-probe-round2.txt)；连接失败与策略拒绝不同，按本节的网络位置局限理解）。中科方德、普华、红旗等仍未探测，这条结论不应外推到整个品类。
 - **审计闭环防的是「改了没同步」，防不住「全员串通」。** 本仓库的证据链是自洽性校验：manifest ↔ tar ↔ 镜像 ID ↔ 探针输出 ↔ 正文数字互相对账，任何一处单独被改都会被 `make verify` 抓到（分析层 15 例变异全部报警，见 §9.2 末条）。但如果有人同时改掉 `raw/` 里的原始输出、`derived/` 的复算结果、正文数字与 manifest 锚点，这套校验在结构上无法分辨——它验的是内部一致，不是「这些数真的来自那次执行」。要挡这一类需要外部信任根（构建产物签名、独立 CI 出具的证明），本仓库没有做。第三方复核的正确做法是拿脚本在自己机器上重跑一遍（麒麟两条路需要访问 `archive.kylinos.cn`，UOS 那条需要它的 ISO，见 §1），而不是核对我们提交的数字彼此是否吻合。
 - **「官方」一词受限使用。** 只有能给出 registry 域名归属证据的才称官方。Docker Hub 上的 `kylin` 命名空间是无关第三方（内容是 Home Assistant 插件），不是厂商。
 
@@ -524,13 +644,114 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 
 **分析层从未被变异测试过。** 本项目对镜像内检查集做了变异测试并引以为据，却一直没对**分析层**做同样的事。审稿时在那里查出五类假阴性：`in_text` 用裸子串匹配（把 `400` 改成 `401` 竟能通过，因为正文别处有「未授权返回 401」）、抬头数字单点改错不报（正文别处还有同一个数）、正文一批数字零覆盖、「断言总数自洽」只检查那句话存在却从不比对数值、图表引用检查被附录索引自动满足因而永不失败。现在补了 `test/mutation-docs.sh` 专测这一层。**做了变异测试不等于覆盖了所有层**——这是对 §7 那段自信表述的一次必要削弱。
 
+**一个数字拆开之后，没有一部分支持它原本的读法。** CVE 扫描在凝思三档上曾报出 538 / 791 / 1204 个 HIGH+CRITICAL，这是全部被试里 trivy 唯一给出非零结果的一家（它把凝思识别成 `debian 10.6` 并标 `EOSL`）。把 micro 档那 538 条拆开：**373 条（69%）命中的是一个内核包** `linux-image-4.19.0-11-linx-security-amd64-unsigned`——而容器共享宿主内核，那个包对运行时没有暴露面，何况它本身就是一条幽灵登记（文件早被删、登记还在，缺陷 D18）。剩下的里绝大多数命中的包版本号带 `linx`，即拿凝思的补丁版本去比 Debian 的公告区间，与麒麟 V10 / UOS 那个误判同族。
+
+清掉幽灵登记后重扫，micro 档降到 **165 个**，差额正是那 373 条。**修复前后的差值把 D18 的影响面量了出来**：一份错误的包清单驱动扫描器产出了 69% 的假命中，而它们在输出里与真命中长得完全一样。
+
+但拆解本身照出了一个真缺陷。那个内核包在 dpkg 库里登记为 `install ok installed`、`Installed-Size 261829`（256 MB），而 `/boot` 与 `/lib/modules` 下的文件**全不在**——`lib/common.sh` 的容器化改造删掉了它们（容器共享宿主内核，留着无意义），却没有从包数据库里移除对应的包（缺陷 D18）。
+
+**这暴露了一类此前完全没有的门禁：包数据库声称已装的包，其文件必须真的存在。** 单看 `no_kernel`（文件不在）与 `pkgs`（包数够多）两项都通过，两者各自自洽，矛盾只在交叉核对时显形。**错误的清单比没有清单更危险**，因为它会驱动下游得出错误结论——这里就是 SBOM 报告一个不存在的 256 MB 包、CVE 凭空产出 373 条。补的门禁是 `ghost_pkgs`：候选集限定在 `/boot`、`/lib/modules`、`/lib/firmware` 下有文件的包（这三处正是容器化改造会清空的目录），再逐个抽查其文件清单里的非目录条目，清单非空且抽样全部缺失即为幽灵。**候选集这一层是为控制开销加的** ——早先的实现逐包调 `dpkg-query -L`，两百多次子进程把检查脚本拖到超时，外层只拿到截断输出、缺失的 key 被读成空值，凭空报出 103 项失败。代价是它不覆盖这三处之外的幽灵包，这一条记在 §9.1。
+
+这道门禁本身出错两次，比它抓到的缺陷更值得记。
+
+**第一版用包名猜，而不是核对文件。** 判据写成「包名匹配 `^kernel(-|$)` 或 `^linux-image`」，于是把麒麟信安的 `kernel-headers` 判成幽灵——那个包 1026 个文件一个不缺，`glibc-devel` 正当依赖它（编译需要内核头文件）。**这道门禁复制了它本该抓的那类错误：用代理指标（名字）替代要测的东西（文件是否存在）。** 若照误报去「修」，排掉 `kernel-headers` 会让 `glibc-devel` 连带坏掉——一个误报驱动出真故障。
+
+**第二版改成实际抽查文件，却成了永真。** 判据是「文件清单非空且抽样全部缺失」，但 dpkg 与 rpm 的清单里目录是**不带尾斜杠**的（`/usr`、`/usr/bin`），这些目录永远存在，于是抽样里总有几条命中，「全部缺失」永不成立——正是 §7 那份四类假通过里的「负向断言变永真」。改成只统计非目录条目后判据才生效。
+
+**第三个问题是我验证的版本与发布的版本不是同一个。** 上面那次验证跑的是手写的等价逻辑片段（在容器里逐包 `dpkg-query -L`），而最终代码为避免超时加了一层候选集过滤——只看 `/boot`、`/lib/modules`、`/lib/firmware` 下有文件的包。手写片段里用 `unzip` 当靶子成立，在最终代码里 `unzip` 永远进不了候选集，那次验证对发布的代码不成立。**一条标着「经变异测试验证」的门禁，实际从未被它验证过。** 现在 `test/mutation.sh` 里补了一条针对最终代码的用例：拿一个真正拥有 `/lib/firmware` 文件的包造幽灵，删光它的文件、留下登记。
+
+**只看「全绿」，这道门禁会一直空转。** 两次错误都不以失败的形式出现：第一版是误报（把人引向错误的修复），第二版是漏报（永远说没问题）。
+
+
+修法换过两次，两次都值得记。
+
+第一版是把该包加进 `PIN_NEVER`、由 `debootstrap --exclude` 在入口拦——对这个包**无效**：它是作为依赖被拉进来的，`--exclude` 管不到。（`PIN_NEVER` 本身没白写：它的另一个作用点是阶段 3 从 stage 缓存 `dpkg` 补装时的文件名过滤，在那里有效，省下白解包再删掉 256 MB 内核文件的功夫，micro 档因此从 268 MB 降到 266 MB。**一个配置项的价值不是二元的**，要说清它在哪一处有效、哪一处无效。）
+
+第二版把 purge 放进了 `lib/common.sh` 删文件的同一处——方向对了，但只 purge 了叶子包，于是 `linux-image-amd64` 与 `update-drivers-4.19.0` 还依赖着一个已被删除的包，第三阶段自检报 `apt-check=BAD`。**用「依赖不一致」换掉了「清单不一致」。** 这已经是第二次了：早先修 `linx-noroot-conf` 时 `dpkg --purge --force-depends` 同样弄坏了依赖图。
+
+最终版有两处补正：purge 的范围扩到整条链（`linux-image*`、`linux-headers*`、`update-drivers*`），并在 purge 之后**当场跑 `apt-get check`**，不健康就中止构建并逐条打印。前两次都是等到第三阶段自检才发现坏了，中间隔着几分钟的构建。**修在不一致产生的地方，而且当场验证没有制造新的不一致。**
+
+**门禁之间有顺序依赖，而这条依赖此前没被记录。** `digest-chain` 校验「manifest ↔ tar ↔ 本地镜像」三端一致，而 `repro` 的第二次构建会**覆写 tar**。于是 repro 跑完之后 digest-chain 必然断裂七处——manifest 记的是重建前的 sha256，本地镜像也是重建前导入的，只有 tar 是新的。这不是假失败，门禁报的正是事实：三端确实脱钩了。
+
+正确顺序是 `repro` 之后重新 `import` 并重生成 manifest，或者把 repro 放在这两步之前。这条依赖在 repro 只覆盖两个被试时没显形，因为那时我总是先跑 repro；加入麒麟信安后链条变长，顺序问题才暴露。**门禁不只各自有前置条件，它们之间也有——而后者比前者更容易漏。**
+
+**门禁报失败时，先确认它的两次采样是否都来自当前代码。** `repro` 报 uos25 三档哈希全漂，我为此绕了四步：先怀疑 `ld.so.cache` 不确定（实测推翻），再逐文件 diff 找到 `aux-cache`（真因，修掉），然后被自己写错的 `grep` 误导——模式里带 `$D` 被 shell 展开成空，于是"清理代码不存在"，我拿这个坏掉的测量去质疑一个正确的修复，又绕了几步。最后独占重跑，九个产物全部一致。
+
+**真正的修复（`aux-cache` 清理）从头到尾都是对的**，中间的漂移是因为门禁把修复**前**的旧 tar 当成了第一次采样。这类"陈旧基准"的失败与"代码真的坏了"在输出上完全一样。
+
+**测量工具本身出错时，它给出的否证毫无价值，却和真否证长得一样。** 那次 `grep -c 'rm -rf "$D/var/cache/ldconfig"'` 的教训很具体：模式含 `$`、`"`、`\` 时一律用单引号且避开变量名，或先用 `grep -F` 固定字符串。这与早先"宿主侧 `os.path.exists` 不认 chroot 边界"是同一族——工具的适用边界没搞清，得到的结论就是噪声。
+
+**补 `ldconfig` 修好了 D16，却让切片路径失去逐位复现——而第一个怀疑对象是错的。** 加上 `ldconfig` 之后 `repro` 门禁报 uos25 三档哈希全漂。最近改的就是这一步，所以第一反应是 `/etc/ld.so.cache` 不确定（它记录库的排列顺序，顺序取决于目录遍历）。实测推翻了：同一 rootfs 上重跑 `ldconfig`，cache 逐位一致。
+
+继续逐文件 diff 两次产物，元数据 sha256 完全相同，唯一差异是 `/var/cache/ldconfig/aux-cache`——`ldconfig` 除了 cache 还写这个辅助文件，里面记每个库的 **inode 与 mtime** 用于增量加速，天然随文件系统状态变化。它只是中间产物，删掉不影响任何功能，而且本来就不该出厂。
+
+**「最近改了什么」给方向，「逐项 diff」给答案。** 停在第一个合理假设上会去改一个本来正确的东西——`ld.so.cache` 的生成逻辑没有任何问题。
+
+**为让新被试过检查而问出的一个问题，照出了老被试里的既存缺陷。** 麒麟信安的 64 个 systemd 二进制起不来，根因是 `/etc/ld.so.cache` 从未生成。顺手查了另外四家，发现**已经发布出去的 UOS 三档也没有这个文件**——切片路径只搬包内文件，而 `ld.so.cache` 不属于任何包，是 `ldconfig` 触发器的产物。
+
+两者的后果不同，这个区别必须说准：Debian 的多架构目录（`/lib/x86_64-linux-gnu`、`/usr/lib/x86_64-linux-gnu`）在动态链接器的**内置默认搜索路径**里，缺 cache 只损性能，UOS 三档抽查的二进制全部正常、`elf_broken` 复算为 0；RH 系把 systemd 私有库放 `/usr/lib64/systemd`，那个目录只写在 `/etc/ld.so.conf.d/systemd-x86_64.conf` 里，缺 cache 就等于二进制全断。两条路径现在都补跑 `ldconfig`，并有 `ldcache` 与 `systemctl_runs` 两项门禁盯着（缺陷 D16）。
+
+**新样本的作用不只是多测一个，而是逼着你把某个此前没人问过的问题问出口**，而那个问题对老样本同样成立。
+
+**「门禁不能与构建并发跑」这条纪律记录过、引用过，然后又踩了一次。** `repro` 报「麒麟信安重建失败」，而单独重跑同一条命令退出码是 0、零错误输出。真因是我在 repro 跑第二次构建的同时并行跑了 d2 采集与 `verify`，三者争用同一个 `build/` 工作目录，`rm -rf` 撞上正被读取的目录报 `Directory not empty`，污染了整体退出码。§9.2 早先记过一次同型事故（`verify` 读 tar 时并发重建覆写了它，`tar_mtab` 假失败）。
+
+**写进文档的纪律没有执行力。** 补的是机制：`repro` 开始前用 `pgrep` 检查是否有并发的构建脚本或门禁在跑，有就直接退出并说明。这与「把教训写进 §9.2 之后 `cp -f` 又反向覆盖一次」是同一个结论——能阻止重犯的是消掉那个状态或加一道机器检查，不是再记一遍。
+
+**采集脚本把两条命令串起来，值变成了 `'112\n0'`。** d2 的包数采集写成 `rpm -qa | wc -l; dpkg-query $A -W | wc -l`——两条都执行，输出拼成两行。这类脏值不总会炸：`int()` 会抛异常（能发现），而字符串直接拼进 README 的镜像表会静默产出「112\n0 包」。改成真分支之外，另在 `verify.py` 加了一条「d2 的标量字段必须是单行」——**检查放在会发现问题的那一层，而不是指望采集时不写错。**
+
+**判据分化的终点是「只剩不可辩解的那一个」，不是「全绿」。** 把逐包许可证检查移植到 rpm 系时，第一版直接问「每个包是否有 `/usr/share/licenses/<包名>/` 目录」，麒麟信安 devel 档列出 62 个缺失。逐层核实下来：
+
+Debian policy **强制**每个包带 `/usr/share/doc/<pkg>/copyright`，RH 没有这条强制——只有实际携带许可证文本的包才装 `%license`，实测 132/194 个包有该目录，`audit-libs` 之类的 rpm 清单里本来就没有 license 条目（`rpm -q --licensefiles` 返回空）。判据改成「**声明了** `%license` 的包，那些文件是否真的在」，剩 2 个。
+
+其中 `basesystem` 是我的判据 bug：rpm 对无文件的包返回字面串 `(contains no files)`，没过滤就被拆成三个「文件名」。剩下 `glib2` 是真缺失，但也不是我删的——它的 `COPYING` 是厂商打的符号链接，指向 `LICENSES/LGPL-2.1-or-later.txt`，而那个文件不在 `glib2` 包里，逐个 `rpm -qlp` 扫过介质里 400 个包也零命中（缺陷 D19）。
+
+**如果第一步就「放宽判据让它通过」，这个厂商缺陷会被一并掩盖。** 62 → 2 → 1，每一步都要说清减掉的那批为什么不算缺陷；减到最后剩下的那一个，才是真发现。
+
+**「等价命令」只能实测，不能靠语义推断——同一个陷阱换一种包管理器会重新踩一遍。** 把可装性判据移植到 rpm 系时我用了 `dnf list --available`，注释里还写着「与 deb 侧只看源提供什么同义」。那句话是错的：`--available` **排除已安装的包**，而 `apt-cache madison` 不管装没装。代价是麒麟信安的 `lsof`/`zstd`/`unzip` 三个明明在源里、也都已装，却一条都不返回，14/14 少报成 11/14。真正等价的是 `dnf repoquery`。
+
+这与本仓库早先记下的 `apt-cache policy` 那个错是同一族，方向恰好相反：那次 Candidate 对「已装但源里没有」也报候选版本，把 UOS 的 0/14 虚报成 6/14；这次把「已装且源里有」误判成源里没有。两次的共同点是**拿一条命令的语义描述去替代实测**。移植判据到新工具链时，正确做法是先找一个「已装且源里有」的包当靶子，确认新命令确实返回它。
+
+**「尺子是 deb 本位」这件事出现了四次，每次都在不同的层。** 加入 rpm 系被试后，同一个毛病在四个地方各犯一遍：能力探针（`capabilities.sh` 写死 `dpkg-query`、`dpkg-deb`，连 glibc 版本都从 `libc6` 这个包名问）、镜像内检查集（`inner-checks.sh` 的包数、许可证路径、CA 路径、`libstdc++` 的多架构目录）、验收门禁（`verify.sh` 的 `has_apt`/`apt_check`/`apt_roundtrip` 与写死的影子文件权限 `0:42/640`）、SBOM 门禁（`sbom.sh` 用 `dpkg-query` 数包，rpm 镜像得 0，于是 `n_dpkg > 0` 不成立而一律判失败）。
+
+第四处最能说明危害：那次的输出是 `kylinsec-desktop-v6:micro  0  114  ❌`——SBOM 那一列 114 完全正常，判失败纯粹因为左边那个 0 来自错误的问法。**门禁自己是 deb 本位时，失败信息会把矛头指向被试而不是指向门禁。**
+
+修法一致：判据按能力命名而不按工具命名，取值按包管理系分支，期望值按发行版取（`distros/*.conf` 的 `EXPECT_SHADOW` 之类）。基线也随被试数从 360 抬到 620——留旧基线不动等于让它失去鉴别力，360 对 5 个被试来说整掉一个发行版都还在线上。
+
+**「碰到失败再修一处」这个做法本身要换掉。** 前几轮每次都是看门禁报错、修那一处、重跑，于是 `dpkg_list_ok` 与 `audit_after` 两项一路漏到最后：前者在从干净基线重打改动时没被算进清单，后者是「同一个判据的两个采样点只改了一个」。`audit_after` 那次尤其难识破——rpm 镜像里没有 dpkg，`dpkg --audit` 输出一行 `command not found`，`wc -l` 把它数成 `1`，**伪装成一条真实的未满足依赖**；若那条命令恰好输出 0 行，这一项又会静默通过。两种都糟，所以判据要先确认命令存在，再谈它的输出。
+
+换掉的方法是写一段脚本，解析 `inner-checks.sh` 的分支结构，列出**所有不在包管理系分支内、却调用了 dpkg/apt/Debian 专属路径的 `kv` 项**。跑完是 0 处遗漏。**判断这类问题改完了，标准不是「当前门禁全绿」，而是「该类问题的所有实例都已枚举并处理」。**
+
+**一整列「不支持」其实是尺子的刻度不对。** 麒麟信安进被试后，矩阵上它在「dpkg 数据库可查」「apt-get 存在」「本地 .deb 直装」三行全是不支持，看上去像个有分量的发现。实际是探针写死了 dpkg：rpm 系当然没有 dpkg。同一轮里另外两格的不支持（CA 证书、TLS 握手）则来自我自己的构建——`--noscripts` 跳过了 `ca-certificates` 的 `%post`。五格不支持里没有一格是发行版的缺陷。**看到不支持先问「是被试缺能力，还是我量错了」**，这是「同口径」这个要求的实质；否则新增一个异构被试，最容易产出的就是一列凭空的缺口。
+
+**修复造成的破坏大于原症状时，正确选择是退回报告。** 凝思带进了 `linx-noroot-conf`（状态停在 half-configured，`dpkg --audit` 多一条），而 `PIN_NEVER` 本该拦住它。第一次修法是在「apt 不在、用 `dpkg -i` 从缓存补装」那条回落路径上按包名过滤——日志显示两个包确实被跳过了，却**仍然进了库**：它们不是从缓存来的，而是 `debootstrap` 的 base 集带进来的，我拦的是错误的入口。随后的补救 `dpkg --purge --force-depends` 更糟，直接把依赖图弄坏（`apt 依赖状态不健康`）——原症状只是审计多一条记录，修完变成依赖图损坏。最终退回：回落路径只报告不移除，真正的拦截交给 `debootstrap --exclude`，也就是包进来之前。
+
+**缓存键漏一个输入，等于把「改了配置」静默降级成「什么都没改」。** 改用 `debootstrap --exclude` 之后第一次重建毫无变化，日志里连那行 `--exclude` 都没打印。原因是 stage 的缓存指纹由 `MIRROR|SUITE|COMPONENTS|STAGE_INCLUDE|KEYRING_FP` 算出，**不含 `PIN_NEVER`**，于是旧 stage 被直接复用、整个阶段 1 被跳过。这类失效不报错，表现是「修了但没用」，最容易让人回头怀疑修法本身。把 `PIN_NEVER` 加进指纹后阶段 1 才重新执行。**凡影响产物的输入都必须进缓存键。**
+
+**新增被试会把「异常回落路径」变成「正常路径」。** `derive_epoch` 在源不是 http 时回落到硬编码的 `1700000000`，§9.1 一直把这个静默回落列为风险。麒麟信安与凝思都只用介质、不走在线源，于是这条兜底分支成了它们的**唯一**路径：值是确定的、逐位复现照样成立，但复核者读被试自己的 conf 找不到时间锚点从哪来。两份 conf 现在显式写明 `SOURCE_DATE_EPOCH=1700000000`（与回落值相同，故此前产物哈希不变）。**判断一条兜底分支要不要显式化，看有没有样本把它走成主路径。**
+
+**宿主侧的路径 API 不认识 chroot 边界。** 补跑 `update-ca-trust extract` 之后我加了一条断言核对 CA bundle 不悬空，构建当场失败——而文件其实好好地生成了。`ca-bundle.crt` 指向一个**绝对路径**，`os.path.exists()` 拿它去解析的是 builder 自己的 `/etc/pki`。断言方向反了：它不是漏报而是误报，把正确的构建判死，危害与漏报同级。凡检查 rootfs 内的符号链接，都要先 `os.readlink()` 再把绝对目标拼回 rootfs 前缀。
+
+**构建期的源被当成了出厂的源。** `selfhost` 路径里出厂 `sources.list` 直接复用了构建期的 `MIRROR`。对四个被试这两者恰好重合（都是在线镜像站），所以这行代码从没出过问题；凝思是第一个「构建期用本地介质、出厂无源可写」的被试，于是 `file:///w/media/lx` 这条 builder 挂载路径被写进了出厂镜像，运行时 `apt update` 必失败。**新增一个打破隐含假设的样本，才会让旧代码里的错误显形**——所以单点修完之后补的是类级门禁：出厂源清单里不许出现 `file://`、`copy://` 或 builder 路径。
+
+**同一个 `cp -f` 事故在写进本节之后又复发了一次，方向相反。** 第一次是 `/data/dosbuild` → 本仓库，覆盖掉本仓库已改造成读 `config/subjects.json` 的 `test/run-capabilities.sh`；改造被抹掉后表面无异常，因为 `git diff` 比的是 HEAD，看不出「盘上曾有未提交的改造」。把这条教训写进本节一小时后，第二次发生：本仓库 → `/data/dosbuild`，覆盖掉 `distros/kylinsec6.conf` 里刚加的 `chkconfig` 与 `RPM_DB_BACKEND`，于是闭包少 4 个包、`rpm -qa` 归零，构建期断言当场拦下。
+
+**把教训写下来并不能阻止重犯，能阻止的是消掉那个状态。** 两个目录持有同一份文件、靠人记方向，就一定会错。改成符号链接是错的——builder 容器只挂了 `/data/dosbuild`，指向本仓库的链接在容器内悬空，与「宿主侧路径 API 不认 chroot 边界」是同一族问题。最后的做法是脚本化：`tools/sync-build-assets.sh <to-work|to-repo>` 方向写在参数里，先打印差异清单，不加 `--apply` 不动手。
+
+值得记的是第二次是**怎么被发现的**：构建期那条「镜像内 `rpm -qa` 条数必须等于闭包条数」的断言直接报了 `读出 0 个包，闭包是 108 个`。如果没有它，产物会是一批「文件都在、包数据库空、SBOM 与 CVE 扫描同时失效」的镜像，而所有构建日志都是正常的。
+
+**静默跳过又出现了三处。** `tools/render-capabilities.py` 在探针文件缺失时 `continue`——少一家被试只表现为矩阵少一列，汇总照样全绿；`Makefile` 的 `import` 用 `[ -f ... ] && ... || true`，产物缺失时报成功而 manifest 照常更新；`test/run-capabilities.sh` 没有 `mkdir -p` 输出目录，重定向失败被判成「探针未跑完」而不报真因。三处都改成硬失败，`run-capabilities.sh` 另加了未知被试的变异用例。这是 §7 那份四类假通过清单的第五、六、七次复发，共同点是**缺数据与数据正常在 shell 里长得一样**。
+
+**「在我机器上能跑」的一次实例。** builder 容器里有 rpm 4.20.1，而它所基于的镜像里没有——rpm 是我往**运行中的容器**里手装的，同时把它加进了 `Dockerfile.builder` 却没重建镜像。发布出去的仓库不受影响（Dockerfile 是对的），但「可复现」这个头条承诺我自己从没验过一遍。重建镜像验证过了：`Dockerfile.builder` 确实产出带 rpm 4.20.1、mmdebstrap 1.5.7、debootstrap 1.0.141 的 builder。**运行中的容器会积累镜像里没有的状态，只有重建能证伪。**
+
+**单一真源只接了循环边界，没接循环体。** `collect_d3_capabilities.py` 的 `for` 已经从 `config/subjects.json` 读被试，函数体内却还留着一份平行的硬编码镜像名表。新增被试后它从「静默只算三家」变成 `KeyError` 硬失败——硬失败好过静默通过，但这恰恰说明**改单一真源要查干净每一处解引用**。`grep DIDS` 只能找到导入，找不到平行的硬编码副本；正确的查法是 grep 字面量（`grep -rn '"kylin11"'`），这一查又在 `tools/render-capabilities.py` 与 `scripts/verify.py` 里各找出一处。
+
 ## 附录 A：图目录
 
 | 图 | 内容 |
 |---|---|
 | [`fig01`](figures/fig01_official_availability.png) | 官方容器镜像可获得性与桌面镜像存在性探测 |
 | [`fig02`](figures/fig02_product_line.png) | 麒麟官方镜像与桌面版的产品线对照 |
-| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（648 格中的一部分行，三态判定与 t05 同源） |
+| [`fig03`](figures/fig03_capability_matrix.png) | 能力矩阵热力图（矩阵中的一部分行，三态判定与 t05 同源；格数见 §6.1） |
 | [`fig04`](figures/fig04_tier_size.png) | 三档镜像的体积与包数 |
 | [`fig05`](figures/fig05_gates.png) | 五道门禁与能力矩阵格分布 |
 | [`fig06`](figures/fig06_defects.png) | 厂商缺陷分布 |
@@ -542,13 +763,13 @@ UOS 还有一个真缺陷已修：`sources.list.d` 里有两个需订阅授权�
 | [`t01`](derived/tables/t01_official_image_availability.csv) | 官方容器镜像可获得性 |
 | [`t02`](derived/tables/t02_registry_existence_probes.csv) | registry 存在性探测 |
 | [`t03`](derived/tables/t03_product_line_comparison.csv) | 产品线对照 |
-| [`t04`](derived/tables/t04_built_images.csv) | 九个镜像的构建产物事实 |
+| [`t04`](derived/tables/t04_built_images.csv) | 15 个镜像的构建产物事实 |
 | [`t05`](derived/tables/t05_capability_matrix.csv) | 能力矩阵（三态） |
 | [`t05b`](derived/tables/t05b_capability_raw.csv) | 能力矩阵（探针原始值） |
 | [`t06`](derived/tables/t06_build_capability.csv) | 编译能力明细 |
 | [`t07`](derived/tables/t07_gates.csv) | 五道门禁结果 |
 | [`t08`](derived/tables/t08_vendor_defects.csv) | 厂商缺陷清单 |
-| [`t09`](derived/tables/t09_build_paths.csv) | 三条构建路径 |
+| [`t09`](derived/tables/t09_build_paths.csv) | 四条构建路径 |
 | [`t10`](derived/tables/t10_environment_fingerprint.csv) | 环境指纹（架构/glibc/setuid 数等，非能力） |
 | [`t11`](derived/tables/t11_tool_installability.csv) | 14 个工具在各自源里的可装性 |
 | [`t12`](derived/tables/t12_hardening_surface.csv) | masked 单元数与 setuid 面（逐档） |

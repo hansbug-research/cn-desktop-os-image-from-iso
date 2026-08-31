@@ -39,12 +39,20 @@ OUT="$ROOT/out/$DID-$TIER.manifest"
   echo "# 镜像 ID: $(docker images "$IMG" --format '{{.ID}}' 2>/dev/null)"
   echo "# 预期基线: glibc=$EXPECT_GLIBC libstdc++=$EXPECT_LIBSTDCPP GLIBCXX=$EXPECT_GLIBCXX"
   echo "#"
-  # 用 dpkg-query -W 的默认输出（包名<TAB>版本），避免格式串被内层 sh 当参数展开
-  docker run --rm "$IMG" /bin/sh -c '
-    if [ -f /usr/lib/dpkg/var/status ]; then dpkg-query --admindir=/usr/lib/dpkg/var -W
-    else dpkg-query -W; fi 2>/dev/null | sort' 2>/dev/null
+    # 包清单按**包管理系**取。原先只用 dpkg-query，rpm 系镜像会拿到空清单，
+    # 好在下面那道「不足 10 个包即失败」的断言会拦住 —— 硬失败而非静默产出空清单。
+    # 用 dpkg-query -W 的默认输出（包名<TAB>版本），避免格式串被内层 sh 当参数展开。
+    docker run --rm "$IMG" /bin/sh -c '
+      if command -v dpkg-query >/dev/null 2>&1; then
+        if [ -f /usr/lib/dpkg/var/status ]; then dpkg-query --admindir=/usr/lib/dpkg/var -W
+        else dpkg-query -W; fi 2>/dev/null | sort
+      elif command -v rpm >/dev/null 2>&1; then
+        rpm -qa --qf "%{NAME}\t%{VERSION}-%{RELEASE}\n" 2>/dev/null | sort
+      fi' 2>/dev/null
 } > "$OUT"
-n=$(grep -vc '^#' "$OUT" || true)
+  # 只数**真实数据行**。原先 grep -vc '^#' 把空行也算进去，于是 rpm 系镜像拿到
+  # 空清单时 n 仍然过线，断言被空行救活 —— 又一次「负向断言失效」。
+  n=$(awk 'NF && !/^#/' "$OUT" | wc -l)
 if [ "${n:-0}" -lt 10 ]; then
   echo "  !! 清单 $OUT 只有 $n 个包，生成失败" >&2; exit 1
 fi

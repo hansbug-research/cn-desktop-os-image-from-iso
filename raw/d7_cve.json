@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T12:30:05Z",
+  "collected_at": "2026-08-31T22:43:13Z",
   "scanner": "aquasec/trivy:0.70.0",
   "images": [
     {
@@ -78,7 +78,7 @@
       "distro_id": "uos25",
       "image": "uos-desktop-v25:micro",
       "real_os_id": "uos",
-      "anchor_tar_sha256": "e97182343fb36cf77a13b030a1a95884d834be59f311d4de2a83f24a9a00c99d",
+      "anchor_tar_sha256": "88b13363811ac907b9f8fcbeab88dc67f64e2b0308865d21317fdd1f336e1eea",
       "trivy_os_family": "debian",
       "trivy_os_name": "bookworm/sid",
       "results": 1,
@@ -90,7 +90,7 @@
       "distro_id": "uos25",
       "image": "uos-desktop-v25:base",
       "real_os_id": "uos",
-      "anchor_tar_sha256": "f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0",
+      "anchor_tar_sha256": "6d61ff3129bcbb4c65bea018c81fd769613087c0662d56819416b5ec364f6ddc",
       "trivy_os_family": "debian",
       "trivy_os_name": "bookworm/sid",
       "results": 1,
@@ -102,12 +102,84 @@
       "distro_id": "uos25",
       "image": "uos-desktop-v25:devel",
       "real_os_id": "uos",
-      "anchor_tar_sha256": "bcd57e55fd3fc30d3bf43b282488e5acaa8eeb25644a13836d13148aef30bca0",
+      "anchor_tar_sha256": "6db58e6cc1e992c16f5a88315841ff0ac827a516e349c4f2305d75337ac0c98c",
       "trivy_os_family": "debian",
       "trivy_os_name": "bookworm/sid",
       "results": 1,
       "vuln_entries": 0,
       "high_critical": 0,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "kylinsec6",
+      "image": "kylinsec-desktop-v6:micro",
+      "real_os_id": "kylinsecos",
+      "anchor_tar_sha256": "4157c2f113be76ba683ad7988f6ceca6159aafa5c1a3af0959b1f71a2c1ee7eb",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 0,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "kylinsec6",
+      "image": "kylinsec-desktop-v6:base",
+      "real_os_id": "kylinsecos",
+      "anchor_tar_sha256": "3471fc11757f01cf646832d266692aa40e2730279c9e6434c52fa36a966be884",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "kylinsec6",
+      "image": "kylinsec-desktop-v6:devel",
+      "real_os_id": "kylinsecos",
+      "anchor_tar_sha256": "b278c8af001f4c729faed2072eb1915b649b9ad366633a9546c2a8e4ec0794c2",
+      "trivy_os_family": "none",
+      "trivy_os_name": "",
+      "results": 1,
+      "vuln_entries": 0,
+      "high_critical": 0,
+      "verdict": "未识别"
+    },
+    {
+      "distro_id": "linx6",
+      "image": "linx-os-v6:micro",
+      "real_os_id": "Linx",
+      "anchor_tar_sha256": "0a3698dbca858489ae35cccdf725008461f6ea37ece130136dfbe15292595a5a",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "10.6",
+      "results": 1,
+      "vuln_entries": 342,
+      "high_critical": 165,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "linx6",
+      "image": "linx-os-v6:base",
+      "real_os_id": "Linx",
+      "anchor_tar_sha256": "136515dfc7a3850a662510766f0fafbd86db32a707df94fb5c7d756380b61cf6",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "10.6",
+      "results": 1,
+      "vuln_entries": 692,
+      "high_critical": 418,
+      "verdict": "误判"
+    },
+    {
+      "distro_id": "linx6",
+      "image": "linx-os-v6:devel",
+      "real_os_id": "Linx",
+      "anchor_tar_sha256": "f46b12b5c28a1b0096d934f80d8d06cb9881eb5661d046b4c4a492d6396fe166",
+      "trivy_os_family": "debian",
+      "trivy_os_name": "10.6",
+      "results": 1,
+      "vuln_entries": 1791,
+      "high_critical": 831,
       "verdict": "误判"
     }
   ]

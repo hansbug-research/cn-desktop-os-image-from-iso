@@ -8,3 +8,9 @@ kylin-desktop-v10:devel,kylin,debian,bullseye/sid,0,误判
 uos-desktop-v25:micro,uos,debian,bookworm/sid,0,误判
 uos-desktop-v25:base,uos,debian,bookworm/sid,0,误判
 uos-desktop-v25:devel,uos,debian,bookworm/sid,0,误判
+kylinsec-desktop-v6:micro,kylinsecos,none,,0,未识别
+kylinsec-desktop-v6:base,kylinsecos,none,,0,未识别
+kylinsec-desktop-v6:devel,kylinsecos,none,,0,未识别
+linx-os-v6:micro,Linx,debian,10.6,165,误判
+linx-os-v6:base,Linx,debian,10.6,418,误判
+linx-os-v6:devel,Linx,debian,10.6,831,误判

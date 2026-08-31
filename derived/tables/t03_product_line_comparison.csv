@@ -3,3 +3,5 @@ kind,image,os_name,os_id,version_id,pkg_format,glibc,repo_url_sample
 本项目自建,kylin-desktop-v11:base,Kylin,kylin,v11,dpkg,2.38-1ok6.9k0.5,deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] http://archive.kyl
 本项目自建,kylin-desktop-v10:base,Kylin,kylin,v10,dpkg,2.31-0kylin9.1k20.3,deb [signed-by=/usr/share/keyrings/kylin-archive-keyring.gpg] http://archive.kyl
 本项目自建,uos-desktop-v25:base,Uos,uos,25,dpkg,2.38-6deepin19,deb https://pro-store-packages.uniontech.com/appstore-V25 snipe appstore
+本项目自建,kylinsec-desktop-v6:base,KylinSec OS,kylinsecos,6,rpm,2.38-54.ks6.kb1,baseurl=file:///run/media/$user/KylinSec/
+本项目自建,linx-os-v6:base,Linx GNU/Linux,Linx,10,dpkg,2.28-10-linx2,

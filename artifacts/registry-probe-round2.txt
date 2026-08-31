@@ -1,0 +1,13 @@
+# 两个第二轮被试的 registry 枚举实测
+# 采集时间: 2026-08-31T16:57:52Z   采集主机出口: 中国大陆
+# 方法: Docker Hub v2 命名空间枚举 + 厂商自有 registry 的 /v2/ 探测
+
+hub.docker.com/v2/repositories/kylinsec/     count=0（0 个仓库）
+hub.docker.com/v2/repositories/linx/         count=1，唯一仓库名 apache（与凝思无关）
+hub.docker.com/v2/repositories/linxinfo/     count=0
+hub.docker.com/v2/repositories/linx-info/    count=0
+https://registry.linx-info.com/v2/           000（不可达）
+https://cr.linx-info.com/v2/                 000（不可达）
+https://hub.linx-info.com/v2/                000（不可达）
+
+# 注: 000 是 curl 的连接失败，与「策略拒绝」不同，需按 §9.1 的网络位置局限理解。

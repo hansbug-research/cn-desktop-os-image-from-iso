@@ -1,6 +1,6 @@
 #!/bin/bash
 # 国产 OS 容器镜像构建 —— 公共函数库
-# 所有路径以 $ROOT 为根（容器内为 /w，宿主为仓库根目录）
+# 所有路径以 $ROOT 为根（容器内为 /w，宿主为 /data/dosbuild）
 ROOT="${ROOT:-/w}"
 # 这两个可以被调用方单独覆盖：selfhost 路径在**目标容器内**执行，仓库是挂载进去的，
 # 路径与构建容器不同，所以不能写死成 $ROOT 的子目录。
@@ -179,6 +179,35 @@ EOF
   fi
   [ -f "$R/etc/nsswitch.conf" ] || printf 'passwd: files\ngroup: files\nshadow: files\nhosts: files dns\nnetworks: files\nprotocols: db files\nservices: db files\nethers: db files\nrpc: db files\n' > "$R/etc/nsswitch.conf"
   # 内核/固件/initramfs 残留（bootstrap 期间可能按宿主 uname -r 生成）
+  # ⚠️ 删文件的同一处必须把包数据库一起改，否则库里会留下「已装而文件全不在」的
+  # 幽灵包。凝思实测：linux-image-* 登记为 install ok installed、Installed-Size
+  # 261829（256 MB），文件一个不在 —— SBOM 报告一个不存在的包，trivy 因此凭空
+  # 产出 373 条 HIGH+CRITICAL，占该镜像全部命中的 69%（缺陷 D18）。
+  # 在入口用 debootstrap --exclude 拦不住它（它是作为依赖被拉进来的），
+  # 而这里正是不一致被创造出来的地方，所以修在这里。
+  if [ -x "$R/usr/bin/dpkg-query" ] || [ -x "$R/usr/bin/dpkg" ]; then
+    # 必须连同**依赖内核包的包**一起 purge。只 purge 叶子会把「清单不一致」
+    # 换成「依赖不一致」—— 实测两次：initramfs-tools 那次和内核这次，
+    # 症状都是第三阶段自检报 apt-check=BAD。凝思这条链是
+    # linux-image-amd64 → linux-image-4.19.0-11-...-unsigned ← update-drivers-4.19.0。
+    _st="$R/var/lib/dpkg/status"; [ -f "$_st" ] || _st="$R/usr/lib/dpkg/var/status"
+    _kpkgs=$(chroot "$R" dpkg-query -W -f='${Package} ${Status}\n' 2>/dev/null \
+      | awk '$NF=="installed"{print $1}' | grep -E '^linux-image|^linux-headers|^update-drivers' | tr '\n' ' ')
+    if [ -n "$(printf %s "$_kpkgs" | tr -d " ")" ]; then
+      log "  移除幽灵内核包登记: $_kpkgs"
+      chroot "$R" dpkg --purge --force-all $_kpkgs >/dev/null 2>&1 || \
+        chroot "$R" dpkg --remove --force-all $_kpkgs >/dev/null 2>&1 || true
+      # 当场验证依赖图仍健康。之前两次都是等到第三阶段自检才发现坏了。
+      if [ -x "$R/usr/bin/apt-get" ]; then
+        if ! chroot "$R" apt-get check >/dev/null 2>&1; then
+          log "  ⚠ purge 后依赖图不健康，逐条列出："
+          chroot "$R" apt-get check 2>&1 | head -6 | sed 's/^/      /'
+          die "purge 内核链破坏了依赖图 —— 检查是否还有包依赖被删的包"
+        fi
+        log "  purge 后 apt-get check 通过"
+      fi
+    fi
+  fi
   rm -rf "$R"/boot/* "$R"/lib/modules/* "$R"/usr/lib/modules/* "$R"/lib/firmware "$R"/usr/lib/firmware \
          "$R"/var/lib/initramfs-tools/* 2>/dev/null || true
   find "$R/var/log" -type f -exec sh -c ': > "$1"' _ {} \; 2>/dev/null || true

@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-08-30T12:29:31Z",
+  "collected_at": "2026-08-31T22:34:24Z",
   "tools": [
     "iproute2",
     "iputils-ping",
@@ -227,7 +227,7 @@
         "gdb": "NOREPO",
         "python3-dev": "NOREPO"
       },
-      "anchor_tar_sha256": "f80abeda86511b60493a45e9dd3bf1b5f7f3edd7c5cff1e400e7ec8294c3aba0",
+      "anchor_tar_sha256": "6d61ff3129bcbb4c65bea018c81fd769613087c0662d56819416b5ec364f6ddc",
       "raw": {
         "iproute2": {
           "madison": "NOREPO",
@@ -304,14 +304,203 @@
         "vim-tiny",
         "zstd"
       ]
+    },
+    "kylinsec6": {
+      "image": "kylinsec-desktop-v6:base",
+      "candidates": {
+        "iproute2": "iproute: iproute-1:6.6.0-3.ks6.x86_64",
+        "iputils-ping": "iputils: iputils-0:20221126-5.ks6.x86_64",
+        "bind9-dnsutils": "bind-utils: bind-utils-32:9.18.21-3.ks6.x86_64",
+        "lsof": "lsof: lsof-0:4.99.3-2.ks6.x86_64",
+        "vim-tiny": "vim-minimal: vim-minimal-2:9.0.2092-12.ks6.x86_64",
+        "zstd": "zstd: zstd-0:1.5.5-1.ks6.x86_64",
+        "unzip": "unzip: unzip-0:6.0-52.ks6.x86_64",
+        "cmake": "cmake: cmake-0:3.27.9-5.ks6.x86_64",
+        "autoconf": "autoconf: autoconf-0:2.71-5.ks6.noarch",
+        "automake": "automake: automake-0:1.16.5-8.ks6.noarch",
+        "git": "git: git-0:2.43.0-11.ks6.x86_64",
+        "strace": "strace: strace-0:6.6-2.ks6.x86_64",
+        "gdb": "gdb: gdb-0:14.1-11.ks6.x86_64",
+        "python3-dev": "python3-devel: python3-devel-0:3.11.6-10.ks6.x86_64"
+      },
+      "anchor_tar_sha256": "3471fc11757f01cf646832d266692aa40e2730279c9e6434c52fa36a966be884",
+      "raw": {
+        "iproute": {
+          "madison": "iproute-1:6.6.0-3.ks6.x86_64",
+          "installed": true
+        },
+        "iputils": {
+          "madison": "iputils-0:20221126-5.ks6.x86_64",
+          "installed": true
+        },
+        "bind-utils": {
+          "madison": "bind-utils-32:9.18.21-3.ks6.x86_64",
+          "installed": false
+        },
+        "lsof": {
+          "madison": "lsof-0:4.99.3-2.ks6.x86_64",
+          "installed": true
+        },
+        "vim-minimal": {
+          "madison": "vim-minimal-2:9.0.2092-12.ks6.x86_64",
+          "installed": true
+        },
+        "vim-enhanced": {
+          "madison": "vim-enhanced-2:9.0.2092-12.ks6.x86_64",
+          "installed": false
+        },
+        "zstd": {
+          "madison": "zstd-0:1.5.5-1.ks6.x86_64",
+          "installed": true
+        },
+        "unzip": {
+          "madison": "unzip-0:6.0-52.ks6.x86_64",
+          "installed": true
+        },
+        "cmake": {
+          "madison": "cmake-0:3.27.9-5.ks6.x86_64",
+          "installed": false
+        },
+        "autoconf": {
+          "madison": "autoconf-0:2.71-5.ks6.noarch",
+          "installed": false
+        },
+        "automake": {
+          "madison": "automake-0:1.16.5-8.ks6.noarch",
+          "installed": false
+        },
+        "git": {
+          "madison": "git-0:2.43.0-11.ks6.x86_64",
+          "installed": false
+        },
+        "strace": {
+          "madison": "strace-0:6.6-2.ks6.x86_64",
+          "installed": false
+        },
+        "gdb": {
+          "madison": "gdb-0:14.1-11.ks6.x86_64",
+          "installed": false
+        },
+        "python3-devel": {
+          "madison": "python3-devel-0:3.11.6-10.ks6.x86_64",
+          "installed": false
+        }
+      },
+      "installable": 14,
+      "total": 14,
+      "preinstalled": [
+        "iproute",
+        "iputils",
+        "lsof",
+        "unzip",
+        "vim-minimal",
+        "zstd"
+      ]
+    },
+    "linx6": {
+      "image": "linx-os-v6:base",
+      "candidates": {
+        "iproute2": "NOREPO",
+        "iputils-ping": "NOREPO",
+        "bind9-dnsutils": "NOREPO",
+        "lsof": "NOREPO",
+        "vim-tiny": "NOREPO",
+        "zstd": "NOREPO",
+        "unzip": "NOREPO",
+        "cmake": "NOREPO",
+        "autoconf": "NOREPO",
+        "automake": "NOREPO",
+        "git": "NOREPO",
+        "strace": "NOREPO",
+        "gdb": "NOREPO",
+        "python3-dev": "NOREPO"
+      },
+      "anchor_tar_sha256": "136515dfc7a3850a662510766f0fafbd86db32a707df94fb5c7d756380b61cf6",
+      "raw": {
+        "iproute2": {
+          "madison": "NOREPO",
+          "installed": true
+        },
+        "iputils-ping": {
+          "madison": "NOREPO",
+          "installed": true
+        },
+        "bind9-dnsutils": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "dnsutils": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "lsof": {
+          "madison": "NOREPO",
+          "installed": true
+        },
+        "vim-tiny": {
+          "madison": "NOREPO",
+          "installed": true
+        },
+        "vim": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "zstd": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "unzip": {
+          "madison": "NOREPO",
+          "installed": true
+        },
+        "cmake": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "autoconf": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "automake": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "git": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "strace": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "gdb": {
+          "madison": "NOREPO",
+          "installed": false
+        },
+        "python3-dev": {
+          "madison": "NOREPO",
+          "installed": false
+        }
+      },
+      "installable": 0,
+      "total": 14,
+      "preinstalled": [
+        "iproute2",
+        "iputils-ping",
+        "lsof",
+        "unzip",
+        "vim-tiny"
+      ]
     }
   },
   "cxx_probe": {
     "kylin11": "g++ present=N repo= g++ | 4:12.2.0-ok1k0.2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages\ngcc present=N repo= gcc | 4:12.2.0-ok1k0.2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages\nmake present=N repo= make | 4.3-ok1k0.1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages\ncmake present=N repo= cmake | 3.28.3-ok4k0.2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/universe amd64 Packages",
     "kylin10": "g++ present=N repo= g++ | 4:9.3.0-11.185.1kylin2k6 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\ngcc present=N repo= gcc | 4:9.3.0-11.185.1kylin2k6 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\nmake present=N repo= make | 4.2.1-1.2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages\ncmake present=N repo= cmake | 3.16.3-1kylin1k3 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
-    "uos25": "g++ present=N repo=NOREPO\ngcc present=N repo=NOREPO\nmake present=N repo=NOREPO\ncmake present=N repo=NOREPO"
+    "uos25": "g++ present=N repo=NOREPO\ngcc present=N repo=NOREPO\nmake present=N repo=NOREPO\ncmake present=N repo=NOREPO",
+    "kylinsec6": "gcc-c++ present=N repo=gcc-c++-0:12.3.1-36.ks6.x86_64\ngcc present=N repo=gcc-0:12.3.1-36.ks6.x86_64\nmake present=N repo=make-1:4.4.1-1.ks6.x86_64\ncmake present=N repo=cmake-0:3.27.9-5.ks6.x86_64",
+    "linx6": "g++ present=N repo=NOREPO\ngcc present=N repo=NOREPO\nmake present=N repo=NOREPO\ncmake present=N repo=NOREPO"
   },
-  "uos_apt_scale": "---stats---\nTotal package names: 4758 (133 k)\nTotal package structures: 4679 (206 k)\n  Normal packages: 2710\n  Pure virtual packages: 3\n  Single virtual packages: 91\n  Mixed virtual packages: 1\n---repo-entries---\n2496\n---positive-control---\nsample=1000-notepad\n1000-notepad |     5.14.0 | https://pro-store-packages.uniontech.com/appstore-V25 snipe/appstore amd64 Packages\n---nano---\nnano:\n  Installed: (none)\n  Candidate: (none)",
+  "uos_apt_scale": "---stats---\nTotal package names: 4754 (133 k)\nTotal package structures: 4675 (206 k)\n  Normal packages: 2714\n  Pure virtual packages: 3\n  Single virtual packages: 92\n  Mixed virtual packages: 1\n---repo-entries---\n2500\n---positive-control---\nsample=1000-notepad\n1000-notepad |     5.14.0 | https://pro-store-packages.uniontech.com/appstore-V25 snipe/appstore amd64 Packages\n---nano---\nnano:\n  Installed: (none)\n  Candidate: (none)",
   "uos_iso_inventory": {
     "package_count": 1636,
     "source": "/w/build/uos25r",
@@ -1970,5 +2159,12 @@
       "zlib1g:amd64",
       "zstd"
     ]
+  },
+  "query_control": {
+    "kylin11": "target=libghc-strict-dev from=repo-index query=libghc-strict-dev | 0.5-ok1 | http://archive.kylinos.cn/kylin/KYLIN-ALL 11.0/main amd64 Packages",
+    "kylin10": "target=2to3 from=repo-index query= 2to3 | 3.8.2-0kylin2 | http://archive.kylinos.cn/kylin/KYLIN-ALL 10.1/main amd64 Packages",
+    "uos25": "target=1000-notepad from=repo-index query=1000-notepad | 5.14.0 | https://pro-store-packages.uniontech.com/appstore-V25 snipe/appstore amd64 Packages",
+    "kylinsec6": "target=389-ds-base from=repo-index query=389-ds-base-0:3.1.1-4.ks6.x86_64",
+    "linx6": "NOSOURCE"
   }
 }

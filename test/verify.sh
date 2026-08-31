@@ -34,7 +34,8 @@ for DID in $DISTROS; do
         MICRO_INCLUDE BASE_INCLUDE DEVEL_INCLUDE STAGE_INCLUDE SLICE_MICRO \
         SLICE_BASE_EXTRA SLICE_DEVEL_EXTRA SOURCE_DATE_EPOCH MIRROR SUITE COMPONENTS \
         EXPECT_GLIBC EXPECT_LIBSTDCPP EXPECT_GLIBCXX IMAGE METHOD USRMERGE DISPLAY_NAME \
-        SRC_ROOTFS ISO_URL ISO_SQUASHFS_PATH SQUASHFS_SHA256 DEBOOTSTRAP_SCRIPT
+        SRC_ROOTFS ISO_URL ISO_SQUASHFS_PATH SQUASHFS_SHA256 DEBOOTSTRAP_SCRIPT \
+        FAMILY EXPECT_SHADOW NO_CHECK_GPG RPM_DB_BACKEND MEDIA_DIR
   . "$ROOT/distros/$DID.conf"
   for TIER in micro base devel; do
     IMG="$IMAGE:$TIER"
@@ -55,23 +56,58 @@ for DID in $DISTROS; do
     check no_sshkey  Y "$(g no_sshkey)"
     check no_firmware Y "$(g no_firmware)"
     check no_kernel  Y "$(g no_kernel)"
+    # 幽灵包：库里登记为已装、而文件被容器化改造删掉的内核/头文件包。
+    # 单看 no_kernel（文件不在）与 pkgs（包数够多）都通过，矛盾只在交叉核对时显形。
+    ghost=$(printf '%s' "$(g ghost_pkgs)" | tr ',' ' ' | tr -s ' ')
+    [ -z "$(printf '%s' "$ghost" | tr -d ' ')" ] \
+      && pass "ghost_pkgs（库里无已删文件的内核包）" \
+      || fail "ghost_pkgs: 库里登记为已装、抽样文件全部缺失的包:$ghost（删文件的那一处应同时清库登记，见 lib/common.sh）"
     check copyright_kept Y "$(g copyright_kept)"
-    # 逐包 copyright：厂商本来就没打的（麒麟 V11 的 libboundscheck/libcryptsetup12/openssl，
-    # 已核对过原始 deb 里也没有）列入白名单；白名单外缺失即失败 —— 精简策略写错时
-    # 只要还剩一个包有 copyright，旧的 copyright_kept 就永真，抓不住。
+    # 逐包 copyright：厂商本来就没打的列入白名单；白名单外缺失即失败 —— 精简策略
+    # 写错时只要还剩一个包有 copyright，旧的 copyright_kept 就永真，抓不住。
+    # 白名单每一条都必须先核对原始 deb 里确实没有，否则等于把自己的 path-exclude
+    # bug 写成「厂商没打」：
+    #   · 麒麟 V11 的 libboundscheck / libcryptsetup12 / openssl
+    #   · 凝思的 linx-archive-keyring —— `dpkg-deb -c` 实测该 deb 只有 5 个条目，
+    #     唯一文件是 usr/share/keyrings/linx-archive-keyring.gpg，无 doc 目录。
+    #   · 麒麟信安的 glib2 —— 厂商把 %license 打成指向 LICENSES/LGPL-2.1-or-later.txt
+    #     的符号链接，而目标文件不在任何介质包里（逐个 rpm -qlp 扫过 400 个包，
+    #     零命中）。这是厂商缺陷 D19，不是本项目精简策略造成的。
     cpmiss=$(printf '%s' "$(g copyright_missing)" | tr ',' '\n' | grep -v '^$' \
-      | grep -vxE 'libboundscheck|libcryptsetup12|openssl' | tr '\n' ' ')
+      | grep -vxE 'libboundscheck|libcryptsetup12|openssl|linx-archive-keyring|glib2' | tr '\n' ' ')
     [ -z "$cpmiss" ] && pass "copyright 逐包（白名单外无缺失）" \
       || fail "copyright 白名单外缺失: $cpmiss"
+    # ld.so.cache 必须存在且非空。切片路径与 --noscripts 的 rpm bootstrap 都会漏它，
+    # 而漏掉的表现是「某些二进制起不来」而非任何构建期报错。
+    [ "$(g ldcache)" -gt 1000 ] 2>/dev/null \
+      && pass "ldcache $(g ldcache) 字节" \
+      || fail "ldcache: 期望 >1000 实际 $(g ldcache)（ldconfig 没跑？）"
+    # 执行型判据：非默认库目录里的二进制真能跑。n/a 只在该档没有 systemctl 时成立。
+    case "$(g systemctl_runs)" in
+      Y|n/a) pass "systemctl_runs $(g systemctl_runs)" ;;
+      *) fail "systemctl_runs: 期望 Y 或 n/a，实际 $(g systemctl_runs)（私有库路径没进 ld.so.cache？）" ;;
+    esac
     check policy_rcd Y "$(g policy_rcd)"
     # L1 完整性
     check audit 0 "$(g audit)"
-    check elf_broken 0 "$(g elf_broken)"
+    # 坏 ELF 按**文件名**白名单，不按数量放宽：允许「1 个」会对任何新增的坏 ELF
+    # 放过，允许「q_atm.so」只放过已论证的那一个。
+    #   · q_atm.so —— iproute2 的 tc ATM 插件，厂商包本身不带 libatm（缺陷 D11）
+    ebad=$(printf '%s' "$(g elf_broken_list)" | tr ',' '\n' | grep -v '^$' \
+      | grep -vxE 'q_atm\.so' | tr '\n' ' ')
+    [ -z "$ebad" ] && pass "elf_broken（白名单外无坏 ELF，计数 $(g elf_broken)）" \
+      || fail "elf_broken 白名单外: $ebad"
     check getent_passwd Y "$(g getent_passwd)"
     check getent_group  Y "$(g getent_group)"
     check ldconfig_clean 0 "$(g ldconfig_clean)" warn
     check tz UTC "$(g tz)"
-    check localtime Etc/UTC "$(g localtime)" warn
+    # tzdata 的规范名随年代变：Debian 10 那一代 /usr/share/zoneinfo/UCT 是真文件、
+    # Etc/UTC 是指向它的链接，`readlink -f` 因此解析到 UCT。同一时刻、不同命名，
+    # 不是缺陷。判据接受两者。
+    case "$(g localtime)" in
+      Etc/UTC|UTC|UCT) pass "localtime $(g localtime)" ;;
+      *) fail "localtime: 期望 Etc/UTC/UTC/UCT，实际 $(g localtime)" ;;
+    esac
     # machine-id 必须存在且为空（systemd 的 first-boot 语义）——report.md §7（验收） 列了却一直没接线
     check machine_id_empty Y "$(g machine_id_empty)"
     check dpkg_list_ok Y "$(g dpkg_list_ok)"
@@ -95,18 +131,58 @@ for DID in $DISTROS; do
     # 非 root 用户可运行（很多生产环境强制 runAsNonRoot）
     nr=$(docker run --rm -u 65534:65534 "$IMG" /bin/sh -c 'id -u' 2>/dev/null)
     check nonroot_run 65534 "${nr:-失败}"
-    # 基线对账
+    # 基线对账。glibc 版本由镜像内检查集从包数据库问出来，而那一段是 dpkg 专用的，
+    # rpm 系问不到（值为空）。inner-checks.sh 已按族分支，这里只需保证期望值存在。
     check glibc_prefix "$EXPECT_GLIBC" "$(printf '%s' "$(g glibc)" | grep -oE '^[0-9]+\.[0-9]+')"
     check libstdcpp "$EXPECT_LIBSTDCPP" "$(g libstdcpp)"
     check glibcxx   "$EXPECT_GLIBCXX"   "$(g glibcxx)"
     # L2 能力（按档位期望）
-    check locale_zh 1 "$(g locale_zh)"
+    # zh 语言包的粒度按族不同：deb 侧 locales 可精简到只留 zh_CN.UTF-8（1 个）；
+    # rpm 侧 glibc-all-langpacks 是一个整包，装了就带 zh_CN 的四个变体
+    # （zh_CN、zh_CN.utf8、zh_CN.gb18030、zh_CN.gbk），拆不开。所以期望值按族取：
+    # 判据要守的是「zh_CN 可用」，不是「恰好一个变体」。
+    if [ "${FAMILY:-deb}" = rpm ]; then
+      [ "$(g locale_zh)" -ge 1 ] 2>/dev/null \
+        && pass "locale_zh $(g locale_zh)（rpm 系整包提供多个变体）" \
+        || fail "locale_zh: 期望 >=1 实际 $(g locale_zh)"
+    else
+      check locale_zh 1 "$(g locale_zh)"
+    fi
     if [ "$(g ca_bytes)" -gt 100000 ]; then PASS=$((PASS+1))
     else FAIL=$((FAIL+1)); PROBLEMS+=("  ✗ $IMG ca_bytes: $(g ca_bytes) 过小"); fi
+    # 期望按**包管理系**分支。rpm 系没有 apt，拿 apt 的判据去量会在 has_apt /
+    # apt_check / apt_roundtrip 上一片失败 —— 量的是尺子不是被试（与能力探针同一个
+    # 错，见 report §6.1）。deb 侧保留原有逻辑，它已针对 UOS 的 OSTree 分发调校过。
+    if [ "${FAMILY:-deb}" = rpm ]; then
+      case $TIER in
+        micro) check has_pkgmgr N "$(g has_pkgmgr)" ;;
+        base)  check has_pkgmgr Y "$(g has_pkgmgr)"; check has_python3 Y "$(g has_python3)"; check tls Y "$(g tls)"
+               check has_source Y "$(g has_source)"
+               check pkg_roundtrip Y "$(g pkg_roundtrip)"
+               # rpm 侧的「装完仍自洽」对应 rpm -Va 的未满足依赖数（inner-checks 已按族分支）
+               check audit_after 0 "$(g audit_after)" ;;
+        devel) check has_pkgmgr Y "$(g has_pkgmgr)"
+               check has_cc Y "$(g has_cc)"; check has_make Y "$(g has_make)"
+               check compile_c Y "$(g compile_c)"
+               check has_cxx Y "$(g has_cxx)"; check compile_cxx Y "$(g compile_cxx)" ;;
+      esac
+    else
     case $TIER in
       micro) check has_apt N "$(g has_apt)"; check apt_check n/a "$(g apt_check)" ;;
       base)  check has_apt Y "$(g has_apt)"; check has_python3 Y "$(g has_python3)"; check tls Y "$(g tls)"
-             if [ "${IMMUTABLE:-no}" = yes ]; then
+             if [ "$(g has_source)" = N ]; then
+               # 凝思：厂商未提供公开在线仓库，出厂 sources.list 留空（§4.5）。
+               # 断言写成「无源」这个确定形态，而不是笼统放过 —— 哪天有源了，
+               # has_source 变 Y，这条就会失败并提示复核期望。
+               # 也不能把「无源时 apt-get update 成功」当成能更新：源清单为空时
+               # 它必然成功（没东西要取），空集上的全称命题恒真。
+               pass "has_source N（厂商无公开在线仓库，出厂源清单为空）"
+               case "$(g apt_roundtrip)" in
+                 N*) pass "apt_roundtrip 如期无源可装（$(g apt_roundtrip)）" ;;
+                 *)  fail "apt_roundtrip: 无源时期望 N*，实际 $(g apt_roundtrip)" ;;
+               esac
+               check audit_after 0 "$(g audit_after)"
+             elif [ "${IMMUTABLE:-no}" = yes ]; then
                # UOS V25 的 OS 分发走 OSTree + 玲珑，apt 源里只有应用商店的 GUI 应用
                # （实测源只提供 2496 个包，不含 nano 这类 OS 包）。所以：
                #   · apt update 必须成功（两个需授权的 401 源已默认注释掉，见 lib/common.sh）
@@ -128,7 +204,7 @@ for DID in $DISTROS; do
                check apt_check_after OK "$(g apt_check_after)"
              fi ;;
       devel) check has_apt Y "$(g has_apt)"
-             [ "${IMMUTABLE:-no}" = yes ] || check apt_check OK "$(g apt_check)"
+             { [ "${IMMUTABLE:-no}" = yes ] || [ "$(g has_source)" = N ]; } || check apt_check OK "$(g apt_check)"
              check has_cc Y "$(g has_cc)"; check has_make Y "$(g has_make)"
              check compile_c Y "$(g compile_c)"
              if [ "${IMMUTABLE:-no}" = yes ]; then
@@ -137,6 +213,7 @@ for DID in $DISTROS; do
                check has_cxx Y "$(g has_cxx)"; check compile_cxx Y "$(g compile_cxx)"
              fi ;;
     esac
+    fi
     # L3 ABI gate：低地板产物必须能跑；高地板产物按 glibc 判定
     r=$(docker run --rm -v "$ROOT/gate:/g:ro" "$IMG" /g/t_low 2>&1 | tail -1)
     check gate_low "ok 14" "$r"
@@ -199,9 +276,12 @@ for DID in $DISTROS; do
         && pass "masked_units $(g masked_units)" \
         || fail "masked_units: 期望 >=5 实际 $(g masked_units)"
     fi
-    # 9 个镜像统一要求：影子文件存在且 root:shadow 0640
-    check shadow  "0:42/640" "$(g shadow)"
-    check gshadow "0:42/640" "$(g gshadow)"
+    # 影子文件的属主与权限**按发行版取**，不能统一写死：Debian 系是 0640 root:shadow，
+    # RH 系是 000 root:root（更严），凝思自带的 shadow 套件产出 0660（多一个组写位）。
+    # 写死一个值会把发行版惯例差异报成缺陷，而真正该守的是「与该发行版的基线一致」。
+    # 值与理由都记在 distros/*.conf 的 EXPECT_SHADOW。
+    check shadow  "${EXPECT_SHADOW:?distros/$DID.conf 缺 EXPECT_SHADOW}" "$(g shadow)"
+    check gshadow "${EXPECT_SHADOW}" "$(g gshadow)"
   done
 done
 echo
@@ -213,7 +293,10 @@ echo "══ 汇总: 通过 $PASS / 失败 $FAIL / 警告 $WARN"
 # 跳过方式 —— conf 变量跨发行版泄漏把 apt_check/compile_cxx 降级成 n/a、
 # g() 取不到值、helper 函数名拼错导致两条分支都是"命令未找到"。
 # 所以数量本身必须是断言：只允许涨，掉下来就是有检查消失了。
-BASELINE=${BASELINE:-360}
+# 基线随被试数一起抬：3 被试时是 360，5 被试实测 637，基线设 620 留 17 的余量吸收
+# 「某档没有 systemctl 因而少两项」这类合法波动。留旧基线不动等于让它失去鉴别力 ——
+# 360 对 5 个被试来说，整掉一个发行版（约 127 项）都还在线上。
+BASELINE=${BASELINE:-620}
 TOTAL_RUN=$((PASS+FAIL+WARN))
 # 只在**全量**跑时校基线：显式指定 DISTROS 是子集调试，撞基线没有意义
 if [ -n "${DISTROS_OVERRIDDEN:-}" ]; then

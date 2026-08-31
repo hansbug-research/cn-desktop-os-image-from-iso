@@ -22,12 +22,12 @@ MAXSEV=${MAXSEV:-0}
 TRIVY=${TRIVY:-aquasec/trivy:0.70.0}
 SOCK=${SOCK:-$(docker context inspect -f '{{.Endpoints.docker.Host}}' 2>/dev/null | sed 's|^unix://||')}
 SOCK=${SOCK:-/run/user/$(id -u)/docker.sock}
-declare -A IMG=([kylin11]=kylin-desktop-v11 [kylin10]=kylin-desktop-v10 [uos25]=uos-desktop-v25)
+. "$(dirname "${BASH_SOURCE[0]:-$0}")/../lib/subjects.sh"   # IMG / ALL_DIDS 的唯一真源
 docker image inspect "$TRIVY" >/dev/null 2>&1 || { echo "!! 本地无 $TRIVY 镜像，跳过（同 test/sbom.sh）"; exit 0; }
 [ -S "$SOCK" ] || { echo "!! 找不到 docker socket ($SOCK)，跳过"; exit 0; }
 
 COVERED=0; UNCOVERED=0; BAD=0
-DISTROS=${DISTROS:-"kylin11 kylin10 uos25"}
+DISTROS=${DISTROS:-$ALL_DIDS}
 for d in $DISTROS; do
   for t in micro base devel; do
     img="${IMG[$d]}:$t"

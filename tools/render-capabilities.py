@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""把 out/caps-*.txt 渲染成能力矩阵。
+"""把 artifacts/caps-*.txt 渲染成能力矩阵。
 
 三态语义（用户要求）：
   ✅ 支持    —— 实测通过
@@ -14,15 +14,17 @@
 import glob, os, pathlib, re, sys, collections
 
 ROOT = os.environ.get("ROOT") or str(pathlib.Path(__file__).resolve().parent.parent)
-DISTROS = [("kylin11", "麒麟V11"), ("kylin10", "麒麟V10"), ("uos25", "UOS25")]
-TIERS = ["micro", "base", "devel"]
+sys.path.insert(0, f"{ROOT}/scripts")
+from _subjects import DIDS, TIERS, SHORT      # 被试清单的唯一真源：config/subjects.json
+DISTROS = [(d, SHORT[d]) for d in DIDS]
 
 data = {}
 for d, _ in DISTROS:
     for t in TIERS:
-        p = f"{ROOT}/out/caps-{d}-{t}.txt"
+        p = f"{ROOT}/artifacts/caps-{d}-{t}.txt"
         if not os.path.exists(p):
-            continue
+            # 静默 continue 会让缺一家被试只表现为「矩阵少一列」，汇总照样全绿。
+            sys.exit(f"缺探针输出 {p}；先跑 test/run-capabilities.sh")
         kv = {}
         for line in open(p):
             if line.startswith("cap."):
@@ -51,13 +53,16 @@ SECTIONS = [
     ("信号 trap（优雅退出基础）",  ["signal_trap"],      set()),
  ]),
  ("包管理", [
-    ("dpkg 数据库可查（SBOM 前提）", ["dpkg_query"],     set()),
-    ("apt-get 存在",               ["apt"],              na("micro")),
-    ("软件源配置 + 密钥环",        ["sources_list","apt_keyring"], na("micro")),
-    ("apt update（连源 + 验签）",  ["apt_update"],       na("micro")),
-    ("apt install/purge 往返",     ["apt_roundtrip"],    na("micro")),
-    ("apt check（依赖自洽）",      ["apt_check"],        na("micro")),
-    ("本地 .deb 直装（离线分发）", ["dpkg_local_deb"],   set()),
+    # 标签按**能力**命名而不是按工具：同一行在 deb 侧由 dpkg/apt 测，rpm 侧由
+    # rpm/dnf 测（见 report §6.1）。写成「dpkg 数据库可查」会让 rpm 系被试
+    # 在这一行必然不支持，而那量的是尺子不是被试。
+    ("包数据库可查（SBOM 前提）",   ["pkgdb_query"],      set()),
+    ("包管理器存在",               ["pkgmgr"],           na("micro")),
+    ("软件源配置 + 密钥环",        ["pkg_sources","pkg_keyring"], na("micro")),
+    ("软件源元数据可刷新",         ["pkg_update"],       na("micro")),
+    ("装卸往返（含维护者脚本）",   ["pkg_roundtrip"],    na("micro")),
+    ("已装包依赖自洽",             ["pkg_check"],        na("micro")),
+    ("本地包直装（离线分发）",     ["pkg_local_install"], set()),
  ]),
  ("编译构建", [
     ("C 编译器存在",               ["cc_present"],       na("micro","base")),

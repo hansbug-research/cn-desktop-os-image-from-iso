@@ -1,0 +1,123 @@
+# 产物清单 kylinsec-desktop-v6:micro
+# 生成时间(UTC): 2026-08-31T21:40:40Z
+# 构建方法: rpmmedia
+# 源: n/a n/a n/a
+# tarball sha256: 4157c2f113be76ba683ad7988f6ceca6159aafa5c1a3af0959b1f71a2c1ee7eb
+# tarball bytes: 388741120
+# image id: b3f76ff9a78c
+# SOURCE_DATE_EPOCH: 1700000000
+# 镜像 ID: b3f76ff9a78c
+# 预期基线: glibc=2.38 libstdc++=6.0.30 GLIBCXX=3.4.30
+#
+attr	2.5.1-5.ks6
+audit-libs	3.1.2-2.ks6
+basesystem	12-3.ks6
+bash	5.2.15-9.ks6
+bc	1.07.1-12.ks6
+brotli	1.1.0-1.ks6
+bzip2	1.0.8-7.ks6
+ca-certificates	2023.2.64-1.ks6
+chkconfig	1.25-2.ks6
+coreutils	9.4-3.ks6
+cracklib	2.9.11-1.ks6
+crontabs	1.11-23.ks6
+crypto-policies	20230614-2.git5f3458e.ks6
+curl	8.4.0-11.ks6
+cyrus-sasl-lib	2.1.28-2.ks6
+diffutils	3.10-2.ks6
+e2fsprogs	1.47.0-3.ks6
+elfutils-default-yama-scope	0.190-3.ks6
+elfutils-libelf	0.190-3.ks6
+elfutils-libs	0.190-3.ks6
+file-libs	5.45-1.ks6
+filesystem	3.16-6.ks6
+findutils	4.9.0-1.ks6
+fuse	2.9.9-11.ks6
+fuse-common	3.16.2-1.ks6
+gawk	5.2.2-1.ks6
+gdbm	1.23-2.ks6
+glib2	2.78.3-6.ks6
+glibc	2.38-54.ks6.kb1
+glibc-all-langpacks	2.38-54.ks6.kb1
+glibc-common	2.38-54.ks6.kb1
+gmp	6.3.0-3.ks6
+grep	3.11-1.ks6
+gzip	1.12-4.ks6
+hostname	3.23-1.ks6
+ima-evm-utils-libs	1.5-1.ks6
+info	7.0.3-3.ks6
+json-c	0.17-6.ks6
+keyutils-libs	1.6.3-5.ks6
+krb5-libs	1.21.2-11.ks6
+kylinsec-gpg-keys	3.6.1-3.1.ks6.kb1
+kylinsec-release	6-3.ks6.kb5
+kylinsec-repos	3.6.1-3.1.ks6.kb1
+libacl	2.3.1-3.ks6
+libarchive	3.7.1-5.ks6
+libblkid	2.39.1-7.ks6.kb1
+libcap	2.69-3.ks6
+libcap-ng	0.8.3-2.ks6
+libcurl	8.4.0-11.ks6
+libev	4.33-4.ks6
+libevent	2.1.12-11.ks6
+libfdisk	2.39.1-7.ks6.kb1
+libffi	3.4.4-3.ks6
+libgcc	12.3.1-36.ks6
+libgcrypt	1.10.2-1.ks6
+libgomp	12.3.1-36.ks6
+libgpg-error	1.47-1.ks6
+libidn2	2.3.4-1.ks6
+libmount	2.39.1-7.ks6.kb1
+libnghttp2	1.58.0-2.ks6
+libnsl2	2.0.1-1.ks6
+libpng	1.6.40-1.ks6
+libpsl	0.21.2-1.ks6
+libpwquality	1.4.5-2.ks6.kb1
+libselinux	3.5-3.ks6
+libsemanage	3.5-1.ks6
+libsepol	3.5-3.ks6
+libsigsegv	2.14-1.ks6
+libsmartcols	2.39.1-7.ks6.kb1
+libssh	0.10.5-2.ks6
+libstdc++	12.3.1-36.ks6
+libtasn1	4.19.0-1.ks6
+libtirpc	1.3.4-4.ks6
+libunistring	1.1-2.ks6
+libutempter	1.2.1-3.ks6
+libuuid	2.39.1-7.ks6.kb1
+libverto	0.3.2-3.ks6
+libxcrypt	4.4.36-2.ks6
+libxml2	2.11.5-4.ks6
+logrotate	3.21.0-1.ks6
+lua	5.4.6-1.ks6
+lz4	1.9.4-2.ks6
+mpfr	4.2.1-1.ks6
+ncurses	6.4-8.ks6
+ncurses-base	6.4-8.ks6
+ncurses-libs	6.4-8.ks6
+newt	0.52.23-3.ks6
+openldap	2.6.5-4.ks6
+openssl-libs	3.0.12-15.ks6
+p11-kit	0.25.0-2.ks6
+p11-kit-trust	0.25.0-2.ks6
+pam	1.5.3-5.ks6.kb4
+pcre2	10.42-12.ks6
+popt	1.19-2.ks6
+publicsuffix-list	20240108-1.ks6
+readline	8.2-3.ks6.kb1
+rpm	4.18.2-22.ks6
+rpm-libs	4.18.2-22.ks6
+sed	4.9-4.ks6
+setup	2.14.5-2.ks6.kb1
+shadow	4.14.3-1.ks6
+shadow-subid-devel	4.14.3-1.ks6
+slang	2.3.3-2.ks6
+systemd-libs	255-35.ks6.kb3
+tar	1.35-2.ks6
+tpm2-tss	4.0.1-3.ks6
+tzdata	2024a-2.ks6
+util-linux	2.39.1-7.ks6.kb1
+which	2.21-16.ks6
+xz-libs	5.4.7-1.ks6
+zlib	1.2.13-2.ks6
+zstd	1.5.5-1.ks6

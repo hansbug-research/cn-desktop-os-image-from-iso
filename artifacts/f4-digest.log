@@ -4,8 +4,14 @@
   ✅ kylin10-micro  manifest=tar=镜像  (136ef44865d2… → 136ef44865d23c4ab8743c4c688fada7d
   ✅ kylin10-base  manifest=tar=镜像  (e5cde2f5ceb8… → e5cde2f5ceb84a3600d01b50fdac73f11b
   ✅ kylin10-devel  manifest=tar=镜像  (3e2931b0be26… → 3e2931b0be26239090e38ca524393d61f
-  ✅ uos25-micro  manifest=tar=镜像  (e97182343fb3… → e97182343fb36cf77a13b030a1a95884d83
-  ✅ uos25-base  manifest=tar=镜像  (f80abeda8651… → f80abeda86511b60493a45e9dd3bf1b5f7f3
-  ✅ uos25-devel  manifest=tar=镜像  (bcd57e55fd3f… → bcd57e55fd3fc30d3bf43b282488e5acaa8
-══ 摘要链: 通过 9 / 失败 0
-✅ 九个镜像的 manifest / tar / 镜像三者一致
+  ✅ uos25-micro  manifest=tar=镜像  (88b13363811a… → 88b13363811ac907b9f8fcbeab88dc67f64
+  ✅ uos25-base  manifest=tar=镜像  (6d61ff3129bc… → 6d61ff3129bcbb4c65bea018c81fd7696130
+  ✅ uos25-devel  manifest=tar=镜像  (6db58e6cc1e9… → 6db58e6cc1e992c16f5a88315841ff0ac82
+  ✅ kylinsec6-micro  manifest=tar=镜像  (4157c2f113be… → 4157c2f113be76ba683ad7988f6ceca
+  ✅ kylinsec6-base  manifest=tar=镜像  (3471fc11757f… → 3471fc11757f01cf646832d266692aa4
+  ✅ kylinsec6-devel  manifest=tar=镜像  (b278c8af001f… → b278c8af001f4c729faed2072eb1915
+  ✅ linx6-micro  manifest=tar=镜像  (0a3698dbca85… → 0a3698dbca858489ae35cccdf725008461f
+  ✅ linx6-base  manifest=tar=镜像  (136515dfc7a3… → 136515dfc7a3850a662510766f0fafbd86db
+  ✅ linx6-devel  manifest=tar=镜像  (f46b12b5c28a… → f46b12b5c28a1b0096d934f80d8d06cb988
+══ 摘要链: 通过 15 / 失败 0
+✅ 全部 15 个镜像的 manifest / tar / 镜像三者一致

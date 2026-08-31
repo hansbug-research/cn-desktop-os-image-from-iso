@@ -123,6 +123,17 @@ build_slice() {
     log "  dpkg admindir 归位 /var/lib/dpkg（/$ADMINDIR 做符号链接指回）"
   fi
 
+  # /etc/ld.so.cache 不属于任何包（是 ldconfig 触发器的产物），切片只搬包内文件，
+  # 所以必然漏。UOS 的情形不致命 —— Debian 多架构目录在动态链接器内置默认路径里，
+  # 缺 cache 只损性能；但补上更接近真机，且这一项现在有门禁盯着。
+  if [ -x "$D/sbin/ldconfig" ]; then
+    chroot "$D" /sbin/ldconfig 2>/dev/null || true
+    [ -s "$D/etc/ld.so.cache" ] && log "  ld.so.cache 生成 $(stat -c%s "$D/etc/ld.so.cache") 字节"
+    # ldconfig 另外会写 /var/cache/ldconfig/aux-cache，它记录每个库的 inode 与
+    # mtime 用于增量加速 —— 天然不可复现，实测让 uos25 三档连构两次哈希全漂。
+    # 它只是加速用的中间产物，删掉不影响任何功能，而且本来就不该出厂。
+    rm -rf "$D/var/cache/ldconfig" 2>/dev/null || true
+  fi
   # locale：宿主的 localedef 版本可能不同，用容器化方式在目标 rootfs 里生成
   if [ -d "$D/usr/share/i18n/locales" ] && [ -x "$D/usr/bin/localedef" ]; then
     chroot "$D" /usr/bin/localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 2>/dev/null || true
@@ -132,12 +143,93 @@ build_slice() {
   make_tarball "$D" "$OUT"
 }
 
-[ "$METHOD" = mmdebstrap ] || [ "$METHOD" = slice ] || [ "$METHOD" = selfhost ] || die "未知 METHOD=$METHOD"
+# ── debmedia：介质自带完整 apt 仓库，从它 bootstrap ────────────────────────
+# 凝思的 DVD 是 Binary-1（.disk/info 明写），dists/ 与 pool/ 都在盘上（实测 6486 个 deb）。
+# 所以不需要切片，也不需要在线源 —— mmdebstrap 直接吃 copy:// 本地源即可。
+# 与 mmdebstrap 路径的差别只有源：那条走厂商在线源并验签，这条走介质、trusted=yes
+# （介质本身的完整性由 ISO 的官方 md5 + sha256 兜，见 conf 里的 ISO_MD5/ISO_SHA256）。
+build_debmedia() {
+  local TIER=$1 variant inc
+  case $TIER in
+    micro) variant=essential; inc="$MICRO_INCLUDE" ;;
+    base)  variant=apt;       inc="$BASE_INCLUDE" ;;
+    devel) variant=apt;       inc="$BASE_INCLUDE,$DEVEL_INCLUDE" ;;
+    *) die "未知档位 $TIER" ;;
+  esac
+  local -a INC_ARG=(); [ -n "$inc" ] && INC_ARG=(--include="$inc")
+  local HOOKS=()
+  [ "${USRMERGE:-no}" = yes ] && HOOKS+=(--hook-dir=/usr/share/mmdebstrap/hooks/merged-usr)
+  local MEDIA="$ROOT/media/$MEDIA_DIR"
+  [ -d "$MEDIA/dists/$SUITE" ] || die "介质仓库不存在: $MEDIA/dists/$SUITE"
+  # 预检包名：介质里没有的包名会让 mmdebstrap 在「installing essential packages」
+  # 阶段挂死（dpkg 变僵尸、CPU 归零），而不是明确报错 —— 实测等了 20 分钟才发现，
+  # 根因只是 libgcc-s1 在 Debian 10 里叫 libgcc1。所以在这里秒级失败。
+  local IDX="$MEDIA/dists/$SUITE/${COMPONENTS:-main}/binary-amd64/Packages"
+  [ -f "$IDX" ] || IDX="$IDX.gz"
+  if [ -f "$IDX" ]; then
+    local missing="" pk
+    for pk in $(printf '%s' "$inc" | tr ',' ' '); do
+      [ -z "$pk" ] && continue
+      case "$IDX" in
+        *.gz) zgrep -qx "Package: $pk" "$IDX" || missing="$missing $pk" ;;
+        *)     grep -qx "Package: $pk" "$IDX" || missing="$missing $pk" ;;
+      esac
+    done
+    [ -z "$missing" ] || die "[$DID/$TIER] 介质里没有这些包（包名与该发行版的 suite 不符？）:$missing"
+  fi
+  local OUT="$ROOT/out/$DID-$TIER.tar"
+  rm -f "$OUT"
+  log "[$DID/$TIER] debmedia variant=$variant suite=$SUITE"
+  printf 'deb [trusted=yes] copy://%s %s %s\n' "$MEDIA" "$SUITE" "${COMPONENTS:-main}" | \
+  DID=$DID TIER=$TIER ROOT=$ROOT SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" mmdebstrap \
+      --mode=root --architectures=amd64 --format=tar --variant="$variant" \
+      "${INC_ARG[@]}" "${HOOKS[@]}" "${EXC[@]}" \
+      --skip=chroot/policy-rc.d \
+      --aptopt='Acquire::Languages "none"' \
+      --aptopt='APT::Install-Recommends "false"' \
+      --setup-hook="ROOT=$ROOT DID=$DID $ROOT/build/setup.sh \"\$1\"" \
+      --customize-hook="ROOT=$ROOT DID=$DID TIER=$TIER $ROOT/build/customize.sh \"\$1\"" \
+      "$SUITE" "$OUT" -
+  [ -s "$OUT" ] || die "[$DID/$TIER] 产物为空"
+}
+
+# ── rpmmedia：rpm 系介质，解析 repodata 求闭包后用 rpm --root 装 ───────────
+# 麒麟信安的 ISO 实测无 squashfs（只有 Packages/ 2935 个 rpm + repodata/），
+# 所以既不能切片，也没有在线源可用（桌面版源需授权）。走 tools/rpmmedia.py。
+build_rpmmedia() {
+  local TIER=$1 seeds
+  case $TIER in
+    micro) seeds="$SLICE_MICRO" ;;
+    base)  seeds="$SLICE_MICRO,$SLICE_BASE_EXTRA" ;;
+    devel) seeds="$SLICE_MICRO,$SLICE_BASE_EXTRA,$SLICE_DEVEL_EXTRA" ;;
+    *) die "未知档位 $TIER" ;;
+  esac
+  local MEDIA="$ROOT/media/$MEDIA_DIR"
+  [ -d "$MEDIA/repodata" ] || die "介质仓库不存在: $MEDIA/repodata"
+  local D="$ROOT/build/$DID-$TIER"
+  rm -rf "$D"; mkdir -p "$D"
+  log "[$DID/$TIER] rpmmedia 从介质仓库装包"
+  RPM_DB_BACKEND="${RPM_DB_BACKEND:-}" \
+    python3 "$ROOT/tools/rpmmedia.py" "$MEDIA" "$D" "$seeds" || die "[$DID/$TIER] rpmmedia 失败"
+  # adapt_container 的签名是 (rootfs, sources.list 内容, distro-id)。
+  # rpm 系没有 apt sources.list，第二个参数传空 —— 那段逻辑里的 `if [ -n "$SRCLIST" ]`
+  # 会正确走到「micro 档写空文件」那一支，不会留下 bootstrap 期的宿主路径。
+  adapt_container "$D" "" "$DID"
+  slim_locales "$D"
+  make_tarball "$D" "$ROOT/out/$DID-$TIER.tar"
+}
+
+case $METHOD in
+  mmdebstrap|slice|selfhost|debmedia|rpmmedia) ;;
+  *) die "未知 METHOD=$METHOD" ;;
+esac
 [ "$METHOD" = mmdebstrap ] && verify_repo_signature "${MIRROR%/}" "$SUITE"
 for T in $TIERS; do
   case $METHOD in
     mmdebstrap) build_mmdebstrap "$T" ;;
     slice)      build_slice "$T" ;;
+    debmedia)   build_debmedia "$T" ;;
+    rpmmedia)   build_rpmmedia "$T" ;;
     selfhost)   log "[$DID/$T] selfhost 由 build/build-selfhost.sh 处理" ;;
   esac
 done

@@ -9,15 +9,37 @@ mkdir -p "${ROOT:-$(cd "$(dirname "$0")/.." && pwd)}/logs"   # 无此目录时�
 ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
 BUILDER=${BUILDER:-dosb}
 EV="$ROOT/out/repro-evidence.txt"
-DISTROS=${1:-"kylin11 uos25"}
+. "$ROOT/lib/subjects.sh"      # ALL_DIDS / METHOD_OF[]，唯一真源 config/subjects.json
+# 默认覆盖范围**从被试清单推导**，不写死：凡走 make_tarball 归一时间戳的路径
+# （mmdebstrap / slice / rpmmedia）都该纳入实测；selfhost 走 docker export/import，
+# 层时间戳每次不同，逐位复现无从谈起，由 manifest 的包集可复现性承担。
+# 写死清单的后果是新增被试后它静默不被测，而凭据文件看着照样完整。
+_repro_dids=""
+for _d in $ALL_DIDS; do
+  case "$(m_of "$_d")" in selfhost) ;; *) _repro_dids="$_repro_dids $_d" ;; esac
+done
+DISTROS=${1:-$_repro_dids}
 {
   echo "# 可复现性实测凭据"
   echo "# 生成时间: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "# 方法: 同一 builder 内连续构建两次，比对产物 tar 的 sha256"
-  echo "# 注意: selfhost 路径（麒麟 V10）走 docker export/import，层时间戳每次不同，"
-  echo "#       本脚本不覆盖它；其包集可复现性由 out/kylin10-*.manifest 承担。"
+  echo "# 注意: selfhost 路径（麒麟 V10 与凝思）走 docker export/import，层时间戳每次"
+  echo "#       不同，本脚本不覆盖；其包集可复现性由各自的 *.manifest 承担。"
+  echo "# 覆盖的被试:$DISTROS"
   echo
 } > "$EV"
+# 互斥检查：本脚本要连构两次，与任何并发的构建或门禁争用同一个 build/ 工作目录。
+# §9.2 记过一次 tar_mtab 假失败（verify 读 tar 时并发重建覆写了它），这次又踩了 ——
+# repro 跑第二次构建时我并行跑着 d2 采集与 verify，`rm -rf` 撞上正被读取的目录，
+# 报 `Directory not empty`，构建被判失败而实际退出码是 0。
+# 纪律记录过、引用过，但没有机制强制，所以在这里加一道。
+for _p in build.sh build-selfhost.sh verify.sh sbom.sh cve.sh collect_d2_our_images.py; do
+  if pgrep -f "[/]$_p" >/dev/null 2>&1; then
+    echo "!! 检测到并发任务 $_p —— repro 必须独占 build/ 与 out/，先等它结束" >&2
+    exit 1
+  fi
+done
+
 RC=0
 for d in $DISTROS; do
   declare -A first

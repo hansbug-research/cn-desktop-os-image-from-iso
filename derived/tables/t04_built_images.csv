@@ -5,6 +5,12 @@ kylin11,devel,kylin-desktop-v11:devel,498,686MB,255,v11,2.38-1ok6.9k0.5,SIGRTMIN
 kylin10,micro,kylin-desktop-v10:micro,213,308MB,154,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,136ef44865d23c4a
 kylin10,base,kylin-desktop-v10:base,270,394MB,221,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,e5cde2f5ceb84a36
 kylin10,devel,kylin-desktop-v10:devel,503,710MB,263,v10,2.31-0kylin9.1k20.3,SIGRTMIN+3,3e2931b0be262390
-uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,e97182343fb36cf7
-uos25,base,uos-desktop-v25:base,191,281MB,164,25,2.38-6deepin19,SIGRTMIN+3,f80abeda86511b60
-uos25,devel,uos-desktop-v25:devel,448,638MB,208,25,2.38-6deepin19,SIGRTMIN+3,bcd57e55fd3fc30d
+uos25,micro,uos-desktop-v25:micro,98,142MB,67,25,2.38-6deepin19,—,88b13363811ac907
+uos25,base,uos-desktop-v25:base,191,281MB,164,25,2.38-6deepin19,SIGRTMIN+3,6d61ff3129bcbb4c
+uos25,devel,uos-desktop-v25:devel,448,638MB,208,25,2.38-6deepin19,SIGRTMIN+3,6db58e6cc1e992c1
+kylinsec6,micro,kylinsec-desktop-v6:micro,389,530MB,112,6,2.38-54.ks6.kb1,—,4157c2f113be76ba
+kylinsec6,base,kylinsec-desktop-v6:base,510,700MB,165,6,2.38-54.ks6.kb1,SIGRTMIN+3,3471fc11757f01cf
+kylinsec6,devel,kylinsec-desktop-v6:devel,794,1.09GB,194,6,2.38-54.ks6.kb1,SIGRTMIN+3,b278c8af001f4c72
+linx6,micro,linx-os-v6:micro,179,266MB,176,10,2.28-10-linx2,SIGRTMIN+3,0a3698dbca858489
+linx6,base,linx-os-v6:base,222,328MB,211,10,2.28-10-linx2,SIGRTMIN+3,136515dfc7a3850a
+linx6,devel,linx-os-v6:devel,437,627MB,249,10,2.28-10-linx2,SIGRTMIN+3,f46b12b5c28a1b00

@@ -46,7 +46,7 @@ mut "统计量：UOS 可装性 0→9"        derived/stats.json 's/"installable_
 mut "统计量：变异跳过数 1→0"        derived/stats.json 's/"mutation_skipped": 1/"mutation_skipped": 0/'
 mut "统计量：ISO 里有 g++"          derived/stats.json 's/"uos_iso_has_gxx": false/"uos_iso_has_gxx": true/'
 mut "统计量：门禁失败数 0→2"        derived/stats.json 's/"verify_failed": 0/"verify_failed": 2/'
-mut "统计量：摘要链 9→8"            derived/stats.json 's/"digest_chain_passed": 9/"digest_chain_passed": 8/'
+mut "统计量：摘要链 15→14"           derived/stats.json 's/"digest_chain_passed": 15/"digest_chain_passed": 14/'
 mut "统计量：产品线包格式 rpm→dpkg" derived/stats.json 's/"official_pkg_format": "rpm"/"official_pkg_format": "dpkg"/'
 mut "统计量：os_id 撞名 true→false" derived/stats.json 's/"os_id_collision": true/"os_id_collision": false/'
 # ⚠️ 不能写死 sha256 前缀：镜像一重建它就变了，变异 sed 匹配不上等于没做变异，

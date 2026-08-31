@@ -1,0 +1,15 @@
+  [kylin11] 第二次构建…
+  ✅ kylin11-micro  4ac37272ca5328b0…（两次一致）
+  ✅ kylin11-base  543bb715cfbdfbaf…（两次一致）
+  ✅ kylin11-devel  ffc161134d7ae6d0…（两次一致）
+  [uos25] 第二次构建…
+  ✅ uos25-micro  88b13363811ac907…（两次一致）
+  ✅ uos25-base  6d61ff3129bcbb4c…（两次一致）
+  ✅ uos25-devel  6db58e6cc1e992c1…（两次一致）
+  [kylinsec6] 第二次构建…
+  ✅ kylinsec6-micro  4157c2f113be76ba…（两次一致）
+  ✅ kylinsec6-base  3471fc11757f01cf…（两次一致）
+  ✅ kylinsec6-devel  b278c8af001f4c72…（两次一致）
+
+凭据已写入 /data/dosbuild/out/repro-evidence.txt
+✅ 覆盖到的路径全部逐位可复现

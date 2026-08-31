@@ -4,10 +4,16 @@
 ── kylin-desktop-v11:micro  (125MB)  Kylin  包=71
 ── kylin-desktop-v11:base  (345MB)  Kylin  包=206
 ── kylin-desktop-v11:devel  (686MB)  Kylin  包=255
+── kylinsec-desktop-v6:micro  (530MB)  KylinSec OS  包=112
+── kylinsec-desktop-v6:base  (700MB)  KylinSec OS  包=165
+── kylinsec-desktop-v6:devel  (1.09GB)  KylinSec OS  包=194
+── linx-os-v6:micro  (266MB)  Linx GNU/Linux  包=176
+── linx-os-v6:base  (328MB)  Linx GNU/Linux  包=211
+── linx-os-v6:devel  (627MB)  Linx GNU/Linux  包=249
 ── uos-desktop-v25:micro  (142MB)  Uos  包=67
 ── uos-desktop-v25:base  (281MB)  Uos  包=164
 ── uos-desktop-v25:devel  (638MB)  Uos  包=208
 
-══ 汇总: 通过 365 / 失败 0 / 警告 0
-   检查总数 365（基线 360）
+══ 汇总: 通过 652 / 失败 0 / 警告 0
+   检查总数 652（基线 620）
 ✅ 全部必过项通过

@@ -3,7 +3,7 @@
 # 目的是防止"检查永远为真"的假通过——本项目就真踩过一次：
 # /var/lib/dpkg/status 是断链时 `dpkg --audit` 输出 0 行，被当成健康。
 set -u
-ROOT=${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}   # 默认取仓库根，换机器无需改脚本
+ROOT=${ROOT:-/data/dosbuild}
 # 基准换成 base：micro 无 apt 无 systemd，很多检查在它上面不适用
 BASE=${BASE:-kylin-desktop-v11:base}
 CHK="$ROOT/test/inner-checks.sh"
@@ -55,6 +55,19 @@ run_mut "删 copyright(全部)"     'find /usr/share/doc -name copyright -delete
 # 只删一个包的 copyright：旧的 copyright_kept 检查在这种情况下永远为 Y，抓不到
 run_mut "只删 bash 的 copyright" 'rm -f /usr/share/doc/bash/copyright'                         'copyright_missing~bash,' 
 run_mut "删 policy-rc.d"        'rm -f /usr/sbin/policy-rc.d'                                 policy_rcd=N
+# 新加的两道门禁必须反向验证过才算数。ldcache 与 systemctl_runs 此前只被正向验证
+# （修好后通过），没被反向验证（坏了会不会报）—— 那正是本仓库批判的「看起来在守、
+# 实际可能空转」。删 cache 之后：ldcache 归零；私有库目录里的二进制随之起不来，
+# 所以同一个破坏应当让两项一起变。
+run_mut "删 ld.so.cache"        'rm -f /etc/ld.so.cache'                                      ldcache=0
+# ghost_pkgs 的变异用例：候选集限定在 /boot、/lib/modules、/lib/firmware 下有文件的包，
+# 所以靶子必须是这类包。造一个「登记还在、文件全删」的幽灵：把 /lib/firmware 下某个包
+# 的文件删掉。此前报告里写的是拿 unzip 做的变异，那是手写等价片段的结果 —— unzip 不
+# 拥有这些路径下的文件，在最终代码里永远进不了候选集，那段轶事不成立（见 §9.2）。
+run_mut "造幽灵包(删 firmware 包的文件)" \
+  'p=$(grep -l "^/lib/firmware/" /var/lib/dpkg/info/*.list 2>/dev/null | head -1 | sed "s|.*/||; s|\.list$||"); \
+   [ -n "$p" ] && dpkg-query -L "$p" 2>/dev/null | while read f; do [ -d "$f" ] || rm -f "$f"; done; true' \
+  'ghost_pkgs~,' 
 # 以下三条补的是 L1/L2/L3 层。之前 7 个用例全打在 L0"文件在不在"上，
 # 结果 elf_broken 恒为 0、tz 恒为 UTC 这两个 bug 一直活着——正是因为没有对应变异。
 # 把 systemd 私有目录里的 .so 拷到普通库目录：它依赖的 libsystemd-shared 只在私有目录里，

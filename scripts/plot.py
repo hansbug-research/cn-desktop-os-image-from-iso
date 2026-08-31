@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """只读 derived/，产出 figures/*.png。图里的每个数字都来自 stats.json 或派生表。"""
-import json, pathlib, csv as csvmod
+import json, pathlib, sys, csv as csvmod
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 import numpy as np
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _subjects import SHORT, DIDS, TIERS
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DER, FIG = ROOT / "derived", ROOT / "figures"
 FIG.mkdir(exist_ok=True)
@@ -60,9 +62,12 @@ def save(fig, name):
 def table(n):
     with open(DER / "tables" / n) as fh: return list(csvmod.DictReader(fh))
 
-COLS = [f"{d}:{t}" for d in ["kylin11", "kylin10", "uos25"] for t in ["micro", "base", "devel"]]
-LBL = [c.replace("kylin11", "麒麟V11").replace("kylin10", "麒麟V10").replace("uos25", "UOS25")
-       .replace(":", "\n") for c in COLS]
+COLS = [f"{d}:{t}" for d in DIDS for t in TIERS]   # 被试清单的唯一真源：config/subjects.json
+_SHORT = SHORT      # 唯一真源 config/subjects.json；短名与矩阵表头共用一份
+def _lbl(c):
+    d, t = c.split(":")
+    return f"{_SHORT.get(d, d)}\n{t}"
+LBL = [_lbl(c) for c in COLS]
 
 # fig01 官方镜像可获得性：左=拉得到的是什么，右=桌面镜像到底有没有
 t1 = table("t01_official_image_availability.csv")
@@ -133,7 +138,7 @@ fig.tight_layout(); save(fig, "fig02_product_line.png")
 # fig03 能力矩阵热力图
 t5 = table("t05_capability_matrix.csv")
 SHOW = ["sh","coreutils","getent","shadow_files","locale_zh","localtime","ca_bundle","dns","tls",
-        "signal_trap","dpkg_query","apt","apt_update","apt_roundtrip","apt_check","dpkg_local_deb",
+        "signal_trap","pkgdb_query","pkgmgr","pkg_update","pkg_roundtrip","pkg_check","pkg_local_install",
         "cc_present","compile_c","static_link","cxx_present","compile_cxx","cxx17","cxx20",
         "libc_headers","binutils","make_build","pkgconfig","cmake","autotools","cc_clean_stderr",
         "python3_run","python3_ssl","perl","openssl","curl","tar","xz","zstd","unzip",
@@ -147,7 +152,10 @@ for k in SHOW:
     # t05 已是三态（Y/N/NA），判定策略在 analyze.py，这里不再自行解释原始值
     M.append([1 if rows[k][c] == "Y" else (0.5 if rows[k][c] == "NA" else 0) for c in COLS])
 M = np.array(M)
-fig, ax = plt.subplots(figsize=(8.6, 13))
+# 宽度按列数推，不写死：按 9 列手调的 8.6 到 15 列会把标签挤成一团，
+# 而图挤不会报错——它安静地产出一张读不出来的图，侧车数据校验照样通过。
+_w = max(8.6, 1.0 + 0.95 * len(COLS))
+fig, ax = plt.subplots(figsize=(_w, 13))
 cmap = matplotlib.colors.ListedColormap(["#c62828", "#bdbdbd", "#2e7d32"])
 ax.imshow(M, cmap=cmap, aspect="auto", vmin=0, vmax=1)
 ax.set_xticks(range(len(COLS))); ax.set_xticklabels(LBL, fontsize=8)
@@ -155,7 +163,9 @@ ax.set_yticks(range(len(ylab))); ax.set_yticklabels(ylab, fontsize=7.5)
 ax.set_xticks(np.arange(-.5, len(COLS), 1), minor=True)
 ax.set_yticks(np.arange(-.5, len(ylab), 1), minor=True)
 ax.grid(which="minor", color="w", linewidth=.6); ax.tick_params(which="minor", length=0)
-ax.set_title(f"能力矩阵（{S['capability_items']} 项 × 9 镜像 = {S['capability_cells']} 格，全部实测）\n"
+# 镜像数不写死：项数与格数都从 stats.json 取，中间这个因子却写着 9，
+# 加了被试之后标题会自相矛盾（项 × 9 ≠ 格）。
+ax.set_title(f"能力矩阵（{S['capability_items']} 项 × {S['images_built']} 镜像 = {S['capability_cells']} 格，全部实测）\n"
              f"绿=支持 {S['cells_supported']}　红=不支持 {S['cells_gap']}　"
              f"灰=不适用 {S['cells_na']}（按档位定位判，判据见 analyze.py 的 NA_POLICY）", fontsize=10.5)
 fig.tight_layout(); save(fig, "fig03_capability_matrix.png")
