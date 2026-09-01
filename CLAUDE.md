@@ -28,7 +28,7 @@ python3 scripts/analyze.py && python3 scripts/plot.py && python3 scripts/verify.
 - `collect_d4_gates.py` 五道门禁结果与 manifest 审计锚点
 - `collect_d5_iso_and_defects.py` 三条路径配置 + 厂商缺陷清单
 - `collect_d6_installability.py` 工具在各自源里的可装性、UOS 源规模与 ISO 包清单
-- `collect_d7_cve.py` 通用漏洞扫描器对三个发行版的覆盖判定（有效覆盖／误判／未识别）
+- `collect_d7_cve.py` 通用漏洞扫描器对全部被试的覆盖判定（有效覆盖／误判／未识别）
 
 ## 分析层也要被变异测试
 

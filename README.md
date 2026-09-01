@@ -70,7 +70,8 @@
 仓库不含镜像与 ISO（体积原因），但含完整构建链路。换一台 Linux 机器：
 
 ```bash
-# 0) 前提：docker（rootless 亦可）、python3、能访问三个发行版的官方软件源。
+# 0) 前提：docker（rootless 亦可）、python3。麒麟两版需能访问 archive.kylinos.cn；
+#    UOS、麒麟信安、凝思三条走 ISO 介质，需持有对应 ISO（仓库不含）。
 #    UOS 走切片路径，需要它的 squashfs：默认由 tools/fetch-squashfs.py 用 HTTP Range
 #    从 distros/uos25.conf 里的 ISO_URL 远程抽取（不下整个 ISO）；离线环境请自备 ISO
 #    并把 squashfs 放到 conf 指定位置，其 sha256 必须与 SQUASHFS_SHA256 相符。
@@ -188,4 +189,4 @@ scripts/                      collect_d*.py 只采集不判断；analyze.py 只�
 
 ## 8. 许可
 
-代码 MIT，文档与数据 CC BY 4.0。三个发行版的 ISO、软件包与 GPG keyring 版权归各厂商所有，本仓库不分发它们。
+代码 MIT，文档与数据 CC BY 4.0。五个发行版的 ISO、软件包与 GPG keyring 版权归各厂商所有，本仓库不分发它们。
