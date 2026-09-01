@@ -186,7 +186,3 @@ scripts/                      collect_d*.py 只采集不判断；analyze.py 只�
 ## 7. 相关工作
 
 同 org 的 [`cn-desktop-os-buildchain-study`](https://github.com/hansbug-research/cn-desktop-os-buildchain-study) 研究的是「用哪个基座编、能落到哪些国产桌面上」的 ABI 选型，被试是既有镜像；本仓库研究的是「目标环境本身怎么造出来」。两者结论互补：前者结论 7 指出厂商 server 镜像可作为对应桌面版的 **ABI 预检代理**，本仓库 §2.3 指出它**不是**桌面版的等价环境——符号地板的单向预检与用户态环境的一致复现是两个不同强度的需求。
-
-## 8. 许可
-
-代码 MIT，文档与数据 CC BY 4.0。五个发行版的 ISO、软件包与 GPG keyring 版权归各厂商所有，本仓库不分发它们。
