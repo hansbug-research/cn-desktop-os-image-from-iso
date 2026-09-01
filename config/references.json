@@ -1,1131 +1,1167 @@
 {
- "revision": "2026-08-30",
- "note": "全局引用表。title_source=page 表示标题由脚本抓自该页的 <title>；manual 表示该页未返回 title，标题为人工描述性标注。accessed 为访问日期。report.md 里的每处引用都以 [Rn] 指向此表，verify.py 断言引用与本表双向闭合（无悬空引用、无未被引用的条目）。",
- "references": [
-  {
-   "id": "R1",
-   "publisher": "aosc.io",
-   "title": "下载中心 | 安同开源社区 (AOSC)",
-   "url": "https://aosc.io/downloads/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R2",
-   "publisher": "bianbu.spacemit.com",
-   "title": "SpacemiT",
-   "url": "https://bianbu.spacemit.com/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R3",
-   "publisher": "catalog.redhat.com",
-   "title": "Red Hat Universal Base Image - Red Hat Ecosystem Catalog",
-   "url": "https://catalog.redhat.com/software/base-images",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R4",
-   "publisher": "cdimage.deepin.com",
-   "title": "Index of /releases/",
-   "url": "https://cdimage.deepin.com/releases/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R5",
-   "publisher": "cdimage.ubuntu.com",
-   "title": "Index of /ubuntukylin/releases",
-   "url": "https://cdimage.ubuntu.com/ubuntukylin/releases/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R6",
-   "publisher": "cdimage.ubuntu.com",
-   "title": "Ubuntu Kylin 26.04.1 LTS (Resolute Raccoon)",
-   "url": "https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R7",
-   "publisher": "cr.kylinos.cn",
-   "title": "(JSON API 响应)",
-   "url": "https://cr.kylinos.cn/api/v2.0/projects",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R8",
-   "publisher": "cr.kylinos.cn",
-   "title": "(JSON API 响应)",
-   "url": "https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R9",
-   "publisher": "cr.loongnix.cn",
-   "title": "(JSON API 响应)",
-   "url": "https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R10",
-   "publisher": "cs2c.com.cn",
-   "title": "公司新闻·天津麒麟、中标软件整合实质完成 中国操作系统新旗舰扬帆起航！ - 国产操作系统、银河麒麟、中标麒麟--中标软件官网",
-   "url": "https://cs2c.com.cn/about/company/1349.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R11",
-   "publisher": "docs.opencloudos.org",
-   "title": "OpenCloudOS v9.6发行说明 - OpenCloudOS Documentation",
-   "url": "https://docs.opencloudos.org/release/v9.6/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R12",
-   "publisher": "docs.opencloudos.org",
-   "title": "桌面安装 - OpenCloudOS Documentation",
-   "url": "https://docs.opencloudos.org/OCS/Install_Guide/ocs-desktop/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R13",
-   "publisher": "docs.openeuler.org",
-   "title": "图形桌面使用 | 文档 | openEuler社区",
-   "url": "https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R14",
-   "publisher": "faq.uniontech.com",
-   "title": "统信操作系统【家庭版、专业版、教育版、社区版】区别介绍 | 统信软件-知识分享平台",
-   "url": "https://faq.uniontech.com/desktop/f435/install/da34",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R15",
-   "publisher": "fydeos.com",
-   "title": "FydeOS v23: Chromatic Cadence 正式发布 - FydeOS",
-   "url": "https://fydeos.com/blog/release-note-v23/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R16",
-   "publisher": "gitee.com",
-   "title": "openKylin 官方容器镜像构建仓（Gitee openkylin 组织）",
-   "url": "https://gitee.com/openkylin/openkylin-docker-images",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R17",
-   "publisher": "gitee.com",
-   "title": "openEuler 官方容器镜像目录仓（Gitee openeuler 组织）",
-   "url": "https://gitee.com/openeuler/openeuler-docker-images",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R18",
-   "publisher": "gitee.com",
-   "title": "Anolis OS 官方容器镜像仓（Gitee anolis 组织）",
-   "url": "https://gitee.com/anolis/docker-images",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R19",
-   "publisher": "gitee.com",
-   "title": "OpenCloudOS 超凡桌面: 超凡桌面（简称EX-NDE）是一个超融合轻量级桌面环境，让系统具备拥有桌面、服务器、平板三种交互模式，能够在更低配置的智能终端、平板、一体机、PC、工作站、服务器等不同的设备场景中流畅运行，减少系统的碎片化。",
-   "url": "https://gitee.com/opencloudos-exnde",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R20",
-   "publisher": "github.com",
-   "title": "GitHub - AOSC-Dev/aosc-os-docker-files: Docker files for AOSC OS · GitHub",
-   "url": "https://github.com/AOSC-Dev/aosc-os-docker-files",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R21",
-   "publisher": "github.com",
-   "title": "openFyde repositories · GitHub",
-   "url": "https://github.com/orgs/openFyde/repositories",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R22",
-   "publisher": "github.com",
-   "title": "GitHub - IceWhaleTech/ZimaOS: A Simplified, Focused and Open NAS OS_ · GitHub",
-   "url": "https://github.com/IceWhaleTech/ZimaOS",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R23",
-   "publisher": "github.com",
-   "title": "EvernightFedora (怪力熊玩Fedora) · GitHub",
-   "url": "https://github.com/EvernightFedora",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R24",
-   "publisher": "github.com",
-   "title": "Aromatic05 (Yiming Sun) · GitHub",
-   "url": "https://github.com/Aromatic05",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R25",
-   "publisher": "github.com",
-   "title": "GitHub - Wtada233/LankeOS: The public repo of LankeOS. · GitHub",
-   "url": "https://github.com/Wtada233/LankeOS",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R26",
-   "publisher": "github.com",
-   "title": "GitHub - hansbug-research/cn-desktop-os-buildchain-study: 国产桌面操作系统的 ABI 分档与构建链路选型：27 镜像实测、820 格运行矩阵、C/C++/Rust/Python 四链逐个验证，全部证据可审计 · GitHub",
-   "url": "https://github.com/hansbug-research/cn-desktop-os-buildchain-study",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R27",
-   "publisher": "github.com",
-   "title": "GitHub - canonical/chisel · GitHub",
-   "url": "https://github.com/canonical/chisel",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R28",
-   "publisher": "github.com",
-   "title": "GitHub - chainguard-dev/apko: Build OCI images from APK packages directly without Dockerfile · GitHub",
-   "url": "https://github.com/chainguard-dev/apko",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R29",
-   "publisher": "gitlab.mister-muffin.de",
-   "title": "mmdebstrap 项目仓（J. Schauer）",
-   "url": "https://gitlab.mister-muffin.de/josch/mmdebstrap",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R30",
-   "publisher": "hub.docker.com",
-   "title": "openkylin/openkylin - Docker Image",
-   "url": "https://hub.docker.com/r/openkylin/openkylin",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R31",
-   "publisher": "hub.docker.com",
-   "title": "linuxdeepin/deepin - Docker Image",
-   "url": "https://hub.docker.com/r/linuxdeepin/deepin",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R32",
-   "publisher": "hub.docker.com",
-   "title": "openeuler/openeuler - Docker Image",
-   "url": "https://hub.docker.com/r/openeuler/openeuler",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R33",
-   "publisher": "hub.docker.com",
-   "title": "openanolis/anolisos - Docker Image",
-   "url": "https://hub.docker.com/r/openanolis/anolisos",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R34",
-   "publisher": "hub.docker.com",
-   "title": "OpenCloudOS",
-   "url": "https://hub.docker.com/u/opencloudos",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R35",
-   "publisher": "hub.docker.com",
-   "title": "aosc/aosc-os - Docker Image",
-   "url": "https://hub.docker.com/r/aosc/aosc-os",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R36",
-   "publisher": "hub.docker.com",
-   "title": "(JSON API 响应)",
-   "url": "https://hub.docker.com/v2/orgs/cs2cneokylin/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R37",
-   "publisher": "hub.docker.com",
-   "title": "cs2cneokylin/ns76-base-x86_64 - Docker Image",
-   "url": "https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R38",
-   "publisher": "hub.docker.com",
-   "title": "debian - Official Image | Docker Hub",
-   "url": "https://hub.docker.com/_/debian",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R39",
-   "publisher": "mirror.iscas.ac.cn",
-   "title": "Index of /revyos/",
-   "url": "https://mirror.iscas.ac.cn/revyos/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R40",
-   "publisher": "mirror.nju.edu.cn",
-   "title": "openKylin apt 仓库 dists 目录（南京大学镜像站，用于核对代号与血统）",
-   "url": "https://mirror.nju.edu.cn/openkylin/dists/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R41",
-   "publisher": "mirrors.openanolis.cn",
-   "title": "Index of /anolis/23.5/isos/GA/x86_64/",
-   "url": "https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R42",
-   "publisher": "mirrors.openanolis.cn",
-   "title": "Index of /anolis/23.5/DDE/",
-   "url": "https://mirrors.openanolis.cn/anolis/23.5/DDE/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R43",
-   "publisher": "mirrors.opencloudos.tech",
-   "title": "Index of /opencloudos/9.6/isos/x86_64/20260713.0/",
-   "url": "https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R44",
-   "publisher": "openanolis.cn",
-   "title": "Anolis OS 23 · 内核 6.6 LTS · OpenAnolis",
-   "url": "https://openanolis.cn/anolisos/23",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R45",
-   "publisher": "openfyde.io",
-   "title": "openFyde",
-   "url": "https://openfyde.io/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R46",
-   "publisher": "registry.uniontech.com",
-   "title": "(JSON API 响应)",
-   "url": "https://registry.uniontech.com/api/v2.0/projects",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R47",
-   "publisher": "registry.uniontech.com",
-   "title": "(JSON API 响应)",
-   "url": "https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R48",
-   "publisher": "repo.openeuler.org",
-   "title": "openEuler 24.03 LTS SP3 DevStation 容器 rootfs 目录（官方 repo）",
-   "url": "https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R49",
-   "publisher": "repo.openeuler.org",
-   "title": "openEuler 24.03 LTS SP4 ISO 目录（官方 repo，用于核对无桌面版 ISO）",
-   "url": "https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R50",
-   "publisher": "repos.os.nfschina.com",
-   "title": "Welcome to Repo Server",
-   "url": "https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R51",
-   "publisher": "revyos.github.io",
-   "title": "Site not found &middot; GitHub Pages",
-   "url": "https://revyos.github.io/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R52",
-   "publisher": "sourceforge.net",
-   "title": "OsoLinux 项目页（SourceForge）",
-   "url": "https://sourceforge.net/projects/osolinux/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R53",
-   "publisher": "uniontech.com",
-   "title": "智慧·高效·可靠——统信桌面操作系统V25发布！-统信软件",
-   "url": "https://uniontech.com/m/news-info/2877.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R54",
-   "publisher": "web.archive.org",
-   "title": "通用基础软件产品-普华基础软件",
-   "url": "http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R55",
-   "publisher": "web.archive.org",
-   "title": "Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux",
-   "url": "http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R56",
-   "publisher": "www.atzlinux.com",
-   "title": "铜豌豆 Linux",
-   "url": "https://www.atzlinux.com/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R57",
-   "publisher": "www.deepin.org",
-   "title": "deepin 25.2.0 Release Note &#8211; Deepin Technology Community",
-   "url": "https://www.deepin.org/en/deepin-25-2-release/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R58",
-   "publisher": "www.emindsoft.com.cn",
-   "title": "一铭软件官网首页",
-   "url": "http://www.emindsoft.com.cn/index.php",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R59",
-   "publisher": "www.gd-linux.com",
-   "title": "中兴新支点操作系统下载_中兴操作系统下载_NewStartOS下载_国产操作系统下载_新支点OS下载",
-   "url": "https://www.gd-linux.com/downloads",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R60",
-   "publisher": "www.gd-linux.com",
-   "title": "中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统",
-   "url": "https://www.gd-linux.com/desktop/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R61",
-   "publisher": "www.i-soft.com.cn",
-   "title": "普华基础软件 · 普华桌面操作系统 V4.0 产品详情页",
-   "url": "https://www.i-soft.com.cn/detail/59.html",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R62",
-   "publisher": "www.i-soft.com.cn",
-   "title": "普华基础软件 · 通用产品页",
-   "url": "https://www.i-soft.com.cn/product/currency.html",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R63",
-   "publisher": "www.itsec.gov.cn",
-   "title": "安全可靠测评结果公告（2023年第1号）",
-   "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R64",
-   "publisher": "www.kylinos.cn",
-   "title": "银河麒麟桌面操作系统V11 -麒麟软件-国产操作系统",
-   "url": "https://www.kylinos.cn/productPc/desktop/desktopMainV11/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R65",
-   "publisher": "www.kylinos.cn",
-   "title": "银河麒麟桌面操作系统V10-麒麟软件-国产操作系统",
-   "url": "https://www.kylinos.cn/productPc/desktop/desktopMain/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R66",
-   "publisher": "www.kylinsec.com.cn",
-   "title": "高效实时！麒麟信安操作系统（嵌入式版）V3来了，为工业领域数智化转型夯实安全底座--麒麟信安",
-   "url": "https://www.kylinsec.com.cn/detail/13151/1.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R67",
-   "publisher": "www.linx-info.com",
-   "title": "Index of /download/document/6.0.80",
-   "url": "https://www.linx-info.com/download/document/6.0.80/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R68",
-   "publisher": "www.linx-info.com",
-   "title": "Index of /download/security",
-   "url": "https://www.linx-info.com/download/security/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R69",
-   "publisher": "www.loongnix.cn",
-   "title": "Loongnix 龙芯开源社区官网",
-   "url": "https://www.loongnix.cn/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R70",
-   "publisher": "www.nfschina.com",
-   "title": "中科方德 国产桌面操作系统 国产服务器操作系统 云计算",
-   "url": "https://www.nfschina.com/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R71",
-   "publisher": "www.openeuler.org",
-   "title": "openEuler下载 | openEuler ISO镜像 | openEuler社区官网",
-   "url": "https://www.openeuler.org/zh/download/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R72",
-   "publisher": "www.openeuler.org",
-   "title": "openEuler商业发行版 | openEuler下载 | openEuler社区官网",
-   "url": "https://www.openeuler.org/zh/download/commercial-release/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R73",
-   "publisher": "www.openkylin.top",
-   "title": "Kernel Leap, AI-Native - openKylin 3.0 Officially Released-openKylin 开放麒麟社区官网 | 开源聚力，共创未来",
-   "url": "https://www.openkylin.top/news/4099-en.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R74",
-   "publisher": "www.openkylin.top",
-   "title": "openKylin镜像仓列表-openKylin - 开放麒麟 - 社区官网 | 开源聚力，共创未来",
-   "url": "https://www.openkylin.top/support/docker_images.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R75",
-   "publisher": "www.secrss.com",
-   "title": "东方中科拟收购国产操作系统厂商万里红 - 安全内参 | 决策者的网络安全知识库",
-   "url": "https://www.secrss.com/articles/23492",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R76",
-   "publisher": "www.stdaily.com",
-   "title": "首个商用6.6内核中国操作系统银河麒麟V11发布",
-   "url": "https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R77",
-   "publisher": "www.superred.com.cn",
-   "title": "北京万里红科技官网（用于核对产品列表已无操作系统条目）",
-   "url": "https://www.superred.com.cn/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R78",
-   "publisher": "www.ubuntukylin.com",
-   "title": "优麒麟",
-   "url": "https://www.ubuntukylin.com/downloads/",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R79",
-   "publisher": "www.ubuntukylin.com",
-   "title": "优麒麟 26.04 版本正式发布！-优麒麟｜Linux 开源操作系统",
-   "url": "https://www.ubuntukylin.com/news/ubuntukylin2604-cn.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R80",
-   "publisher": "www.uniontech.com",
-   "title": "统信容器镜像平台-统信软件",
-   "url": "https://www.uniontech.com/os-containerImage.html",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R81",
-   "publisher": "zh.wikipedia.org",
-   "title": "中标麒麟 - 维基百科，自由的百科全书",
-   "url": "https://zh.wikipedia.org/zh-hans/中标麒麟",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R82",
-   "publisher": "docs.revyos.dev",
-   "title": "RevyOS 官方文档站",
-   "url": "https://docs.revyos.dev/",
-   "title_source": "manual",
-   "accessed": "2026-08-30",
-   "note": "标题为人工标注（该页未返回 <title>）"
-  },
-  {
-   "id": "R83",
-   "publisher": "www.gd-linux.com",
-   "title": "关于我们_中兴新支点公司介绍_中兴新支点联系方式_新支点操作系统-NewStartOS",
-   "url": "https://www.gd-linux.com/about",
-   "title_source": "page",
-   "accessed": "2026-08-30",
-   "note": ""
-  },
-  {
-   "id": "R84",
-   "publisher": "uniontech.com",
-   "title": "产品动态-统信软件",
-   "url": "https://uniontech.com/m/Product-release.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R85",
-   "publisher": "www.openkylin.top",
-   "title": "openKylin开源操作系统（下载页）",
-   "url": "https://www.openkylin.top/downloads/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R86",
-   "publisher": "archive.spacemit.com",
-   "title": "Index of /image/k1/version",
-   "url": "https://archive.spacemit.com/image/k1/version/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R87",
-   "publisher": "www.kylinos.cn",
-   "title": "试用申请下载-麒麟软件-国产操作系统",
-   "url": "https://www.kylinos.cn/support/trial/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R88",
-   "publisher": "iso.kylinos.cn",
-   "title": "共享文件下载 - Kylin Distro（银河麒麟镜像下载中间页，含文件名/大小/SHA256/SM3）",
-   "url": "https://iso.kylinos.cn/web_pungi/download/cdn/5Kmv3q98GLtFdMQSDTOe6wr4ZcnpXVCb/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R89",
-   "publisher": "cdimage-download.chinauos.com",
-   "title": "统信桌面专业版 V25 ISO（本项目切片路径的 ISO_URL，匿名可下）",
-   "url": "https://cdimage-download.chinauos.com/desktop-professional/2500u1/beta/uos-desktop-25-professional-2500-amd64-202604.iso",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 是二进制文件，无 <title>）"
-  },
-  {
-   "id": "R90",
-   "publisher": "www.kylinos.cn",
-   "title": "行业解决方案-麒麟软件-国产操作系统",
-   "url": "https://www.kylinos.cn/product/solution/scene/solutionIndustry/index.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R91",
-   "publisher": "www.itsec.gov.cn",
-   "title": "安全可靠测评结果公告（2025年第3号）",
-   "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202509/t20250912_235645.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R92",
-   "publisher": "www.itsec.gov.cn",
-   "title": "安全可靠测评结果公告（2026年第1号）",
-   "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202601/t20260116_249958.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R93",
-   "publisher": "www.itsec.gov.cn",
-   "title": "安全可靠测评结果公告（2024年第1号）",
-   "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202405/t20240520_172866.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R94",
-   "publisher": "www.itsec.gov.cn",
-   "title": "安全可靠测评结果公告（2025年第1号）",
-   "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202503/t20250314_216512.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R95",
-   "publisher": "gks.mof.gov.cn",
-   "title": "关于印发《操作系统政府采购需求标准（2023年版）》的通知",
-   "url": "https://gks.mof.gov.cn/guizhangzhidu/202312/t20231226_3924123.htm",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R96",
-   "publisher": "www.mof.gov.cn",
-   "title": "关于印发《台式计算机政府采购需求标准（2023年版）》的通知",
-   "url": "https://www.mof.gov.cn/jrttts/202312/t20231226_3924133.htm",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R97",
-   "publisher": "cs2c.com.cn",
-   "title": "中标麒麟桌面操作系统 - 国产操作系统、银河麒麟、中标麒麟--中标软件官网",
-   "url": "https://cs2c.com.cn/scheme/product/9.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R98",
-   "publisher": "www.uniontech.com",
-   "title": "统信桌面操作系统 V25 专业版",
-   "url": "https://www.uniontech.com/OS-Professional-edition-V25.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R99",
-   "publisher": "www.nfschina.com",
-   "title": "中科方德 国产桌面操作系统 国产服务器操作系统 云计算",
-   "url": "https://www.nfschina.com/index.php?id=65",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R100",
-   "publisher": "www.secrss.com",
-   "title": "企业调研：国产操作系统厂商普华软件 - 安全内参 | 决策者的网络安全知识库",
-   "url": "https://www.secrss.com/articles/11535",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R101",
-   "publisher": "www.linx-info.com",
-   "title": "北京凝思软件股份有限公司",
-   "url": "https://www.linx-info.com/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R102",
-   "publisher": "www.gd-linux.com",
-   "title": "中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统",
-   "url": "https://www.gd-linux.com/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R103",
-   "publisher": "fydeos.com",
-   "title": "下载 - FydeOS",
-   "url": "https://fydeos.com/download/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R104",
-   "publisher": "www.kylinsec.com.cn",
-   "title": "麒麟信安操作系统桌面版--麒麟信安",
-   "url": "https://www.kylinsec.com.cn/detail/1413/1.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R105",
-   "publisher": "developer.huaweicloud.com",
-   "title": "EulerOS_华为云",
-   "url": "https://developer.huaweicloud.com/euleros/index.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R106",
-   "publisher": "www.openeuler.org",
-   "title": "openEuler解决方案 | 用户案例 | openEuler社区官网",
-   "url": "https://www.openeuler.org/zh/showcase/index.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R107",
-   "publisher": "www.openkylin.top",
-   "title": "社区-openKylin - 开放麒麟 - 社区官网 | 开源聚力，共创未来",
-   "url": "https://www.openkylin.top/community/openkylin-cn.html",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R108",
-   "publisher": "www.deepin.org",
-   "title": "deepin - 基于Linux的开源国产操作系统",
-   "url": "https://www.deepin.org/index/zh",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R109",
-   "publisher": "ubuntukylin.com",
-   "title": "优麒麟官网",
-   "url": "https://ubuntukylin.com/",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该页未返回可用 <title>）"
-  },
-  {
-   "id": "R110",
-   "publisher": "openanolis.cn",
-   "title": "Anolis OS · OpenAnolis",
-   "url": "https://openanolis.cn/anolisos",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R111",
-   "publisher": "docs.opencloudos.org",
-   "title": "OpenCloudOS 版本介绍 - OpenCloudOS Documentation",
-   "url": "https://docs.opencloudos.org/release/oc_intro/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R112",
-   "publisher": "aosc.io",
-   "title": "安同 OS 适合我吗？ | 安同开源社区 (AOSC)",
-   "url": "https://aosc.io/aosc-os/right-for-me",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R113",
-   "publisher": "www.loongnix.cn",
-   "title": "龙芯开源社区",
-   "url": "https://www.loongnix.cn/zh/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R114",
-   "publisher": "docs.revyos.dev",
-   "title": "RevyOS",
-   "url": "https://docs.revyos.dev/docs/intro/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R115",
-   "publisher": "ruyisdk.org",
-   "title": "RuyiSDK · 为 100 万 RISC-V 软件开发人员做好准备 | RuyiSDK",
-   "url": "https://ruyisdk.org/",
-   "title_source": "page",
-   "accessed": "2026-08-31",
-   "note": ""
-  },
-  {
-   "id": "R116",
-   "publisher": "repo.huaweicloud.com",
-   "title": "华为镜像站 EulerOS 目录（各版本只有 os/{x86_64,aarch64} 的 RPM 仓库，iso/ 与 ISO/ 实测 404）",
-   "url": "https://repo.huaweicloud.com/euler/",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
-  },
-  {
-   "id": "R117",
-   "publisher": "support.huawei.com",
-   "title": "华为企业支持 软件下载端点（对任意 nid 返回 Uniportal 统一认证跳转头）",
-   "url": "https://support.huawei.com/dl/download.do?nid=1",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
-  },
-  {
-   "id": "R118",
-   "publisher": "www.linx-info.com",
-   "title": "凝思 download 目录（Apache autoindex，匿名可列，22 个 ISO 匿名可下）",
-   "url": "https://www.linx-info.com/download/",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R119",
-   "publisher": "mirrorlists.kylinsec.com.cn",
-   "title": "麒麟信安 ISO 镜像列表（匿名 autoindex，9 个版本目录）",
-   "url": "https://mirrorlists.kylinsec.com.cn/iso/",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R120",
-   "publisher": "releases.openkylin.top",
-   "title": "openKylin ISO 规范发布源（ISO 在 openkylin-cdimage/ 而非 apt 仓库 openkylin/）",
-   "url": "https://releases.openkylin.top/3.0/openKylin-Desktop-V3.0-20260827-x86_64.iso",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R121",
-   "publisher": "download.cs2c.com.cn",
-   "title": "中标麒麟 download 开放 autoindex（桌面 6.0 的 x86_64/i386 ISO 匿名可下）",
-   "url": "https://download.cs2c.com.cn/neokylin/desktop/releases/6.0/x86_64/iso/",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R122",
-   "publisher": "download.fydeos.io",
-   "title": "FydeOS 个人版镜像分发（raw disk image，不发 .iso）",
-   "url": "https://download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R123",
-   "publisher": "nsosmirrors.gd-linux.com",
-   "title": "新支点镜像站 CGSL 服务器版 ISO（目录索引 401 但文件 URL 200）",
-   "url": "https://nsosmirrors.gd-linux.com/CGSLV7/7.02.06B7/x86_64/NewStart-CGSL-7.02.06B7-x86_64-dvd.iso",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R124",
-   "publisher": "updates.os.nfschina.com",
-   "title": "方德更新服务器（递归爬完无桌面 ISO；服务器版 ISO 匿名可下）",
-   "url": "https://updates.os.nfschina.com/NFSChina-Server/V4.0-AN/isos/x86_64/NFSCNS-4-0-230108-AN-x86_64-DVD.iso",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  },
-  {
-   "id": "R125",
-   "publisher": "www.nfschina.com",
-   "title": "方德「镜像下载」栏目（主内容区为空，download_div 计数 0）",
-   "url": "https://www.nfschina.com/index.php?catid=68",
-   "title_source": "manual",
-   "accessed": "2026-08-31",
-   "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
-  }
- ]
+  "revision": "2026-08-30",
+  "note": "全局引用表。title_source=page 表示标题由脚本抓自该页的 <title>；manual 表示该页未返回 title，标题为人工描述性标注。accessed 为访问日期。report.md 里的每处引用都以 [Rn] 指向此表，verify.py 断言引用与本表双向闭合（无悬空引用、无未被引用的条目）。",
+  "references": [
+    {
+      "id": "R1",
+      "publisher": "aosc.io",
+      "title": "下载中心 | 安同开源社区 (AOSC)",
+      "url": "https://aosc.io/downloads/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R2",
+      "publisher": "bianbu.spacemit.com",
+      "title": "SpacemiT",
+      "url": "https://bianbu.spacemit.com/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R3",
+      "publisher": "catalog.redhat.com",
+      "title": "Red Hat Universal Base Image - Red Hat Ecosystem Catalog",
+      "url": "https://catalog.redhat.com/software/base-images",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R4",
+      "publisher": "cdimage.deepin.com",
+      "title": "Index of /releases/",
+      "url": "https://cdimage.deepin.com/releases/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R5",
+      "publisher": "cdimage.ubuntu.com",
+      "title": "Index of /ubuntukylin/releases",
+      "url": "https://cdimage.ubuntu.com/ubuntukylin/releases/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R6",
+      "publisher": "cdimage.ubuntu.com",
+      "title": "Ubuntu Kylin 26.04.1 LTS (Resolute Raccoon)",
+      "url": "https://cdimage.ubuntu.com/ubuntukylin/releases/26.04.1/release/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R7",
+      "publisher": "cr.kylinos.cn",
+      "title": "(JSON API 响应)",
+      "url": "https://cr.kylinos.cn/api/v2.0/projects",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R8",
+      "publisher": "cr.kylinos.cn",
+      "title": "(JSON API 响应)",
+      "url": "https://cr.kylinos.cn/api/v2.0/projects/kylin/repositories",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R9",
+      "publisher": "cr.loongnix.cn",
+      "title": "(JSON API 响应)",
+      "url": "https://cr.loongnix.cn/api/v1/repository/loongson/loongnix?includeTags=true",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R10",
+      "publisher": "cs2c.com.cn",
+      "title": "公司新闻·天津麒麟、中标软件整合实质完成 中国操作系统新旗舰扬帆起航！ - 国产操作系统、银河麒麟、中标麒麟--中标软件官网",
+      "url": "https://cs2c.com.cn/about/company/1349.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R11",
+      "publisher": "docs.opencloudos.org",
+      "title": "OpenCloudOS v9.6发行说明 - OpenCloudOS Documentation",
+      "url": "https://docs.opencloudos.org/release/v9.6/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R12",
+      "publisher": "docs.opencloudos.org",
+      "title": "桌面安装 - OpenCloudOS Documentation",
+      "url": "https://docs.opencloudos.org/OCS/Install_Guide/ocs-desktop/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R13",
+      "publisher": "docs.openeuler.org",
+      "title": "图形桌面使用 | 文档 | openEuler社区",
+      "url": "https://docs.openeuler.org/zh/docs/24.03_LTS_SP4/tools/desktop/index.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R14",
+      "publisher": "faq.uniontech.com",
+      "title": "统信操作系统【家庭版、专业版、教育版、社区版】区别介绍 | 统信软件-知识分享平台",
+      "url": "https://faq.uniontech.com/desktop/f435/install/da34",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R15",
+      "publisher": "fydeos.com",
+      "title": "FydeOS v23: Chromatic Cadence 正式发布 - FydeOS",
+      "url": "https://fydeos.com/blog/release-note-v23/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R16",
+      "publisher": "gitee.com",
+      "title": "openKylin 官方容器镜像构建仓（Gitee openkylin 组织）",
+      "url": "https://gitee.com/openkylin/openkylin-docker-images",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R17",
+      "publisher": "gitee.com",
+      "title": "openEuler 官方容器镜像目录仓（Gitee openeuler 组织）",
+      "url": "https://gitee.com/openeuler/openeuler-docker-images",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R18",
+      "publisher": "gitee.com",
+      "title": "Anolis OS 官方容器镜像仓（Gitee anolis 组织）",
+      "url": "https://gitee.com/anolis/docker-images",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R19",
+      "publisher": "gitee.com",
+      "title": "OpenCloudOS 超凡桌面: 超凡桌面（简称EX-NDE）是一个超融合轻量级桌面环境，让系统具备拥有桌面、服务器、平板三种交互模式，能够在更低配置的智能终端、平板、一体机、PC、工作站、服务器等不同的设备场景中流畅运行，减少系统的碎片化。",
+      "url": "https://gitee.com/opencloudos-exnde",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R20",
+      "publisher": "github.com",
+      "title": "GitHub - AOSC-Dev/aosc-os-docker-files: Docker files for AOSC OS · GitHub",
+      "url": "https://github.com/AOSC-Dev/aosc-os-docker-files",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R21",
+      "publisher": "github.com",
+      "title": "openFyde repositories · GitHub",
+      "url": "https://github.com/orgs/openFyde/repositories",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R22",
+      "publisher": "github.com",
+      "title": "GitHub - IceWhaleTech/ZimaOS: A Simplified, Focused and Open NAS OS_ · GitHub",
+      "url": "https://github.com/IceWhaleTech/ZimaOS",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R23",
+      "publisher": "github.com",
+      "title": "EvernightFedora (怪力熊玩Fedora) · GitHub",
+      "url": "https://github.com/EvernightFedora",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R24",
+      "publisher": "github.com",
+      "title": "Aromatic05 (Yiming Sun) · GitHub",
+      "url": "https://github.com/Aromatic05",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R25",
+      "publisher": "github.com",
+      "title": "GitHub - Wtada233/LankeOS: The public repo of LankeOS. · GitHub",
+      "url": "https://github.com/Wtada233/LankeOS",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R26",
+      "publisher": "github.com",
+      "title": "GitHub - hansbug-research/cn-desktop-os-buildchain-study: 国产桌面操作系统的 ABI 分档与构建链路选型：27 镜像实测、820 格运行矩阵、C/C++/Rust/Python 四链逐个验证，全部证据可审计 · GitHub",
+      "url": "https://github.com/hansbug-research/cn-desktop-os-buildchain-study",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R27",
+      "publisher": "github.com",
+      "title": "GitHub - canonical/chisel · GitHub",
+      "url": "https://github.com/canonical/chisel",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R28",
+      "publisher": "github.com",
+      "title": "GitHub - chainguard-dev/apko: Build OCI images from APK packages directly without Dockerfile · GitHub",
+      "url": "https://github.com/chainguard-dev/apko",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R29",
+      "publisher": "gitlab.mister-muffin.de",
+      "title": "mmdebstrap 项目仓（J. Schauer）",
+      "url": "https://gitlab.mister-muffin.de/josch/mmdebstrap",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R30",
+      "publisher": "hub.docker.com",
+      "title": "openkylin/openkylin - Docker Image",
+      "url": "https://hub.docker.com/r/openkylin/openkylin",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R31",
+      "publisher": "hub.docker.com",
+      "title": "linuxdeepin/deepin - Docker Image",
+      "url": "https://hub.docker.com/r/linuxdeepin/deepin",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R32",
+      "publisher": "hub.docker.com",
+      "title": "openeuler/openeuler - Docker Image",
+      "url": "https://hub.docker.com/r/openeuler/openeuler",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R33",
+      "publisher": "hub.docker.com",
+      "title": "openanolis/anolisos - Docker Image",
+      "url": "https://hub.docker.com/r/openanolis/anolisos",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R34",
+      "publisher": "hub.docker.com",
+      "title": "OpenCloudOS",
+      "url": "https://hub.docker.com/u/opencloudos",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R35",
+      "publisher": "hub.docker.com",
+      "title": "aosc/aosc-os - Docker Image",
+      "url": "https://hub.docker.com/r/aosc/aosc-os",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R36",
+      "publisher": "hub.docker.com",
+      "title": "(JSON API 响应)",
+      "url": "https://hub.docker.com/v2/orgs/cs2cneokylin/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R37",
+      "publisher": "hub.docker.com",
+      "title": "cs2cneokylin/ns76-base-x86_64 - Docker Image",
+      "url": "https://hub.docker.com/r/cs2cneokylin/ns76-base-x86_64",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R38",
+      "publisher": "hub.docker.com",
+      "title": "debian - Official Image | Docker Hub",
+      "url": "https://hub.docker.com/_/debian",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R39",
+      "publisher": "mirror.iscas.ac.cn",
+      "title": "Index of /revyos/",
+      "url": "https://mirror.iscas.ac.cn/revyos/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R40",
+      "publisher": "mirror.nju.edu.cn",
+      "title": "openKylin apt 仓库 dists 目录（南京大学镜像站，用于核对代号与血统）",
+      "url": "https://mirror.nju.edu.cn/openkylin/dists/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R41",
+      "publisher": "mirrors.openanolis.cn",
+      "title": "Index of /anolis/23.5/isos/GA/x86_64/",
+      "url": "https://mirrors.openanolis.cn/anolis/23.5/isos/GA/x86_64/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R42",
+      "publisher": "mirrors.openanolis.cn",
+      "title": "Index of /anolis/23.5/DDE/",
+      "url": "https://mirrors.openanolis.cn/anolis/23.5/DDE/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R43",
+      "publisher": "mirrors.opencloudos.tech",
+      "title": "Index of /opencloudos/9.6/isos/x86_64/20260713.0/",
+      "url": "https://mirrors.opencloudos.tech/opencloudos/9.6/isos/x86_64/20260713.0/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R44",
+      "publisher": "openanolis.cn",
+      "title": "Anolis OS 23 · 内核 6.6 LTS · OpenAnolis",
+      "url": "https://openanolis.cn/anolisos/23",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R45",
+      "publisher": "openfyde.io",
+      "title": "openFyde",
+      "url": "https://openfyde.io/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R46",
+      "publisher": "registry.uniontech.com",
+      "title": "(JSON API 响应)",
+      "url": "https://registry.uniontech.com/api/v2.0/projects",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R47",
+      "publisher": "registry.uniontech.com",
+      "title": "(JSON API 响应)",
+      "url": "https://registry.uniontech.com/api/v2.0/projects/uos-server-base/repositories",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R48",
+      "publisher": "repo.openeuler.org",
+      "title": "openEuler 24.03 LTS SP3 DevStation 容器 rootfs 目录（官方 repo）",
+      "url": "https://repo.openeuler.org/openEuler-24.03-LTS-SP3/DevStation/x86_64/docker_img/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R49",
+      "publisher": "repo.openeuler.org",
+      "title": "openEuler 24.03 LTS SP4 ISO 目录（官方 repo，用于核对无桌面版 ISO）",
+      "url": "https://repo.openeuler.org/openEuler-24.03-LTS-SP4/ISO/x86_64/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R50",
+      "publisher": "repos.os.nfschina.com",
+      "title": "Welcome to Repo Server",
+      "url": "https://repos.os.nfschina.com/debian-sign/pool/main/m/mate-desktop-environment/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R51",
+      "publisher": "revyos.github.io",
+      "title": "Site not found &middot; GitHub Pages",
+      "url": "https://revyos.github.io/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R52",
+      "publisher": "sourceforge.net",
+      "title": "OsoLinux 项目页（SourceForge）",
+      "url": "https://sourceforge.net/projects/osolinux/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R53",
+      "publisher": "uniontech.com",
+      "title": "智慧·高效·可靠——统信桌面操作系统V25发布！-统信软件",
+      "url": "https://uniontech.com/m/news-info/2877.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R54",
+      "publisher": "web.archive.org",
+      "title": "通用基础软件产品-普华基础软件",
+      "url": "http://web.archive.org/web/20260608023757/https://www.i-soft.com.cn/product/currency.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R55",
+      "publisher": "web.archive.org",
+      "title": "Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux",
+      "url": "http://web.archive.org/web/20230401004048/http://emindsoft.com.cn/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R56",
+      "publisher": "www.atzlinux.com",
+      "title": "铜豌豆 Linux",
+      "url": "https://www.atzlinux.com/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R57",
+      "publisher": "www.deepin.org",
+      "title": "deepin 25.2.0 Release Note &#8211; Deepin Technology Community",
+      "url": "https://www.deepin.org/en/deepin-25-2-release/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R58",
+      "publisher": "www.emindsoft.com.cn",
+      "title": "一铭软件官网首页",
+      "url": "http://www.emindsoft.com.cn/index.php",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R59",
+      "publisher": "www.gd-linux.com",
+      "title": "中兴新支点操作系统下载_中兴操作系统下载_NewStartOS下载_国产操作系统下载_新支点OS下载",
+      "url": "https://www.gd-linux.com/downloads",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R60",
+      "publisher": "www.gd-linux.com",
+      "title": "中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统",
+      "url": "https://www.gd-linux.com/desktop/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R61",
+      "publisher": "www.i-soft.com.cn",
+      "title": "普华基础软件 · 普华桌面操作系统 V4.0 产品详情页",
+      "url": "https://www.i-soft.com.cn/detail/59.html",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R62",
+      "publisher": "www.i-soft.com.cn",
+      "title": "普华基础软件 · 通用产品页",
+      "url": "https://www.i-soft.com.cn/product/currency.html",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R63",
+      "publisher": "www.itsec.gov.cn",
+      "title": "安全可靠测评结果公告（2023年第1号）",
+      "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202312/t20231226_162074.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R64",
+      "publisher": "www.kylinos.cn",
+      "title": "银河麒麟桌面操作系统V11 -麒麟软件-国产操作系统",
+      "url": "https://www.kylinos.cn/productPc/desktop/desktopMainV11/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R65",
+      "publisher": "www.kylinos.cn",
+      "title": "银河麒麟桌面操作系统V10-麒麟软件-国产操作系统",
+      "url": "https://www.kylinos.cn/productPc/desktop/desktopMain/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R66",
+      "publisher": "www.kylinsec.com.cn",
+      "title": "高效实时！麒麟信安操作系统（嵌入式版）V3来了，为工业领域数智化转型夯实安全底座--麒麟信安",
+      "url": "https://www.kylinsec.com.cn/detail/13151/1.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R67",
+      "publisher": "www.linx-info.com",
+      "title": "Index of /download/document/6.0.80",
+      "url": "https://www.linx-info.com/download/document/6.0.80/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R68",
+      "publisher": "www.linx-info.com",
+      "title": "Index of /download/security",
+      "url": "https://www.linx-info.com/download/security/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R69",
+      "publisher": "www.loongnix.cn",
+      "title": "Loongnix 龙芯开源社区官网",
+      "url": "https://www.loongnix.cn/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R70",
+      "publisher": "www.nfschina.com",
+      "title": "中科方德 国产桌面操作系统 国产服务器操作系统 云计算",
+      "url": "https://www.nfschina.com/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R71",
+      "publisher": "www.openeuler.org",
+      "title": "openEuler下载 | openEuler ISO镜像 | openEuler社区官网",
+      "url": "https://www.openeuler.org/zh/download/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R72",
+      "publisher": "www.openeuler.org",
+      "title": "openEuler商业发行版 | openEuler下载 | openEuler社区官网",
+      "url": "https://www.openeuler.org/zh/download/commercial-release/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R73",
+      "publisher": "www.openkylin.top",
+      "title": "Kernel Leap, AI-Native - openKylin 3.0 Officially Released-openKylin 开放麒麟社区官网 | 开源聚力，共创未来",
+      "url": "https://www.openkylin.top/news/4099-en.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R74",
+      "publisher": "www.openkylin.top",
+      "title": "openKylin镜像仓列表-openKylin - 开放麒麟 - 社区官网 | 开源聚力，共创未来",
+      "url": "https://www.openkylin.top/support/docker_images.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R75",
+      "publisher": "www.secrss.com",
+      "title": "东方中科拟收购国产操作系统厂商万里红 - 安全内参 | 决策者的网络安全知识库",
+      "url": "https://www.secrss.com/articles/23492",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R76",
+      "publisher": "www.stdaily.com",
+      "title": "首个商用6.6内核中国操作系统银河麒麟V11发布",
+      "url": "https://www.stdaily.com/web/gdxw/2025-08/26/content_390577.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R77",
+      "publisher": "www.superred.com.cn",
+      "title": "北京万里红科技官网（用于核对产品列表已无操作系统条目）",
+      "url": "https://www.superred.com.cn/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R78",
+      "publisher": "www.ubuntukylin.com",
+      "title": "优麒麟",
+      "url": "https://www.ubuntukylin.com/downloads/",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R79",
+      "publisher": "www.ubuntukylin.com",
+      "title": "优麒麟 26.04 版本正式发布！-优麒麟｜Linux 开源操作系统",
+      "url": "https://www.ubuntukylin.com/news/ubuntukylin2604-cn.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R80",
+      "publisher": "www.uniontech.com",
+      "title": "统信容器镜像平台-统信软件",
+      "url": "https://www.uniontech.com/os-containerImage.html",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R81",
+      "publisher": "zh.wikipedia.org",
+      "title": "中标麒麟 - 维基百科，自由的百科全书",
+      "url": "https://zh.wikipedia.org/zh-hans/中标麒麟",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R82",
+      "publisher": "docs.revyos.dev",
+      "title": "RevyOS 官方文档站",
+      "url": "https://docs.revyos.dev/",
+      "title_source": "manual",
+      "accessed": "2026-08-30",
+      "note": "标题为人工标注（该页未返回 <title>）"
+    },
+    {
+      "id": "R83",
+      "publisher": "www.gd-linux.com",
+      "title": "关于我们_中兴新支点公司介绍_中兴新支点联系方式_新支点操作系统-NewStartOS",
+      "url": "https://www.gd-linux.com/about",
+      "title_source": "page",
+      "accessed": "2026-08-30",
+      "note": ""
+    },
+    {
+      "id": "R84",
+      "publisher": "uniontech.com",
+      "title": "产品动态-统信软件",
+      "url": "https://uniontech.com/m/Product-release.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R85",
+      "publisher": "www.openkylin.top",
+      "title": "openKylin开源操作系统（下载页）",
+      "url": "https://www.openkylin.top/downloads/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R86",
+      "publisher": "archive.spacemit.com",
+      "title": "Index of /image/k1/version",
+      "url": "https://archive.spacemit.com/image/k1/version/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R87",
+      "publisher": "www.kylinos.cn",
+      "title": "试用申请下载-麒麟软件-国产操作系统",
+      "url": "https://www.kylinos.cn/support/trial/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R88",
+      "publisher": "iso.kylinos.cn",
+      "title": "共享文件下载 - Kylin Distro（银河麒麟镜像下载中间页，含文件名/大小/SHA256/SM3）",
+      "url": "https://iso.kylinos.cn/web_pungi/download/cdn/5Kmv3q98GLtFdMQSDTOe6wr4ZcnpXVCb/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R89",
+      "publisher": "cdimage-download.chinauos.com",
+      "title": "统信桌面专业版 V25 ISO（本项目切片路径的 ISO_URL，匿名可下）",
+      "url": "https://cdimage-download.chinauos.com/desktop-professional/2500u1/beta/uos-desktop-25-professional-2500-amd64-202604.iso",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 是二进制文件，无 <title>）"
+    },
+    {
+      "id": "R90",
+      "publisher": "www.kylinos.cn",
+      "title": "行业解决方案-麒麟软件-国产操作系统",
+      "url": "https://www.kylinos.cn/product/solution/scene/solutionIndustry/index.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R91",
+      "publisher": "www.itsec.gov.cn",
+      "title": "安全可靠测评结果公告（2025年第3号）",
+      "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202509/t20250912_235645.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R92",
+      "publisher": "www.itsec.gov.cn",
+      "title": "安全可靠测评结果公告（2026年第1号）",
+      "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202601/t20260116_249958.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R93",
+      "publisher": "www.itsec.gov.cn",
+      "title": "安全可靠测评结果公告（2024年第1号）",
+      "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202405/t20240520_172866.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R94",
+      "publisher": "www.itsec.gov.cn",
+      "title": "安全可靠测评结果公告（2025年第1号）",
+      "url": "https://www.itsec.gov.cn/aqkkcp/cpgg/202503/t20250314_216512.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R95",
+      "publisher": "gks.mof.gov.cn",
+      "title": "关于印发《操作系统政府采购需求标准（2023年版）》的通知",
+      "url": "https://gks.mof.gov.cn/guizhangzhidu/202312/t20231226_3924123.htm",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R96",
+      "publisher": "www.mof.gov.cn",
+      "title": "关于印发《台式计算机政府采购需求标准（2023年版）》的通知",
+      "url": "https://www.mof.gov.cn/jrttts/202312/t20231226_3924133.htm",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R97",
+      "publisher": "cs2c.com.cn",
+      "title": "中标麒麟桌面操作系统 - 国产操作系统、银河麒麟、中标麒麟--中标软件官网",
+      "url": "https://cs2c.com.cn/scheme/product/9.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R98",
+      "publisher": "www.uniontech.com",
+      "title": "统信桌面操作系统 V25 专业版",
+      "url": "https://www.uniontech.com/OS-Professional-edition-V25.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R99",
+      "publisher": "www.nfschina.com",
+      "title": "中科方德 国产桌面操作系统 国产服务器操作系统 云计算",
+      "url": "https://www.nfschina.com/index.php?id=65",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R100",
+      "publisher": "www.secrss.com",
+      "title": "企业调研：国产操作系统厂商普华软件 - 安全内参 | 决策者的网络安全知识库",
+      "url": "https://www.secrss.com/articles/11535",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R101",
+      "publisher": "www.linx-info.com",
+      "title": "北京凝思软件股份有限公司",
+      "url": "https://www.linx-info.com/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R102",
+      "publisher": "www.gd-linux.com",
+      "title": "中兴新支点操作系统官网_NewStartOS_国产操作系统_新支点OS_信创操作系统",
+      "url": "https://www.gd-linux.com/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R103",
+      "publisher": "fydeos.com",
+      "title": "下载 - FydeOS",
+      "url": "https://fydeos.com/download/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R104",
+      "publisher": "www.kylinsec.com.cn",
+      "title": "麒麟信安操作系统桌面版--麒麟信安",
+      "url": "https://www.kylinsec.com.cn/detail/1413/1.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R105",
+      "publisher": "developer.huaweicloud.com",
+      "title": "EulerOS_华为云",
+      "url": "https://developer.huaweicloud.com/euleros/index.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R106",
+      "publisher": "www.openeuler.org",
+      "title": "openEuler解决方案 | 用户案例 | openEuler社区官网",
+      "url": "https://www.openeuler.org/zh/showcase/index.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R107",
+      "publisher": "www.openkylin.top",
+      "title": "社区-openKylin - 开放麒麟 - 社区官网 | 开源聚力，共创未来",
+      "url": "https://www.openkylin.top/community/openkylin-cn.html",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R108",
+      "publisher": "www.deepin.org",
+      "title": "deepin - 基于Linux的开源国产操作系统",
+      "url": "https://www.deepin.org/index/zh",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R109",
+      "publisher": "ubuntukylin.com",
+      "title": "优麒麟官网",
+      "url": "https://ubuntukylin.com/",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该页未返回可用 <title>）"
+    },
+    {
+      "id": "R110",
+      "publisher": "openanolis.cn",
+      "title": "Anolis OS · OpenAnolis",
+      "url": "https://openanolis.cn/anolisos",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R111",
+      "publisher": "docs.opencloudos.org",
+      "title": "OpenCloudOS 版本介绍 - OpenCloudOS Documentation",
+      "url": "https://docs.opencloudos.org/release/oc_intro/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R112",
+      "publisher": "aosc.io",
+      "title": "安同 OS 适合我吗？ | 安同开源社区 (AOSC)",
+      "url": "https://aosc.io/aosc-os/right-for-me",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R113",
+      "publisher": "www.loongnix.cn",
+      "title": "龙芯开源社区",
+      "url": "https://www.loongnix.cn/zh/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R114",
+      "publisher": "docs.revyos.dev",
+      "title": "RevyOS",
+      "url": "https://docs.revyos.dev/docs/intro/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R115",
+      "publisher": "ruyisdk.org",
+      "title": "RuyiSDK · 为 100 万 RISC-V 软件开发人员做好准备 | RuyiSDK",
+      "url": "https://ruyisdk.org/",
+      "title_source": "page",
+      "accessed": "2026-08-31",
+      "note": ""
+    },
+    {
+      "id": "R116",
+      "publisher": "repo.huaweicloud.com",
+      "title": "华为镜像站 EulerOS 目录（各版本只有 os/{x86_64,aarch64} 的 RPM 仓库，iso/ 与 ISO/ 实测 404）",
+      "url": "https://repo.huaweicloud.com/euler/",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
+    },
+    {
+      "id": "R117",
+      "publisher": "support.huawei.com",
+      "title": "华为企业支持 软件下载端点（对任意 nid 返回 Uniportal 统一认证跳转头）",
+      "url": "https://support.huawei.com/dl/download.do?nid=1",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页/API 端点，无 <title>）"
+    },
+    {
+      "id": "R118",
+      "publisher": "www.linx-info.com",
+      "title": "凝思 download 目录（Apache autoindex，匿名可列，22 个 ISO 匿名可下）",
+      "url": "https://www.linx-info.com/download/",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R119",
+      "publisher": "mirrorlists.kylinsec.com.cn",
+      "title": "麒麟信安 ISO 镜像列表（匿名 autoindex，9 个版本目录）",
+      "url": "https://mirrorlists.kylinsec.com.cn/iso/",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R120",
+      "publisher": "releases.openkylin.top",
+      "title": "openKylin ISO 规范发布源（ISO 在 openkylin-cdimage/ 而非 apt 仓库 openkylin/）",
+      "url": "https://releases.openkylin.top/3.0/openKylin-Desktop-V3.0-20260827-x86_64.iso",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R121",
+      "publisher": "download.cs2c.com.cn",
+      "title": "中标麒麟 download 开放 autoindex（桌面 6.0 的 x86_64/i386 ISO 匿名可下）",
+      "url": "https://download.cs2c.com.cn/neokylin/desktop/releases/6.0/x86_64/iso/",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R122",
+      "publisher": "download.fydeos.io",
+      "title": "FydeOS 个人版镜像分发（raw disk image，不发 .iso）",
+      "url": "https://download.fydeos.io/v23.0/FydeOS_for_PC_iris_v23.0-com.bin.zip",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R123",
+      "publisher": "nsosmirrors.gd-linux.com",
+      "title": "新支点镜像站 CGSL 服务器版 ISO（目录索引 401 但文件 URL 200）",
+      "url": "https://nsosmirrors.gd-linux.com/CGSLV7/7.02.06B7/x86_64/NewStart-CGSL-7.02.06B7-x86_64-dvd.iso",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R124",
+      "publisher": "updates.os.nfschina.com",
+      "title": "方德更新服务器（递归爬完无桌面 ISO；服务器版 ISO 匿名可下）",
+      "url": "https://updates.os.nfschina.com/NFSChina-Server/V4.0-AN/isos/x86_64/NFSCNS-4-0-230108-AN-x86_64-DVD.iso",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R125",
+      "publisher": "www.nfschina.com",
+      "title": "方德「镜像下载」栏目（主内容区为空，download_div 计数 0）",
+      "url": "https://www.nfschina.com/index.php?catid=68",
+      "title_source": "manual",
+      "accessed": "2026-08-31",
+      "note": "标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）"
+    },
+    {
+      "id": "R126",
+      "publisher": "www.ccgp-beijing.gov.cn",
+      "title": "北京市政府采购网 中标公告（统信桌面操作系统 V20 采购实例）",
+      "url": "http://www.ccgp-beijing.gov.cn/xxgg/qjxxgg/qjzbggs/2026/7/4fe76b8cad4448488bef91145a52bef9.htm",
+      "title_source": "manual",
+      "accessed": "2026-09-01",
+      "note": "用于核对政采点名的是 V20 而非 V25；标题为人工标注"
+    },
+    {
+      "id": "R127",
+      "publisher": "www.linx-info.com",
+      "title": "凝思安全操作系统 CSAF 安全公告 Linx-SA-20260601-1",
+      "url": "https://www.linx-info.com/cve/SA/Linx-SA-20260601-1.json",
+      "title_source": "manual",
+      "accessed": "2026-09-01",
+      "note": "厂商签发的 CPE 为 cpe:/o:linxos:linxos:6.0.100 与 :6.0.80 并列，佐证第三段即大版本；本地直连实测"
+    },
+    {
+      "id": "R128",
+      "publisher": "archive.org",
+      "title": "Internet Archive: Neo Kylin Linux Desktop 6.0 i386 B045 20141201",
+      "url": "https://archive.org/details/NeoKylinLinuxDesktop6.0I386B04520141201",
+      "title_source": "manual",
+      "accessed": "2026-09-01",
+      "note": "第三方归档；站方提供 md5/sha1，Range 读出的 ISO9660 卷标为 NeoKylin Linux Desktop 6.0"
+    },
+    {
+      "id": "R129",
+      "publisher": "archive.org",
+      "title": "Internet Archive: Neo Kylin Linux Server 2.0",
+      "url": "https://archive.org/details/kylin-2.0-14-a",
+      "title_source": "manual",
+      "accessed": "2026-09-01",
+      "note": "第三方归档；两张 ISO 各带 md5"
+    }
+  ]
 }

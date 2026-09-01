@@ -307,8 +307,8 @@
   "probe_provenance_recorded": 15,
   "probe_stale_vs_image": [],
   "references_title_from_page": 99,
-  "references_title_manual": 26,
-  "references_total": 125,
+  "references_title_manual": 30,
+  "references_total": 129,
   "repro_identical": 9,
   "sbom_passed": 15,
   "setuid_micro": {

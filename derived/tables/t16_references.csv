@@ -124,3 +124,7 @@ R122,download.fydeos.io,FydeOS 个人版镜像分发（raw disk image，不发 .
 R123,nsosmirrors.gd-linux.com,新支点镜像站 CGSL 服务器版 ISO（目录索引 401 但文件 URL 200）,https://nsosmirrors.gd-linux.com/CGSLV7/7.02.06B7/x86_64/NewStart-CGSL-7.02.06B7-x86_64-dvd.iso,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
 R124,updates.os.nfschina.com,方德更新服务器（递归爬完无桌面 ISO；服务器版 ISO 匿名可下）,https://updates.os.nfschina.com/NFSChina-Server/V4.0-AN/isos/x86_64/NFSCNS-4-0-230108-AN-x86_64-DVD.iso,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
 R125,www.nfschina.com,方德「镜像下载」栏目（主内容区为空，download_div 计数 0）,https://www.nfschina.com/index.php?catid=68,manual,2026-08-31,标题为人工标注（该 URL 为目录页或二进制文件，无 <title>）
+R126,www.ccgp-beijing.gov.cn,北京市政府采购网 中标公告（统信桌面操作系统 V20 采购实例）,http://www.ccgp-beijing.gov.cn/xxgg/qjxxgg/qjzbggs/2026/7/4fe76b8cad4448488bef91145a52bef9.htm,manual,2026-09-01,用于核对政采点名的是 V20 而非 V25；标题为人工标注
+R127,www.linx-info.com,凝思安全操作系统 CSAF 安全公告 Linx-SA-20260601-1,https://www.linx-info.com/cve/SA/Linx-SA-20260601-1.json,manual,2026-09-01,厂商签发的 CPE 为 cpe:/o:linxos:linxos:6.0.100 与 :6.0.80 并列，佐证第三段即大版本；本地直连实测
+R128,archive.org,Internet Archive: Neo Kylin Linux Desktop 6.0 i386 B045 20141201,https://archive.org/details/NeoKylinLinuxDesktop6.0I386B04520141201,manual,2026-09-01,第三方归档；站方提供 md5/sha1，Range 读出的 ISO9660 卷标为 NeoKylin Linux Desktop 6.0
+R129,archive.org,Internet Archive: Neo Kylin Linux Server 2.0,https://archive.org/details/kylin-2.0-14-a,manual,2026-09-01,第三方归档；两张 ISO 各带 md5
