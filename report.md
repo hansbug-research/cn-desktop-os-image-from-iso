@@ -294,10 +294,10 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 | 厂商 | 大版本 | glibc / GCC | 在用信号 | ISO | 字节数 | 实测卷标 | 本项目 |
 |---|---|---|---|---|---|---|---|
-| 银河麒麟 | V4（`4.0.2`） | **2.23** / 5.3 | 基础源 2025-02-12、补丁源 2025-03-12 | ✘ 无 ISO，但[基础源可 bootstrap](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/4.0.2/) | — | — | — |
-| 银河麒麟 | V10（`10.0`） | — | 源 2025-03-21 | ✘ 无 ISO，[`10.0` 只是补丁源](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/10.0/)、无 glibc | — | — | — |
+| 银河麒麟 | V4（`4.0.2`） | **2.23** / 5.4 | 基础源 2025-02-12、补丁源 2025-03-12 | ✘ 无 ISO，但[基础源可 bootstrap](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/4.0.2/) | — | — | — |
+| 银河麒麟 | V10（`10.0`） | **2.23** / 5.4 | 源 2025-03-21 | ✘ 无 ISO，但[`10.0` 源可 bootstrap](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/10.0/)（libc6 在 `main`） | — | — | — |
 | 银河麒麟 | **V10 SP1**（`10.1`） | **2.31** / 9.3 | 源 **2026-04-11 全场最新**；央采入围 | [✔ 官方 CDN](https://iso.kylinos.cn/web_pungi/download/cdn/N1kIGe0WnfAMilFVURgrC75szThH6QKc/Kylin-Desktop-V10-SP1-2503-Release-20250430-X86_64.iso) | 4777895936 | `Kylin-Desktop-V10-SP1` | **✔** |
-| 银河麒麟 | **V11**（`11.0`） | **2.38** / 12.2 | 源 2025-08-25；安可 2025#3 | [✔ 官方 CDN](https://iso.kylinos.cn/web_pungi/download/cdn/5Kmv3q98GLtFdMQSDTOe6wr4ZcnpXVCb/Kylin-Desktop-V11-2603-Release-20260228-X86_64.iso) | 8203812864 | `Kylin-Desktop-V11` | **✔** |
+| 银河麒麟 | **V11**（`11.0`） | **2.38** / 12.3 | 源 2025-08-25；安可 2025#3 | [✔ 官方 CDN](https://iso.kylinos.cn/web_pungi/download/cdn/5Kmv3q98GLtFdMQSDTOe6wr4ZcnpXVCb/Kylin-Desktop-V11-2603-Release-20260228-X86_64.iso) | 8203812864 | `Kylin-Desktop-V11` | **✔** |
 | 统信 UOS | **V20**（末版 1070） | **2.28** / 8.3 | **政采点名全是它**[^R126] | [✔ 官方 cdimage](https://cdimage-download.chinauos.com/desktop-professional/1070/release/uos-desktop-20-professional-1070-amd64.iso) | 5010776064 | `UOS 20` | — |
 | 统信 UOS | **V25**（2500u1） | **2.38** / 12.3 | 2026-04-15 GA | [✔ 官方 cdimage](https://cdimage-download.chinauos.com/desktop-professional/2500u1/beta/uos-desktop-25-professional-2500-amd64-202604.iso) | 7282405376 | — | **✔** |
 | 麒麟信安 | Desktop 3.4-4A | 2.28 / 7.3 | 源停 2024-11、公告停 2024-10 | [✔ 官方镜像站](https://mirrorlists.kylinsec.com.cn/iso/V3.4-4A-Desktop/x86_64/KylinSec-Desktop-3.4-4A-2206-201547-x86_64.iso) | 4572839936 | — | — |
@@ -326,9 +326,9 @@ DevStation 作为桌面 ISO 是常规交付物，但它的**容器形态**只在
 
 **上表 ISO 一列的对钩都是可点的直链，落地字节数即该行「字节数」列；拿不到直链的三种情况各有各的走法。**
 
-**银河麒麟四个版本都不必经 ISO。** 本项目的 `kylin10` 与 `kylin11` 就不读 ISO，而是直接从 apt 归档建：镜像 `http://archive.kylinos.cn/kylin/KYLIN-ALL/`，suite 分别取 `10.1` 与 `11.0`，component 取 `main universe`——**glibc 在这台归档上位于 `universe` 而非 `main`**，三个 suite 一律如此，只配 `main` 会得到一个没有 libc6 的源。V4 用同一条路走得通：suite 取 [`4.0.2`](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/4.0.2/)（`main` 11045 个包、`universe` 43496 个包，libc6 为 `2.23-0kord10`、gcc `4:5.3.1-1kord1`，Ubuntu 16.04 血脉），配 `DEBOOTSTRAP_SCRIPT=xenial` 即可套用 `kylin10` 的 selfhost 两段式。上表 V4 那行的 glibc 与 GCC 取自这份源索引，不是从装好的系统里读的。
+**银河麒麟四个版本都不必经 ISO。** 本项目的 `kylin10` 与 `kylin11` 就不读 ISO，而是直接从 apt 归档建：镜像 `http://archive.kylinos.cn/kylin/KYLIN-ALL/`，suite 分别取 `10.1` 与 `11.0`，component 取 `main universe`——**glibc 落在哪个 component 因 suite 而异**：`4.0.2`、`10.1`、`11.0` 在 `universe`，而 `10.0` 与 `4.0.2sp4` 在 `main`，所以两个都得配上，只配其中之一就可能得到一个没有 libc6 的源。V4 用同一条路走得通：suite 取 [`4.0.2`](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/4.0.2/)（`main` 11045 个包、`universe` 43496 个包，libc6 为 `2.23-0kord10`、gcc `4:5.3.1-1kord1`，Ubuntu 16.04 血脉），配 `DEBOOTSTRAP_SCRIPT=xenial` 即可套用 `kylin10` 的 selfhost 两段式。上表 V4 与 V10 两行的 glibc 与 GCC 取自按这条路径实建出的镜像（见 `distrotwin/kylin`），不是源索引里的元包版本——元包写 `4:5.3.1`，实际编译器是 `5.4.0`。V11 那行同理改用实测值：`artifacts/kylin11-devel.manifest` 里 `gcc` 元包是 `4:12.2.0-ok1k0.2`，而真正的编译器 `gcc-12` 是 `12.3.0-1ok3k0.1`。
 
-**同厂的 [`10.0`](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/10.0/) 走不通，原因不是访问受限而是内容不全。** 它的 `universe` 有 43171 个包却没有 libc6（八个 `libc*` 包里一个都不是），与它 `Release` 里 `Label: v10-离在线更新推送` 的自述一致：这是给已装机器推更新的差异源，不是能从零 bootstrap 的基础源。`4.0.2sp4` 同理，它的 Label 是 `v4-离在线更新推送`——**V4 能建靠的是 `4.0.2`，不是 `4.0.2sp4`。**
+**同厂的 [`10.0`](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/10.0/) 与 [`4.0.2sp4`](http://archive.kylinos.cn/kylin/KYLIN-ALL/dists/4.0.2sp4/) 同样走得通，先前判它们「内容不全」是错的。** 两者的 libc6 都在 `main` 而不在 `universe`：`10.0/main` 11857 个包、libc6 `2.23-0kord11k20.14`、78 个 `Priority: required`；`4.0.2sp4/main` 11613 个包、libc6 `2.23-0kord11k20.5`、81 个 `Priority: required`。两者的 `InRelease` 都由麒麟归档 key 正常签名。`10.0` 已按 `kylin10` 的 selfhost 两段式实建成功并发布（`distrotwin/kylin` 的 `v10`），其 `Release` 自述 `Description: Kylin Desktop v4 V10 10.0` —— **V10 原版是 v4 代码线**（Ubuntu 16.04、dpkg 1.18、gcc 5.4、代号同为 `juniper`），与 V10 SP1 的 Ubuntu 20.04 差一代。
 
 **`Release` 里的 `Label` 只能当线索，不能当判据。** 同一台归档上 `10.1` 的 Label 写着 `v10-sp1-2107-2203-rc8版本差异包-龙芯`，而本项目正是从它建出了完整的 amd64 V10 SP1（`main` 10217 个包，libc6 `2.31-0kylin9.1k20.3`）。判一个 suite 能不能 bootstrap，要看它有没有 libc6，不看它自称是什么。
 
@@ -701,7 +701,11 @@ D16 那一条的判据设计值得单说。`elf_broken` 检查早就会报 `libs
 
 **同一个站上「按另一个版本的规律去枚举」会产生假否定，我在统信 V20 上栽了两次，两次的归因都是错的。** 第一次：按 `1070/uos-desktop-20-professional-1070-amd64.iso` 试，404，我据此写下「发行注记的 1070 与归档的 1060 是两套编号」。这个解释站不住——1070 的介质一直在，只是多插了一层 `release/`，加上这层即 200（5010776064 B，卷标实测 `UOS 20`），而 1060 反过来，加上 `release/` 就是 404。**编号本来就是同一套，变的是目录布局。** 第二次：改用「读校验清单拿全文件名」，这条对 1060 有效（目录下有 `md5sum.txt` 与 `sha256sum.txt`），对 1070 无效——1070 目录下没有清单，站点顶层的 `MD5SUMS` 只覆盖到 1050-update4，1070 的三个架构都不在任何公开清单里。两次错法不同，共同点是**拿一个版本上验证过的规律当全站规律**。这与上面「目录索引 401/403 不等于文件拿不到」是同族的不同一条：那条讲上级目录的可列性不代表文件的可得性，这条讲同一个站内部的布局与清单覆盖都会随版本漂移。能纠正它的不是更努力地枚举文件名，而是**把路径形式本身也当变量**：同时试平铺与带 `release/` 两种形式，并对每一种都做阴性对照。
 
-**「银河麒麟 V4 建不出镜像」是错的，而且错在一个本该被对照实验立刻拆穿的地方。** 我先前查了 `archive.kylinos.cn` 上的 `4.0.2sp4`，看到包数少、没有 libc6，就断定 V4 的源是增量补丁源、拿不到基础包。两处都错：其一，V4 的基础源是 `4.0.2`（`Label: 银河麒麟桌面版本v4`），`4.0.2sp4` 的 Label 是 `v4-离在线更新推送`，我查的是补丁源；其二，**「`main` 里没有 libc6」在这台归档上根本不是信号**——`10.1` 与 `11.0` 的 `main` 同样没有 libc6，而本项目正是从这两个 suite 建出了 V10 SP1 与 V11。这台归档把 glibc 放在 `universe`。**同一条判据套到两个已经建成的被试身上会得出「它们也建不出来」，这就是它不成立的证明**，而这个对照只需要一条命令。补做之后 V4 的结论反转：`4.0.2/universe` 里 libc6 是 `2.23-0kord10`，套 `kylin10` 的 selfhost 路径即可，四家里因此只剩凝思 V6-G2 / V8 一个是确认拿不到的。
+**上一条的修正本身又埋了一个错：把「glibc 在 `universe`」当成了这台归档的通则。** 补做对照之后我写下「这台归档把 glibc 放在 `universe`」，并据此判定 `10.0` 与 `4.0.2sp4` 内容不全——因为它们的 `universe` 里确实没有 libc6。实际是**每个 suite 各有各的划分**：`4.0.2`、`10.1`、`11.0` 的 libc6 在 `universe`，而 `10.0` 与 `4.0.2sp4` 的在 `main`。两个都配上就都能建，`10.0` 已实建成功并发布。
+
+两次错的形状是一样的：**在一个 component 里抽样，然后把结论推广到整个 suite 或整台归档**。第一次是只看 `main`，第二次是只看 `universe`，方向相反而错法相同。正确的做法是把该 suite 的全部 component 索引都拉下来找一遍 —— `10.0` 的四个非空 component 加起来 4.16 MB + 16.3 MB + 338 KB + 22 KB，一次全查的成本远低于错判一个版本。这也说明「换个方向再抽一次样」不等于对照实验：真正的对照是**穷举**，或者至少是在得出结论前问一句「这个判据套到已知能建的被试身上会怎样」。
+
+**「银河麒麟 V4 建不出镜像」是错的，而且错在一个本该被对照实验立刻拆穿的地方。** 我先前查了 `archive.kylinos.cn` 上的 `4.0.2sp4`，看到包数少、没有 libc6，就断定 V4 的源是增量补丁源、拿不到基础包。两处都错：其一，V4 的基础源是 `4.0.2`（`Label: 银河麒麟桌面版本v4`），`4.0.2sp4` 的 Label 是 `v4-离在线更新推送`，我查的是补丁源；其二，**「`main` 里没有 libc6」在这台归档上根本不是信号**——`10.1` 与 `11.0` 的 `main` 同样没有 libc6，而本项目正是从这两个 suite 建出了 V10 SP1 与 V11。**同一条判据套到两个已经建成的被试身上会得出「它们也建不出来」，这就是它不成立的证明**，而这个对照只需要一条命令。补做之后 V4 的结论反转：`4.0.2/universe` 里 libc6 是 `2.23-0kord10`，套 `kylin10` 的 selfhost 路径即可，四家里因此只剩凝思 V6-G2 / V8 一个是确认拿不到的。
 
 **同一轮里还有两个假否定，都来自「拿残缺数据当完整数据用」。** `Packages.gz` 下到一半（1949406 / 4102679 字节）时 `zcat` 不报错、照常吐出前半段，于是我数出 5484 个包并列出一串「缺失」的核心包——补全后是 11045 个包，那串缺失里除 libc6 外全都在。改用 `-C -` 续传又踩第二个：服务器给的续传结果让文件涨到 25092096 字节，比 `Content-Length` 声明的 17436756 还大。**规矩因此是：凡解压缩后要据以下结论的归档，先 `gzip -t`；凡续传，落地后核对字节数与 `Content-Length` 相等。**
 
